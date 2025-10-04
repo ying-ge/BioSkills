@@ -25,7 +25,19 @@ jobs:
     - name: Install system dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y libcurl4-openssl-dev libxml2-dev libssl-dev
+        sudo apt-get install -y git-lfs libmagick++-dev libgeos-dev libgfortran5 liblapack-dev libblas-dev \
+            libpng-dev libjpeg-dev librsvg2-dev libcairo2-dev libnode-dev libproj-dev \
+            libxml2-dev libcurl4-openssl-dev libssl-dev libhdf5-dev libv8-dev \
+            libfontconfig1-dev libharfbuzz-dev libfribidi-dev libgdal-dev \
+            libfreetype6-dev libtiff5-dev libudunits2-devsudo apt-get install -y git-lfs libmagick++-dev libgeos-dev libgfortran5 liblapack-dev libblas-dev \
+            libpng-dev libjpeg-dev librsvg2-dev libcairo2-dev libnode-dev libproj-dev \
+            libxml2-dev libcurl4-openssl-dev libssl-dev libhdf5-dev libv8-dev \
+            libfontconfig1-dev libharfbuzz-dev libfribidi-dev libgdal-dev \
+            libfreetype6-dev libtiff5-dev libudunits2-devsudo apt-get install -y git-lfs libmagick++-dev libgeos-dev libgfortran5 liblapack-dev libblas-dev \
+            libpng-dev libjpeg-dev librsvg2-dev libcairo2-dev libnode-dev libproj-dev \
+            libxml2-dev libcurl4-openssl-dev libssl-dev libhdf5-dev libv8-dev \
+            libfontconfig1-dev libharfbuzz-dev libfribidi-dev libgdal-dev \
+            libfreetype6-dev libtiff5-dev libudunits2-dev
 
     # 安装R脚本所需的包
     - name: Install R packages
