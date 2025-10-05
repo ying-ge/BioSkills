@@ -2,10 +2,13 @@ name: Download and Push R Packages
 
 on:
   workflow_dispatch:
-  
+  schedule:
+    # 定时运行（可选），此处设置为每天运行
+    - cron: "0 0 * * *"
+
 permissions:
-  contents: write 
-  
+  contents: write  # 授予工作流对代码库内容的写权限
+
 jobs:
   download-and-push:
     runs-on: ubuntu-latest
@@ -19,25 +22,17 @@ jobs:
     - name: Set up R
       uses: r-lib/actions/setup-r@v2
       with:
-        r-version: "latest" 
+        r-version: "4.2" # 确保使用合适的 R 版本
 
-    # 安装R脚本依赖的系统工具
+    # 安装系统依赖
     - name: Install system dependencies
       run: |
-        sudo apt-get update
-        sudo apt-get install -y git-lfs libmagick++-dev libgeos-dev libgfortran5 liblapack-dev libblas-dev \
-            libpng-dev libjpeg-dev librsvg2-dev libcairo2-dev libnode-dev libproj-dev \
-            libxml2-dev libcurl4-openssl-dev libssl-dev libhdf5-dev libv8-dev \
-            libfontconfig1-dev libharfbuzz-dev libfribidi-dev libgdal-dev \
-            libfreetype6-dev libtiff5-dev libudunits2-devsudo apt-get install -y git-lfs libmagick++-dev libgeos-dev libgfortran5 liblapack-dev libblas-dev \
-            libpng-dev libjpeg-dev librsvg2-dev libcairo2-dev libnode-dev libproj-dev \
-            libxml2-dev libcurl4-openssl-dev libssl-dev libhdf5-dev libv8-dev \
-            libfontconfig1-dev libharfbuzz-dev libfribidi-dev libgdal-dev \
-            libfreetype6-dev libtiff5-dev libudunits2-devsudo apt-get install -y git-lfs libmagick++-dev libgeos-dev libgfortran5 liblapack-dev libblas-dev \
-            libpng-dev libjpeg-dev librsvg2-dev libcairo2-dev libnode-dev libproj-dev \
-            libxml2-dev libcurl4-openssl-dev libssl-dev libhdf5-dev libv8-dev \
-            libfontconfig1-dev libharfbuzz-dev libfribidi-dev libgdal-dev \
-            libfreetype6-dev libtiff5-dev libudunits2-dev
+        sudo apt-get update && sudo apt-get install -y \
+          libmagick++-dev libgeos-dev libgfortran5 liblapack-dev libblas-dev \
+          libpng-dev libjpeg-dev librsvg2-dev libcairo2-dev libnode-dev libproj-dev \
+          libxml2-dev libcurl4-openssl-dev libssl-dev libhdf5-dev libv8-dev \
+          libfontconfig1-dev libharfbuzz-dev libfribidi-dev libgdal-dev \
+          libfreetype6-dev libtiff5-dev libudunits2-dev
 
     # 安装R脚本所需的包
     - name: Install R packages
