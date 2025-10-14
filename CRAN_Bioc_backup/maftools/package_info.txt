@@ -1,0 +1,7 @@
+Package: maftools
+Version: 2.18.0
+Source: Bioconductor BioCsoft
+URL: https://bioconductor.org/packages/3.18/bioc/src/contrib/maftools_2.18.0.tar.gz
+Size: 10.92 MB
+Download Date: 2025-10-14
+
