@@ -1,0 +1,7 @@
+Package: AUCell
+Version: 1.24.0
+Source: Bioconductor BioCsoft
+URL: https://bioconductor.org/packages/3.18/bioc/src/contrib/AUCell_1.24.0.tar.gz
+Size: 1.69 MB
+Download Date: 2025-10-14
+
