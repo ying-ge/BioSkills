@@ -1,0 +1,7 @@
+Package: fgsea
+Version: 1.28.0
+Source: Bioconductor BioCsoft
+URL: https://bioconductor.org/packages/3.18/bioc/src/contrib/fgsea_1.28.0.tar.gz
+Size: 4.72 MB
+Download Date: 2025-10-14
+
