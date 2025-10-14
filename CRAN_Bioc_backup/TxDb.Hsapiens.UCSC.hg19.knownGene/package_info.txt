@@ -1,0 +1,7 @@
+Package: TxDb.Hsapiens.UCSC.hg19.knownGene
+Version: 3.2.2
+Source: Bioconductor BioCann
+URL: https://bioconductor.org/packages/3.18/data/annotation/src/contrib/TxDb.Hsapiens.UCSC.hg19.knownGene_3.2.2.tar.gz
+Size: 17.80 MB
+Download Date: 2025-10-14
+
