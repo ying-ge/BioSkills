@@ -46,3 +46,5 @@ https://github.com/wanyewang1/Index_model
 https://github.com/woobe/rPlotter
 https://github.com/xlucpu/MOVICS
 https://github.com/zzwch/crosslink
+https://github.com/fbertran/plsRcox
+https://github.com/binderh/CoxBoost
