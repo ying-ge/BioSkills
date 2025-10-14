@@ -1,0 +1,7 @@
+Package: genefu
+Version: 2.34.0
+Source: Bioconductor BioCsoft
+URL: https://bioconductor.org/packages/3.18/bioc/src/contrib/genefu_2.34.0.tar.gz
+Size: 4.84 MB
+Download Date: 2025-10-14
+
