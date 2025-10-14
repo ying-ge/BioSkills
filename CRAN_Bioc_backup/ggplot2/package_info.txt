@@ -1,0 +1,7 @@
+Package: ggplot2
+Version: 4.0.0
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/ggplot2_4.0.0.tar.gz
+Size: 3.63 MB
+Download Date: 2025-10-14
+
