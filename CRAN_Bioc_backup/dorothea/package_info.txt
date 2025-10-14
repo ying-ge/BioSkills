@@ -1,0 +1,7 @@
+Package: dorothea
+Version: 1.14.1
+Source: Bioconductor BioCexp
+URL: https://bioconductor.org/packages/3.18/data/experiment/src/contrib/dorothea_1.14.1.tar.gz
+Size: 33.03 MB
+Download Date: 2025-10-14
+
