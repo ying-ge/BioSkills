@@ -1,0 +1,7 @@
+Package: msigdbr
+Version: 25.1.1
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/msigdbr_25.1.1.tar.gz
+Size: 0.01 MB
+Download Date: 2025-10-14
+
