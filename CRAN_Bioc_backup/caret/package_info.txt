@@ -1,0 +1,7 @@
+Package: caret
+Version: 7.0-1
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/caret_7.0-1.tar.gz
+Size: 2.17 MB
+Download Date: 2025-10-14
+
