@@ -60,64 +60,25 @@ jobs:
         git config --global user.name "GitHub Actions Bot"
         git config --global user.email "actions@github.com"
  
-    - name: Prepare repository list
+    - name: Check and prepare repository list
       run: |
-        echo "🔍 准备仓库列表..."
+        echo "🔍 检查仓库列表文件..."
         
-        # 创建仓库列表文件
-        cat > repo_list.txt << 'EOF'
-        tpq/kpmt
-        cBioPortal/cgdsr
-        satijalab/seurat-data
-        jespermaag/gganatogram
-        chrisamiller/fishplot
-        BITS-VIB/venn-tools
-        FredHutch/Galeano-Nino-Bullman-Intratumoral-Microbiota_2022
-        Gibbsdavidl/Immune-Subtype-Clustering
-        Gibbsdavidl/ImmuneSubtypeClassifier
-        GuangchuangYu/gglayer
-        IOBR/IOBR
-        IndrajeetPatil/ggstatsplot
-        KrishnaswamyLab/MAGIC
-        NKI-CCB/DISCOVER
-        Simon-Coetzee/motifBreakR
-        Teichlab/cellphonedb
-        YuLab-SMU/clusterProfiler-book
-        aertslab/pySCENIC
-        califano-lab/ARACNe-AP
-        cole-trapnell-lab/monocle-release
-        cran/colorfulVennPlot
-        dylkot/cNMF
-        ebecht/MCPcounter
-        fawda123/ggord
-        icbi-lab/Immunophenogram
-        inutano/pfastq-dump
-        johncolby/SVM-RFE
-        linnarsson-lab/ipynb-lamanno2016
-        lmcinnes/umap
-        matanhofree/crc-immune-hubs
-        matt-black/dcapy
-        mg14/mg14
-        nicholasehamilton/ggtern
-        paulgeeleher/pRRophetic
-        paulgeeleher/pRRophetic2
-        peterawe/CMScaller
-        raerose01/deconstructSigs
-        rfordatascience/tidytuesday
-        richie2019/MBpanel
-        ropensci/rentrez
-        rsankowski/sankowski-et-al-microglia
-        spren9er/tidytuesday
-        taoliu/MACS
-        wanyewang1/Index_model
-        woobe/rPlotter
-        xlucpu/MOVICS
-        zzwch/crosslink
-        fbertran/plsRcox
-        binderh/CoxBoost
-        EOF
+        # 检查可能的文件位置
+        if [ -f ".github/docs/github_repo_list.txt" ]; then
+          echo "✅ 找到文件: .github/docs/github_repo_list.txt"
+          cp .github/docs/github_repo_list.txt repo_list.txt
+        else
+          echo "⚠️ 未找到仓库列表文件 .github/docs/github_repo_list.txt"
+          # 创建一个空的 repo_list.txt 以免后续步骤失败
+          touch repo_list.txt
+        fi
         
-        echo "✅ 创建了包含 $(wc -l < repo_list.txt) 个仓库的列表"
+        # 显示包列表信息
+        echo "📄 仓库列表内容:"
+        cat repo_list.txt | head -20
+        echo ""
+        echo "📊 统计: $(grep -v '^#' repo_list.txt | grep -v '^$' | wc -l) 个仓库"
  
     - name: Run backup script
       run: |
