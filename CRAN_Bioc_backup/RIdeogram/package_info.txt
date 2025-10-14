@@ -1,0 +1,7 @@
+Package: RIdeogram
+Version: 0.2.2
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/RIdeogram_0.2.2.tar.gz
+Size: 4.76 MB
+Download Date: 2025-10-14
+
