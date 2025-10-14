@@ -1,0 +1,7 @@
+Package: SimDesign
+Version: 2.21
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/SimDesign_2.21.tar.gz
+Size: 2.34 MB
+Download Date: 2025-10-14
+
