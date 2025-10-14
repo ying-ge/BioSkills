@@ -1,0 +1,7 @@
+Package: ChIPseeker
+Version: 1.38.0
+Source: Bioconductor BioCsoft
+URL: https://bioconductor.org/packages/3.18/bioc/src/contrib/ChIPseeker_1.38.0.tar.gz
+Size: 6.91 MB
+Download Date: 2025-10-14
+

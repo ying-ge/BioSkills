@@ -1,0 +1,7 @@
+Package: pathifier
+Version: 1.40.0
+Source: Bioconductor BioCsoft
+URL: https://bioconductor.org/packages/3.18/bioc/src/contrib/pathifier_1.40.0.tar.gz
+Size: 1.91 MB
+Download Date: 2025-10-14
+

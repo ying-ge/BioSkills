@@ -1,0 +1,7 @@
+Package: mixtools
+Version: 2.0.0.1
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/mixtools_2.0.0.1.tar.gz
+Size: 0.67 MB
+Download Date: 2025-10-14
+

@@ -1,0 +1,7 @@
+Package: colorRamps
+Version: 2.3.4
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/colorRamps_2.3.4.tar.gz
+Size: 0.00 MB
+Download Date: 2025-10-14
+

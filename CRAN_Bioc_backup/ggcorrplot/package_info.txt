@@ -1,0 +1,7 @@
+Package: ggcorrplot
+Version: 0.1.4.1
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/ggcorrplot_0.1.4.1.tar.gz
+Size: 0.37 MB
+Download Date: 2025-10-14
+

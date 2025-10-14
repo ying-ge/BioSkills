@@ -1,0 +1,7 @@
+Package: survival
+Version: 3.8-3
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/survival_3.8-3.tar.gz
+Size: 9.10 MB
+Download Date: 2025-10-14
+

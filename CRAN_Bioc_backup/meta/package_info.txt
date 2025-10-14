@@ -1,0 +1,7 @@
+Package: meta
+Version: 8.2-1
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/meta_8.2-1.tar.gz
+Size: 0.96 MB
+Download Date: 2025-10-14
+

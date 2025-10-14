@@ -1,0 +1,7 @@
+Package: givitiR
+Version: 1.3
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/givitiR_1.3.tar.gz
+Size: 0.09 MB
+Download Date: 2025-10-14
+

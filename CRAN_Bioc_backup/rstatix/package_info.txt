@@ -1,0 +1,7 @@
+Package: rstatix
+Version: 0.7.2
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/rstatix_0.7.2.tar.gz
+Size: 0.39 MB
+Download Date: 2025-10-14
+

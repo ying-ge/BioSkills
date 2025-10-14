@@ -1,0 +1,7 @@
+Package: ggsignif
+Version: 0.6.4
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/ggsignif_0.6.4.tar.gz
+Size: 0.56 MB
+Download Date: 2025-10-14
+

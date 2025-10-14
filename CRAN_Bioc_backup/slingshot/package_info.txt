@@ -1,0 +1,7 @@
+Package: slingshot
+Version: 2.10.0
+Source: Bioconductor BioCsoft
+URL: https://bioconductor.org/packages/3.18/bioc/src/contrib/slingshot_2.10.0.tar.gz
+Size: 1.64 MB
+Download Date: 2025-10-14
+

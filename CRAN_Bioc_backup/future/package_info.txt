@@ -1,0 +1,7 @@
+Package: future
+Version: 1.67.0
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/future_1.67.0.tar.gz
+Size: 0.42 MB
+Download Date: 2025-10-14
+

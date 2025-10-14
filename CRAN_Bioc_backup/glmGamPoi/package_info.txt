@@ -1,0 +1,7 @@
+Package: glmGamPoi
+Version: 1.14.3
+Source: Bioconductor BioCsoft
+URL: https://bioconductor.org/packages/3.18/bioc/src/contrib/glmGamPoi_1.14.3.tar.gz
+Size: 2.01 MB
+Download Date: 2025-10-14
+

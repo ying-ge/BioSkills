@@ -1,0 +1,7 @@
+Package: circlize
+Version: 0.4.16
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/circlize_0.4.16.tar.gz
+Size: 2.38 MB
+Download Date: 2025-10-14
+

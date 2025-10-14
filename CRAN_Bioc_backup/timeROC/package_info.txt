@@ -1,0 +1,7 @@
+Package: timeROC
+Version: 0.4
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/timeROC_0.4.tar.gz
+Size: 0.05 MB
+Download Date: 2025-10-14
+

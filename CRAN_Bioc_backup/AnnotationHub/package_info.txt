@@ -1,0 +1,7 @@
+Package: AnnotationHub
+Version: 3.10.1
+Source: Bioconductor BioCsoft
+URL: https://bioconductor.org/packages/3.18/bioc/src/contrib/AnnotationHub_3.10.1.tar.gz
+Size: 0.95 MB
+Download Date: 2025-10-14
+

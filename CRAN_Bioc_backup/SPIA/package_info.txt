@@ -1,0 +1,7 @@
+Package: SPIA
+Version: 2.54.0
+Source: Bioconductor BioCsoft
+URL: https://bioconductor.org/packages/3.18/bioc/src/contrib/SPIA_2.54.0.tar.gz
+Size: 2.45 MB
+Download Date: 2025-10-14
+

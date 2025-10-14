@@ -1,0 +1,7 @@
+Package: pamr
+Version: 1.57
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/pamr_1.57.tar.gz
+Size: 0.50 MB
+Download Date: 2025-10-14
+

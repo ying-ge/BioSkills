@@ -1,0 +1,7 @@
+Package: MethComp
+Version: 1.30.2
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/MethComp_1.30.2.tar.gz
+Size: 2.66 MB
+Download Date: 2025-10-14
+

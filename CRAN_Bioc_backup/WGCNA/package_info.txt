@@ -1,0 +1,7 @@
+Package: WGCNA
+Version: 1.73
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/WGCNA_1.73.tar.gz
+Size: 1.12 MB
+Download Date: 2025-10-14
+

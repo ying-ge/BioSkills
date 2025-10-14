@@ -1,0 +1,7 @@
+Package: GEOquery
+Version: 2.70.0
+Source: Bioconductor BioCsoft
+URL: https://bioconductor.org/packages/3.18/bioc/src/contrib/GEOquery_2.70.0.tar.gz
+Size: 13.06 MB
+Download Date: 2025-10-14
+

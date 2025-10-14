@@ -1,0 +1,7 @@
+Package: phangorn
+Version: 2.12.1
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/phangorn_2.12.1.tar.gz
+Size: 1.86 MB
+Download Date: 2025-10-14
+

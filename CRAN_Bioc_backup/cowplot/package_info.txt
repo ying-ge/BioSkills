@@ -1,0 +1,7 @@
+Package: cowplot
+Version: 1.2.0
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/cowplot_1.2.0.tar.gz
+Size: 1.56 MB
+Download Date: 2025-10-14
+

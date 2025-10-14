@@ -1,0 +1,7 @@
+Package: extrafont
+Version: 0.20
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/extrafont_0.20.tar.gz
+Size: 0.02 MB
+Download Date: 2025-10-14
+

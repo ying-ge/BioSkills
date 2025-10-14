@@ -1,0 +1,7 @@
+Package: reshape2
+Version: 1.4.4
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/reshape2_1.4.4.tar.gz
+Size: 0.04 MB
+Download Date: 2025-10-14
+

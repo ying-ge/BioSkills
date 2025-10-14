@@ -1,0 +1,7 @@
+Package: pubmed.mineR
+Version: 1.0.21
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/pubmed.mineR_1.0.21.tar.gz
+Size: 0.65 MB
+Download Date: 2025-10-14
+

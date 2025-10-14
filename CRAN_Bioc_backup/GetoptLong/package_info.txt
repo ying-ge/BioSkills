@@ -1,0 +1,7 @@
+Package: GetoptLong
+Version: 1.0.5
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/GetoptLong_1.0.5.tar.gz
+Size: 0.73 MB
+Download Date: 2025-10-14
+

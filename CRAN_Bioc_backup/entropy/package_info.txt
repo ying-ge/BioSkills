@@ -1,0 +1,7 @@
+Package: entropy
+Version: 1.3.2
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/entropy_1.3.2.tar.gz
+Size: 0.01 MB
+Download Date: 2025-10-14
+

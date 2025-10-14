@@ -1,0 +1,7 @@
+Package: org.Mm.eg.db
+Version: 3.18.0
+Source: Bioconductor BioCann
+URL: https://bioconductor.org/packages/3.18/data/annotation/src/contrib/org.Mm.eg.db_3.18.0.tar.gz
+Size: 77.14 MB
+Download Date: 2025-10-14
+

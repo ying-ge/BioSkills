@@ -1,0 +1,7 @@
+Package: pec
+Version: 2025.06.24
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/pec_2025.06.24.tar.gz
+Size: 0.16 MB
+Download Date: 2025-10-14
+

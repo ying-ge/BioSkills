@@ -1,0 +1,7 @@
+Package: lolR
+Version: 2.1
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/lolR_2.1.tar.gz
+Size: 2.47 MB
+Download Date: 2025-10-14
+

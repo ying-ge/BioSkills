@@ -1,0 +1,7 @@
+Package: muhaz
+Version: 1.2.6.4
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/muhaz_1.2.6.4.tar.gz
+Size: 0.03 MB
+Download Date: 2025-10-14
+

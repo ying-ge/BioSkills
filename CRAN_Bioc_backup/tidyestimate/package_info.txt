@@ -1,0 +1,7 @@
+Package: tidyestimate
+Version: 1.1.1
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/tidyestimate_1.1.1.tar.gz
+Size: 0.89 MB
+Download Date: 2025-10-14
+

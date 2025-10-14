@@ -1,0 +1,7 @@
+Package: gridExtra
+Version: 2.3
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/gridExtra_2.3.tar.gz
+Size: 1.01 MB
+Download Date: 2025-10-14
+

@@ -1,0 +1,7 @@
+Package: gtable
+Version: 0.3.6
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/gtable_0.3.6.tar.gz
+Size: 0.14 MB
+Download Date: 2025-10-14
+

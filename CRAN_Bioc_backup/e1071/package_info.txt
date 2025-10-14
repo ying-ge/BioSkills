@@ -1,0 +1,7 @@
+Package: e1071
+Version: 1.7-16
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/e1071_1.7-16.tar.gz
+Size: 0.31 MB
+Download Date: 2025-10-14
+

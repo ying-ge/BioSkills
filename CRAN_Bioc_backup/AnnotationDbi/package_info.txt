@@ -1,0 +1,7 @@
+Package: AnnotationDbi
+Version: 1.64.1
+Source: Bioconductor BioCsoft
+URL: https://bioconductor.org/packages/3.18/bioc/src/contrib/AnnotationDbi_1.64.1.tar.gz
+Size: 4.16 MB
+Download Date: 2025-10-14
+

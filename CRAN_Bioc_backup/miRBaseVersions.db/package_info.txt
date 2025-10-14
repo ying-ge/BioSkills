@@ -1,0 +1,7 @@
+Package: miRBaseVersions.db
+Version: 1.1.0
+Source: Bioconductor BioCann
+URL: https://bioconductor.org/packages/3.18/data/annotation/src/contrib/miRBaseVersions.db_1.1.0.tar.gz
+Size: 20.17 MB
+Download Date: 2025-10-14
+

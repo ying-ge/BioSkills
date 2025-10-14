@@ -1,0 +1,7 @@
+Package: data.table
+Version: 1.17.8
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/data.table_1.17.8.tar.gz
+Size: 5.54 MB
+Download Date: 2025-10-14
+

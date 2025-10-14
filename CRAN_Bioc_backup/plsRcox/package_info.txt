@@ -1,0 +1,7 @@
+Package: plsRcox
+Version: 1.8.0
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/plsRcox_1.8.0.tar.gz
+Size: 1.89 MB
+Download Date: 2025-10-14
+

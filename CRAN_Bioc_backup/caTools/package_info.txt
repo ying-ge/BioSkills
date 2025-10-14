@@ -1,0 +1,7 @@
+Package: caTools
+Version: 1.18.3
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/caTools_1.18.3.tar.gz
+Size: 0.06 MB
+Download Date: 2025-10-14
+

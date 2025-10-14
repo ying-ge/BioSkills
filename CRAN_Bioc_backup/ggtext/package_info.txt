@@ -1,0 +1,7 @@
+Package: ggtext
+Version: 0.1.2
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/ggtext_0.1.2.tar.gz
+Size: 1.16 MB
+Download Date: 2025-10-14
+

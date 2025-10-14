@@ -1,0 +1,7 @@
+Package: networkD3
+Version: 0.4.1
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/networkD3_0.4.1.tar.gz
+Size: 0.13 MB
+Download Date: 2025-10-14
+

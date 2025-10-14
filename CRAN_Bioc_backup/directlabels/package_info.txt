@@ -1,0 +1,7 @@
+Package: directlabels
+Version: 2025.6.24
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/directlabels_2025.6.24.tar.gz
+Size: 0.46 MB
+Download Date: 2025-10-14
+

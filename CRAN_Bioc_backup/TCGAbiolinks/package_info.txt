@@ -1,0 +1,7 @@
+Package: TCGAbiolinks
+Version: 2.30.4
+Source: Bioconductor BioCsoft
+URL: https://bioconductor.org/packages/3.18/bioc/src/contrib/TCGAbiolinks_2.30.4.tar.gz
+Size: 62.61 MB
+Download Date: 2025-10-14
+

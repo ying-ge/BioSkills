@@ -1,0 +1,7 @@
+Package: tidyjson
+Version: 0.3.2
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/tidyjson_0.3.2.tar.gz
+Size: 1.65 MB
+Download Date: 2025-10-14
+

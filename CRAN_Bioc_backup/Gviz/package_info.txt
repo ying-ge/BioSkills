@@ -1,0 +1,7 @@
+Package: Gviz
+Version: 1.46.1
+Source: Bioconductor BioCsoft
+URL: https://bioconductor.org/packages/3.18/bioc/src/contrib/Gviz_1.46.1.tar.gz
+Size: 6.88 MB
+Download Date: 2025-10-14
+

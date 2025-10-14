@@ -1,0 +1,7 @@
+Package: survivalsvm
+Version: 0.0.6
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/survivalsvm_0.0.6.tar.gz
+Size: 0.04 MB
+Download Date: 2025-10-14
+

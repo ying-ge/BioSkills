@@ -1,0 +1,7 @@
+Package: factoextra
+Version: 1.0.7
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/factoextra_1.0.7.tar.gz
+Size: 1.32 MB
+Download Date: 2025-10-14
+

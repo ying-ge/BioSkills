@@ -1,0 +1,7 @@
+Package: RCircos
+Version: 1.2.2
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/RCircos_1.2.2.tar.gz
+Size: 1.76 MB
+Download Date: 2025-10-14
+

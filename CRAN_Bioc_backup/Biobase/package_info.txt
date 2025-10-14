@@ -1,0 +1,7 @@
+Package: Biobase
+Version: 2.62.0
+Source: Bioconductor BioCsoft
+URL: https://bioconductor.org/packages/3.18/bioc/src/contrib/Biobase_2.62.0.tar.gz
+Size: 1.71 MB
+Download Date: 2025-10-14
+

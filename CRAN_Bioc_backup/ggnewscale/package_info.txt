@@ -1,0 +1,7 @@
+Package: ggnewscale
+Version: 0.5.2
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/ggnewscale_0.5.2.tar.gz
+Size: 0.40 MB
+Download Date: 2025-10-14
+

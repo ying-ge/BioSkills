@@ -1,0 +1,7 @@
+Package: RTN
+Version: 2.26.0
+Source: Bioconductor BioCsoft
+URL: https://bioconductor.org/packages/3.18/bioc/src/contrib/RTN_2.26.0.tar.gz
+Size: 10.53 MB
+Download Date: 2025-10-14
+

@@ -1,0 +1,7 @@
+Package: PharmacoGx
+Version: 3.6.0
+Source: Bioconductor BioCsoft
+URL: https://bioconductor.org/packages/3.18/bioc/src/contrib/PharmacoGx_3.6.0.tar.gz
+Size: 4.42 MB
+Download Date: 2025-10-14
+

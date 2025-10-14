@@ -1,0 +1,7 @@
+Package: wateRmelon
+Version: 2.8.0
+Source: Bioconductor BioCsoft
+URL: https://bioconductor.org/packages/3.18/bioc/src/contrib/wateRmelon_2.8.0.tar.gz
+Size: 3.26 MB
+Download Date: 2025-10-14
+

@@ -1,0 +1,7 @@
+Package: gcrma
+Version: 2.74.0
+Source: Bioconductor BioCsoft
+URL: https://bioconductor.org/packages/3.18/bioc/src/contrib/gcrma_2.74.0.tar.gz
+Size: 0.14 MB
+Download Date: 2025-10-14
+

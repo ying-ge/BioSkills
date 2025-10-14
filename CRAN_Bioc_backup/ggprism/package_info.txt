@@ -1,0 +1,7 @@
+Package: ggprism
+Version: 1.0.7
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/ggprism_1.0.7.tar.gz
+Size: 2.67 MB
+Download Date: 2025-10-14
+

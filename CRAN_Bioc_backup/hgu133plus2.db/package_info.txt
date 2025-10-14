@@ -1,0 +1,7 @@
+Package: hgu133plus2.db
+Version: 3.13.0
+Source: Bioconductor BioCann
+URL: https://bioconductor.org/packages/3.18/data/annotation/src/contrib/hgu133plus2.db_3.13.0.tar.gz
+Size: 2.14 MB
+Download Date: 2025-10-14
+

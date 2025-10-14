@@ -1,0 +1,7 @@
+Package: DT
+Version: 0.34.0
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/DT_0.34.0.tar.gz
+Size: 1.59 MB
+Download Date: 2025-10-14
+

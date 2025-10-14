@@ -1,0 +1,7 @@
+Package: TxDb.Hsapiens.UCSC.hg38.knownGene
+Version: 3.18.0
+Source: Bioconductor BioCann
+URL: https://bioconductor.org/packages/3.18/data/annotation/src/contrib/TxDb.Hsapiens.UCSC.hg38.knownGene_3.18.0.tar.gz
+Size: 45.00 MB
+Download Date: 2025-10-14
+

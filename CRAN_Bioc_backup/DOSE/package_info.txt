@@ -1,0 +1,7 @@
+Package: DOSE
+Version: 3.28.2
+Source: Bioconductor BioCsoft
+URL: https://bioconductor.org/packages/3.18/bioc/src/contrib/DOSE_3.28.2.tar.gz
+Size: 6.49 MB
+Download Date: 2025-10-14
+

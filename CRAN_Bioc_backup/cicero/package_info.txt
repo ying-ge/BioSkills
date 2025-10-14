@@ -1,0 +1,7 @@
+Package: cicero
+Version: 1.20.0
+Source: Bioconductor BioCsoft
+URL: https://bioconductor.org/packages/3.18/bioc/src/contrib/cicero_1.20.0.tar.gz
+Size: 1.18 MB
+Download Date: 2025-10-14
+

@@ -1,0 +1,7 @@
+Package: affyPLM
+Version: 1.78.0
+Source: Bioconductor BioCsoft
+URL: https://bioconductor.org/packages/3.18/bioc/src/contrib/affyPLM_1.78.0.tar.gz
+Size: 5.73 MB
+Download Date: 2025-10-14
+

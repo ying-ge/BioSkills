@@ -1,0 +1,7 @@
+Package: ConsensusClusterPlus
+Version: 1.66.0
+Source: Bioconductor BioCsoft
+URL: https://bioconductor.org/packages/3.18/bioc/src/contrib/ConsensusClusterPlus_1.66.0.tar.gz
+Size: 0.23 MB
+Download Date: 2025-10-14
+

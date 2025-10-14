@@ -1,0 +1,7 @@
+Package: xlsx
+Version: 0.6.5
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/xlsx_0.6.5.tar.gz
+Size: 0.47 MB
+Download Date: 2025-10-14
+

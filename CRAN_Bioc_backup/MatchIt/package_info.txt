@@ -1,0 +1,7 @@
+Package: MatchIt
+Version: 4.7.2
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/MatchIt_4.7.2.tar.gz
+Size: 1.44 MB
+Download Date: 2025-10-14
+

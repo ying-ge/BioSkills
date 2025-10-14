@@ -1,0 +1,7 @@
+Package: tidyHeatmap
+Version: 1.12.2
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/tidyHeatmap_1.12.2.tar.gz
+Size: 3.88 MB
+Download Date: 2025-10-14
+

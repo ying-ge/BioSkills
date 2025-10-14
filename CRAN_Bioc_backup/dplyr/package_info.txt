@@ -1,0 +1,7 @@
+Package: dplyr
+Version: 1.1.4
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/dplyr_1.1.4.tar.gz
+Size: 1.15 MB
+Download Date: 2025-10-14
+

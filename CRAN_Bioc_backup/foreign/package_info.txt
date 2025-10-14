@@ -1,0 +1,7 @@
+Package: foreign
+Version: 0.8-90
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/foreign_0.8-90.tar.gz
+Size: 0.35 MB
+Download Date: 2025-10-14
+
