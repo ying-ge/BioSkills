@@ -1,0 +1,7 @@
+Package: trackViewer
+Version: 1.38.2
+Source: Bioconductor BioCsoft
+URL: https://bioconductor.org/packages/3.18/bioc/src/contrib/trackViewer_1.38.2.tar.gz
+Size: 9.06 MB
+Download Date: 2025-10-14
+
