@@ -1,0 +1,110 @@
+# .github/workflows/sync-from-figureya.yml
+name: Sync Packages from FigureYa
+ 
+on:
+  workflow_dispatch:
+    inputs:
+      force_update:
+        description: 'Force update all packages'
+        required: false
+        default: 'false'
+        type: boolean
+  schedule:
+    # 每周日运行一次
+    - cron: '0 2 * * 0'
+ 
+jobs:
+  sync-packages:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout FigureYa-package repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        token: ${{ secrets.FIGUREYA2ACTION }}
+    
+    - name: Setup R
+      uses: r-lib/actions/setup-r@v2
+      with:
+        r-version: 'latest'
+        use-public-rspm: true
+    
+    - name: Install R dependencies
+      run: |
+        install.packages(c("rvest", "stringr", "jsonlite", "httr"), 
+                        repos = "https://cloud.r-project.org/")
+      shell: Rscript {0}
+    
+    - name: Extract package versions from FigureYa
+      run: |
+        Rscript scripts/extract_versions_from_figureya.R
+      env:
+        GITHUB_TOKEN: ${{ secrets.FIGUREYA2ACTION }}
+    
+    - name: Download packages
+      run: |
+        Rscript scripts/download_packages.R
+    
+    - name: Generate package index
+      run: |
+        Rscript scripts/generate_package_index.R
+    
+    - name: Check storage usage
+      run: |
+        echo "Package directory size:"
+        du -sh packages/
+        
+        echo "Detailed breakdown:"
+        du -sh packages/*
+        
+        # 如果超过1GB，发出警告
+        size_mb=$(du -sm packages/ | cut -f1)
+        if [ "$size_mb" -gt 1024 ]; then
+          echo "Warning: Package directory is ${size_mb}MB, consider cleanup"
+        fi
+    
+    - name: Commit and push changes
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "FigureYa Package Sync"
+        
+        git add metadata/
+        git add packages/
+        
+        if git diff --staged --quiet; then
+          echo "No changes to commit"
+        else
+          # 统计包数量
+          total_packages=$(find packages/ -name "*.tar.gz" | wc -l)
+          
+          git commit -m "Update R packages repository
+          
+          - Synced from ying-ge/FigureYa
+          - Total packages: ${total_packages}
+          - Updated: $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+          
+          git push
+        fi
+    
+    - name: Create release summary
+      if: github.ref == 'refs/heads/main'
+      run: |
+        if [ -f "metadata/download_logs/download_"*".json" ]; then
+          latest_log=$(ls -t metadata/download_logs/download_*.json | head -1)
+          echo "## Package Sync Summary" > sync_summary.md
+          echo "Date: $(date)" >> sync_summary.md
+          echo "" >> sync_summary.md
+          
+          jq -r '"**Total Packages:** \(.total_packages)
+**Successful Downloads:** \(.summary.success)  
+**Failed Downloads:** \(.summary.failed)
+**Skipped:** \(.summary.skipped)
+**Duration:** \(.duration) minutes"' "$latest_log" >> sync_summary.md
+          
+          echo "" >> sync_summary.md
+          echo "### Package Directory Structure" >> sync_summary.md
+          tree packages/ -L 3 >> sync_summary.md || find packages/ -type d | head -20 >> sync_summary.md
+          
+          cat sync_summary.md
+        fi
