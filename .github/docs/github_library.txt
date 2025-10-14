@@ -14,7 +14,6 @@ https://github.com/KrishnaswamyLab/MAGIC
 https://github.com/NKI-CCB/DISCOVER
 https://github.com/Simon-Coetzee/motifBreakR
 https://github.com/Teichlab/cellphonedb
-https://github.com/YuLab-SMU/clusterProfiler-book
 https://github.com/aertslab/pySCENIC
 https://github.com/califano-lab/ARACNe-AP
 https://github.com/chrisamiller/fishplot
