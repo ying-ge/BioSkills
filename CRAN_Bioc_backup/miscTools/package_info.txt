@@ -1,0 +1,7 @@
+Package: miscTools
+Version: 0.6-28
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/miscTools_0.6-28.tar.gz
+Size: 0.02 MB
+Download Date: 2025-10-14
+
