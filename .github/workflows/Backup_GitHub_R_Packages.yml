@@ -1,9 +1,9 @@
-name: Backup GitHub R Packages (One by One)
+name: Backup GitHub R Packages (One by One - Fixed)
  
 on:
   workflow_dispatch:
-  #schedule:
-  #  - cron: "0 2 * * 0"
+  schedule:
+    - cron: "0 2 * * 0"
  
 permissions:
   contents: write
@@ -42,7 +42,54 @@ jobs:
         git config --global user.name "GitHub Actions Bot"
         git config --global user.email "actions@github.com"
  
-    - name: Create and run one-by-one backup script
+    # 首先检查并创建仓库列表文件（如果不存在）
+    - name: Check and create repository list
+      run: |
+        echo "🔍 检查仓库列表文件..."
+        
+        # 检查可能的文件位置
+        if [ -f ".github/docs/github_library.txt" ]; then
+          echo "✅ 找到文件: .github/docs/github_library.txt"
+          cp .github/docs/github_library.txt github_library.txt
+        elif [ -f "docs/github_library.txt" ]; then
+          echo "✅ 找到文件: docs/github_library.txt"
+          cp docs/github_library.txt github_library.txt
+        elif [ -f "github_library.txt" ]; then
+          echo "✅ 找到文件: github_library.txt"
+        elif [ -f "scripts/github_library.txt" ]; then
+          echo "✅ 找到文件: scripts/github_library.txt"
+          cp scripts/github_library.txt github_library.txt
+        else
+          echo "⚠️ 未找到仓库列表文件，创建示例文件..."
+          cat > github_library.txt << 'EOF'
+        # GitHub R包仓库列表
+        tpq/kpmt
+        cBioPortal/cgdsr
+        satijalab/seurat-data
+        jespermaag/gganatogram
+        chrisamiller/fishplot
+        BITS-VIB/venn-tools
+        GuangchuangYu/gglayer
+        IOBR/IOBR
+        IndrajeetPatil/ggstatsplot
+        KrishnaswamyLab/MAGIC
+        NKI-CCB/DISCOVER
+        Simon-Coetzee/motifBreakR
+        ebecht/MCPcounter
+        fawda123/ggord
+        nicholasehamilton/ggtern
+        paulgeeleher/pRRophetic
+        ropensci/rentrez
+        xlucpu/MOVICS
+        zzwch/crosslink
+        EOF
+          echo "✅ 已创建示例文件 github_library.txt"
+        fi
+        
+        echo "📄 文件内容预览:"
+        head -10 github_library.txt
+ 
+    - name: Create and run backup script
       run: |
         cat > backup_one_by_one.R << 'EOF'
         library(jsonlite)
@@ -56,7 +103,7 @@ jobs:
         # 读取仓库列表
         read_github_repos <- function(file_path) {
           if (!file.exists(file_path)) {
-            stop("文件不存在: ", file_path)
+            stop(paste("文件不存在:", file_path))
           }
           
           lines <- readLines(file_path, warn = FALSE)
@@ -64,11 +111,12 @@ jobs:
           
           repos <- character(0)
           for (line in lines) {
+            line <- trimws(line)
             if (grepl("github.com", line)) {
               repo <- gsub(".*github.com/([^/]+/[^/]+).*", "\\1", line)
               repos <- c(repos, repo)
-            } else if (grepl("^[^/]+/[^/]+$", trimws(line))) {
-              repos <- c(repos, trimws(line))
+            } else if (grepl("^[^/]+/[^/]+$", line)) {
+              repos <- c(repos, line)
             }
           }
           
@@ -97,7 +145,7 @@ jobs:
             status = "failed",
             download_date = as.character(Sys.Date()),
             file_size_mb = 0,
-            commit_hash = NA
+            commit_hash = ""
           )
           
           tryCatch({
@@ -148,7 +196,7 @@ jobs:
                     meta_file <- file.path(repo_dir, "repository_info.json")
                     writeLines(repo_info, meta_file)
                     
-                    # 提取commit hash
+                    # 提取默认分支信息
                     repo_data <- fromJSON(repo_info)
                     if (!is.null(repo_data$default_branch)) {
                       result$commit_hash <- repo_data$default_branch
@@ -174,27 +222,22 @@ jobs:
           return(result)
         }
         
-        # 查找仓库列表文件
-        possible_paths <- c(
-          ".github/docs/github_library.txt",
-        )
+        # 固定使用根目录的文件
+        repo_file <- "github_library.txt"
         
-        repo_file <- NULL
-        for (path in possible_paths) {
-          if (file.exists(path)) {
-            repo_file <- path
-            break
-          }
-        }
-        
-        if (is.null(repo_file)) {
-          cat("未找到仓库列表文件\n")
+        if (!file.exists(repo_file)) {
+          cat("错误: 未找到仓库列表文件", repo_file, "\n")
           quit(status = 1)
         }
         
         # 读取仓库列表
         github_repos <- read_github_repos(repo_file)
         cat("找到", length(github_repos), "个仓库，将逐一处理\n\n")
+        
+        if (length(github_repos) == 0) {
+          cat("错误: 仓库列表为空\n")
+          quit(status = 1)
+        }
         
         # 创建总日志
         all_results <- data.frame(
@@ -220,7 +263,7 @@ jobs:
             status = result$status,
             download_date = result$download_date,
             file_size_mb = result$file_size_mb,
-            commit_hash = ifelse(is.na(result$commit_hash), "", result$commit_hash),
+            commit_hash = result$commit_hash,
             stringsAsFactors = FALSE
           ))
           
@@ -233,8 +276,9 @@ jobs:
           log_file <- file.path(backup_dir, paste0("backup_log_", Sys.Date(), ".csv"))
           write.csv(all_results, log_file, row.names = FALSE)
           
-          # 输出当前仓库的处理结果文件，供shell脚本读取
-          cat(paste(result$repo, result$status, result$file_size_mb, sep = "|"), file = "current_result.txt")
+          # 输出当前仓库的处理结果
+          result_line <- paste(result$repo, result$status, result$file_size_mb, sep = "|")
+          writeLines(result_line, "current_result.txt")
           
           cat(sprintf("📊 当前进度: %d/%d 完成\n", i, length(github_repos)))
           
@@ -257,70 +301,75 @@ jobs:
         cat("失败:", failed_count, "\n")
         
         # 输出最终统计
-        cat(paste(success_count, skipped_count, failed_count, total_size_mb, sep = "|"), file = "final_stats.txt")
+        final_stats <- paste(success_count, skipped_count, failed_count, round(total_size_mb, 1), sep = "|")
+        writeLines(final_stats, "final_stats.txt")
         EOF
         
-        # 运行R脚本，逐一处理仓库
+        # 运行R脚本
+        echo "🚀 开始运行备份脚本..."
         Rscript backup_one_by_one.R &
         r_pid=$!
         
-        # 监控R脚本进度并逐一提交
+        # 监控进度并逐一提交
+        echo "🔄 开始监控进度..."
         repo_count=0
+        last_result=""
+        
         while kill -0 $r_pid 2>/dev/null; do
-          # 检查是否有新的仓库处理完成
           if [ -f "current_result.txt" ]; then
-            result_line=$(cat current_result.txt)
-            repo_name=$(echo "$result_line" | cut -d'|' -f1)
-            status=$(echo "$result_line" | cut -d'|' -f2)
-            file_size=$(echo "$result_line" | cut -d'|' -f3)
+            current_result=$(cat current_result.txt 2>/dev/null || echo "")
             
-            repo_dir_name=$(echo "$repo_name" | sed 's/\//_/g')
-            
-            echo ""
-            echo "🔄 处理完成: $repo_name ($status)"
-            
-            # 提交这个仓库的备份（如果成功）
-            if [ "$status" = "success" ] && [ -d "R_packages_backup/$repo_dir_name" ]; then
-              echo "📦 提交 $repo_name 的备份文件..."
+            # 检查是否是新的结果
+            if [ "$current_result" != "$last_result" ] && [ -n "$current_result" ]; then
+              repo_name=$(echo "$current_result" | cut -d'|' -f1)
+              status=$(echo "$current_result" | cut -d'|' -f2)
+              file_size=$(echo "$current_result" | cut -d'|' -f3)
               
-              git add "R_packages_backup/$repo_dir_name/"
-              git add "R_packages_backup/backup_log_$(date +'%Y-%m-%d').csv"
+              repo_dir_name=$(echo "$repo_name" | sed 's/\//_/g')
               
-              if ! git diff --staged --quiet; then
-                if git commit -m "📦 Add backup for $repo_name (${file_size}MB) - $(date +'%Y-%m-%d %H:%M')"; then
-                  echo "💾 提交成功，正在推送..."
-                  
-                  # 推送，带重试
-                  retry=0
-                  while [ $retry -lt 3 ]; do
-                    if git push origin main; then
-                      echo "✅ $repo_name 推送成功"
-                      break
-                    else
-                      retry=$((retry + 1))
-                      echo "⚠️ 推送失败，重试 $retry/3..."
-                      sleep 5
+              echo ""
+              echo "📦 处理完成: $repo_name ($status)"
+              
+              # 提交这个仓库的备份
+              if [ "$status" = "success" ] && [ -d "R_packages_backup/$repo_dir_name" ]; then
+                echo "💾 提交 $repo_name 的备份..."
+                
+                git add "R_packages_backup/$repo_dir_name/"
+                git add "R_packages_backup/backup_log_$(date +'%Y-%m-%d').csv" 2>/dev/null || true
+                
+                if ! git diff --staged --quiet; then
+                  if git commit -m "📦 Add backup for $repo_name (${file_size}MB) - $(date +'%Y-%m-%d %H:%M')"; then
+                    echo "🚀 推送中..."
+                    
+                    retry=0
+                    while [ $retry -lt 3 ]; do
+                      if git push origin main; then
+                        echo "✅ $repo_name 推送成功"
+                        break
+                      else
+                        retry=$((retry + 1))
+                        echo "⚠️ 推送失败，重试 $retry/3..."
+                        sleep $((retry * 2))
+                      fi
+                    done
+                    
+                    if [ $retry -eq 3 ]; then
+                      echo "❌ $repo_name 推送失败"
                     fi
-                  done
-                  
-                  if [ $retry -eq 3 ]; then
-                    echo "❌ $repo_name 推送失败"
+                  else
+                    echo "❌ $repo_name 提交失败"
                   fi
-                else
-                  echo "❌ $repo_name 提交失败"
                 fi
+              else
+                echo "ℹ️ $repo_name 状态: $status，更新日志"
+                git add "R_packages_backup/backup_log_$(date +'%Y-%m-%d').csv" 2>/dev/null || true
+                git commit -m "📊 Update log for $repo_name ($status)" 2>/dev/null || true
+                git push origin main 2>/dev/null || true
               fi
-            elif [ "$status" != "success" ]; then
-              echo "⚠️ $repo_name 未成功下载，跳过提交"
-              # 仍然提交更新的日志
-              git add "R_packages_backup/backup_log_$(date +'%Y-%m-%d').csv" 2>/dev/null || true
-              git commit -m "📊 Update log for $repo_name ($status) - $(date +'%Y-%m-%d %H:%M')" 2>/dev/null || true
-              git push origin main 2>/dev/null || true
+              
+              last_result="$current_result"
+              repo_count=$((repo_count + 1))
             fi
-            
-            # 清理当前结果文件，准备下一次
-            rm -f current_result.txt
-            repo_count=$((repo_count + 1))
           fi
           
           sleep 3
@@ -328,11 +377,10 @@ jobs:
         
         # 等待R脚本完成
         wait $r_pid
-        
         echo ""
-        echo "🎉 所有仓库处理完成！"
+        echo "🎉 R脚本执行完成！"
         
-        # 最终统计提交
+        # 最终提交
         if [ -f "final_stats.txt" ]; then
           stats=$(cat final_stats.txt)
           success=$(echo "$stats" | cut -d'|' -f1)
@@ -342,8 +390,7 @@ jobs:
           
           echo "📊 最终统计: 成功 $success, 跳过 $skipped, 失败 $failed, 总大小 ${total_size}MB"
           
-          # 确保最终日志被提交
-          git add "R_packages_backup/backup_log_$(date +'%Y-%m-%d').csv" 2>/dev/null || true
+          git add "R_packages_backup/" 2>/dev/null || true
           git commit -m "📊 Final backup summary: $success success, $skipped skipped, $failed failed - $(date +'%Y-%m-%d')" 2>/dev/null || true
           git push origin main 2>/dev/null || true
         fi
@@ -370,10 +417,7 @@ jobs:
           echo "| ❌ 失败 | $failed | 下载失败 |" >> $GITHUB_STEP_SUMMARY
           echo "| 📦 总计 | $total | - |" >> $GITHUB_STEP_SUMMARY
           echo "| 💾 总大小 | ${total_size}MB | 已推送数据 |" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### ✨ 特点" >> $GITHUB_STEP_SUMMARY
-          echo "- 🔄 逐一处理: 每个仓库独立下载和推送" >> $GITHUB_STEP_SUMMARY
-          echo "- 📦 即时推送: 下载完成立即推送，避免累积" >> $GITHUB_STEP_SUMMARY
-          echo "- 🛡️ 大小限制: 超过100MB的文件自动跳过" >> $GITHUB_STEP_SUMMARY
-          echo "- 🔁 重试机制: 推送失败自动重试3次" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "## ⚠️ 备份未完成" >> $GITHUB_STEP_SUMMARY
+          echo "未找到统计文件，请检查日志" >> $GITHUB_STEP_SUMMARY
         fi
