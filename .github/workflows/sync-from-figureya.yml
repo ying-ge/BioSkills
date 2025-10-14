@@ -1,3 +1,4 @@
+# .github/workflows/sync-from-figureya.yml
 name: Sync Packages from FigureYa
  
 on:
@@ -9,7 +10,6 @@ on:
         default: 'false'
         type: boolean
   schedule:
-    # 每周日运行一次
     - cron: '0 2 * * 0'
  
 jobs:
@@ -17,145 +17,306 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    - name: Checkout FigureYa-package repository
+    - name: Checkout FigureYa-package repository (current repo)
       uses: actions/checkout@v4
       with:
-        fetch-depth: 0
         token: ${{ secrets.FIGUREYA2ACTION }}
+        fetch-depth: 0
+        # 不需要repository参数，因为这就是当前仓库
     
     - name: Setup R (latest version)
       uses: r-lib/actions/setup-r@v2
       with:
-        r-version: 'release'  # 使用最新稳定版本
+        r-version: 'release'
         use-public-rspm: true
     
     - name: Install R dependencies
+      shell: Rscript {0}
       run: |
         install.packages(c("rvest", "stringr", "jsonlite", "httr"), 
                         repos = "https://cloud.r-project.org/")
-      shell: Rscript {0}
+    
+    - name: Create scripts directory
+      shell: bash
+      run: |
+        mkdir -p scripts
+        mkdir -p metadata
+        mkdir -p packages/CRAN
+        mkdir -p packages/Bioconductor
+    
+    - name: Create extraction script
+      shell: bash
+      run: |
+        cat > scripts/extract_versions_from_figureya.R << 'EOF'
+        #!/usr/bin/env Rscript
+        # 从FigureYa仓库提取包版本信息
+        
+        suppressPackageStartupMessages({
+          library(rvest)
+          library(stringr)
+          library(jsonlite)
+          library(httr)
+        })
+        
+        # 配置
+        FIGUREYA_REPO <- "ying-ge/FigureYa"
+        GITHUB_TOKEN <- Sys.getenv("GITHUB_TOKEN")
+        OUTPUT_FILE <- "metadata/figureya_packages.json"
+        
+        cat("从FigureYa仓库提取包版本信息...\n")
+        cat("目标仓库:", FIGUREYA_REPO, "\n")
+        
+        # 从GitHub API获取文件列表
+        get_html_files_from_github <- function(repo, token = NULL) {
+          headers <- list()
+          if(!is.null(token) && token != "") {
+            headers[["Authorization"]] <- paste("token", token)
+          }
+          
+          # 获取仓库内容
+          get_files_recursive <- function(path = "") {
+            url <- paste0("https://api.github.com/repos/", repo, "/contents/", path)
+            
+            cat("请求URL:", url, "\n")
+            response <- GET(url, add_headers(.headers = headers))
+            
+            if(status_code(response) != 200) {
+              cat("请求失败:", url, "状态码:", status_code(response), "\n")
+              return(character(0))
+            }
+            
+            content_list <- content(response, "parsed")
+            html_files <- character(0)
+            
+            for(item in content_list) {
+              if(item$type == "file" && grepl("\\.html$", item$name)) {
+                # 跳过docs目录和其他不需要的目录
+                if(!grepl("^docs/|^\\.git/|\\.github/", item$path)) {
+                  cat("找到HTML文件:", item$path, "\n")
+                  html_files <- c(html_files, item$download_url)
+                }
+              } else if(item$type == "dir" && 
+                       !item$name %in% c("docs", ".git", ".github", "js", "texts")) {
+                # 递归处理子目录
+                sub_files <- get_files_recursive(item$path)
+                html_files <- c(html_files, sub_files)
+              }
+            }
+            
+            return(html_files)
+          }
+          
+          return(get_files_recursive())
+        }
+        
+        # 从HTML URL提取session info
+        extract_session_info_from_url <- function(html_url) {
+          tryCatch({
+            cat("处理文件:", basename(html_url), "\n")
+            response <- GET(html_url)
+            if(status_code(response) != 200) {
+              cat("下载失败:", html_url, "\n")
+              return(NULL)
+            }
+            
+            html_content <- read_html(content(response, "text"))
+            
+            # 查找session info
+            session_blocks <- html_content %>%
+              html_nodes("pre") %>%
+              html_text()
+            
+            session_text <- session_blocks[grepl("attached base packages|other attached packages", session_blocks)]
+            
+            if(length(session_text) == 0) {
+              cat("未找到session info:", basename(html_url), "\n")
+              return(NULL)
+            }
+            
+            packages <- list()
+            
+            # 解析R版本
+            r_version <- NA
+            r_version_match <- str_extract(session_text, "R version [0-9.]+")
+            if(!is.na(r_version_match)) {
+              r_version <- str_extract(r_version_match, "[0-9.]+")
+            }
+            
+            # 提取attached packages
+            if(grepl("other attached packages:", session_text)) {
+              attached_section <- str_extract(session_text, "other attached packages:.*?(?=\\n\\n|loaded via|$)")
+              attached_packages <- str_extract_all(attached_section, "\\w+_[0-9.-]+")[[1]]
+              
+              for(pkg_info in attached_packages) {
+                parts <- str_split(pkg_info, "_")[[1]]
+                if(length(parts) == 2) {
+                  packages[[parts[1]]] <- list(
+                    version = parts[2],
+                    source = "CRAN",
+                    priority = "attached",
+                    r_version = r_version
+                  )
+                }
+              }
+            }
+            
+            # 提取loaded packages
+            if(grepl("loaded via a namespace", session_text)) {
+              loaded_section <- str_extract(session_text, "loaded via a namespace.*")
+              loaded_packages <- str_extract_all(loaded_section, "\\w+_[0-9.-]+")[[1]]
+              
+              for(pkg_info in loaded_packages) {
+                parts <- str_split(pkg_info, "_")[[1]]
+                if(length(parts) == 2 && !parts[1] %in% names(packages)) {
+                  packages[[parts[1]]] <- list(
+                    version = parts[2],
+                    source = "CRAN",
+                    priority = "loaded",
+                    r_version = r_version
+                  )
+                }
+              }
+            }
+            
+            return(list(
+              packages = packages,
+              r_version = r_version,
+              source_url = html_url
+            ))
+            
+          }, error = function(e) {
+            cat("处理错误", html_url, ":", e$message, "\n")
+            return(NULL)
+          })
+        }
+        
+        # 主函数
+        main <- function() {
+          # 获取所有HTML文件
+          html_urls <- get_html_files_from_github(FIGUREYA_REPO, GITHUB_TOKEN)
+          cat("找到", length(html_urls), "个HTML文件\n")
+          
+          if(length(html_urls) == 0) {
+            cat("警告: 没有找到HTML文件，检查仓库访问权限\n")
+            # 创建空的输出文件
+            empty_data <- list(
+              packages = list(),
+              metadata = list(
+                extraction_date = Sys.time(),
+                figureya_repo = FIGUREYA_REPO,
+                total_html_files = 0,
+                r_versions = c(),
+                error = "No HTML files found"
+              )
+            )
+            dir.create(dirname(OUTPUT_FILE), showWarnings = FALSE, recursive = TRUE)
+            writeLines(toJSON(empty_data, pretty = TRUE, auto_unbox = TRUE), OUTPUT_FILE)
+            return()
+          }
+          
+          # 收集所有包信息
+          all_data <- list(
+            packages = list(),
+            metadata = list(
+              extraction_date = Sys.time(),
+              figureya_repo = FIGUREYA_REPO,
+              total_html_files = length(html_urls),
+              r_versions = c()
+            )
+          )
+          
+          # 限制处理文件数量（避免超时）
+          max_files <- min(50, length(html_urls))
+          html_urls <- html_urls[1:max_files]
+          
+          for(i in seq_along(html_urls)) {
+            cat("处理 (", i, "/", length(html_urls), ")\n")
+            
+            session_data <- extract_session_info_from_url(html_urls[i])
+            
+            if(!is.null(session_data)) {
+              # 记录R版本
+              if(!is.na(session_data$r_version)) {
+                all_data$metadata$r_versions <- unique(c(all_data$metadata$r_versions, session_data$r_version))
+              }
+              
+              # 合并包信息
+              for(pkg_name in names(session_data$packages)) {
+                pkg_info <- session_data$packages[[pkg_name]]
+                
+                if(!pkg_name %in% names(all_data$packages)) {
+                  all_data$packages[[pkg_name]] <- list()
+                }
+                
+                # 按R版本组织
+                r_ver <- ifelse(is.na(pkg_info$r_version), "unknown", pkg_info$r_version)
+                
+                if(!r_ver %in% names(all_data$packages[[pkg_name]])) {
+                  all_data$packages[[pkg_name]][[r_ver]] <- pkg_info
+                  all_data$packages[[pkg_name]][[r_ver]]$source_files <- c()
+                }
+                
+                all_data$packages[[pkg_name]][[r_ver]]$source_files <- 
+                  unique(c(all_data$packages[[pkg_name]][[r_ver]]$source_files, session_data$source_url))
+              }
+            }
+          }
+          
+          # 保存结果
+          dir.create(dirname(OUTPUT_FILE), showWarnings = FALSE, recursive = TRUE)
+          writeLines(toJSON(all_data, pretty = TRUE, auto_unbox = TRUE), OUTPUT_FILE)
+          
+          cat("\n提取完成!\n")
+          cat("唯一包数量:", length(all_data$packages), "\n")
+          cat("R版本:", paste(all_data$metadata$r_versions, collapse = ", "), "\n")
+          cat("输出文件:", OUTPUT_FILE, "\n")
+        }
+        
+        main()
+        EOF
     
     - name: Extract package versions from FigureYa
-      run: |
-        Rscript scripts/extract_versions_from_figureya.R
+      shell: bash
       env:
         GITHUB_TOKEN: ${{ secrets.FIGUREYA2ACTION }}
-    
-    - name: Download packages with size check
       run: |
-        Rscript scripts/download_packages_with_size_check.R
+        Rscript scripts/extract_versions_from_figureya.R
     
-    - name: Check file sizes and storage usage
+    - name: Check extraction results
+      shell: bash
       run: |
-        echo "=== File Size Check ==="
-        # 检查是否有超过100MB的文件
-        large_files=$(find packages/ -type f -size +100M 2>/dev/null || true)
-        if [ -n "$large_files" ]; then
-          echo "❌ Found files larger than 100MB (GitHub limit):"
-          echo "$large_files"
-          find packages/ -type f -size +100M -exec ls -lh {} \; 2>/dev/null || true
-          echo "These files will be moved to releases or external storage"
-        else
-          echo "✅ All files are under 100MB limit"
-        fi
-        
-        echo ""
-        echo "=== Storage Summary ==="
-        if [ -d "packages" ]; then
-          echo "Package directory size:"
-          du -sh packages/
-          
-          echo "Breakdown by R version:"
-          du -sh packages/*/* 2>/dev/null || echo "No version subdirectories"
-          
-          echo "File count by type:"
-          find packages/ -name "*.tar.gz" | wc -l | xargs echo "tar.gz files:"
-          
-          # 计算总大小（MB）
-          total_size_mb=$(du -sm packages/ | cut -f1)
-          echo "Total size: ${total_size_mb}MB"
-          
-          # GitHub仓库建议限制在1GB以下
-          if [ "$total_size_mb" -gt 1000 ]; then
-            echo "⚠️  Warning: Repository size (${total_size_mb}MB) is getting large"
-            echo "Consider implementing cleanup strategy"
+        if [ -f "metadata/figureya_packages.json" ]; then
+          echo "提取结果："
+          echo "文件大小: $(du -h metadata/figureya_packages.json)"
+          echo ""
+          echo "包数量统计："
+          if command -v jq > /dev/null; then
+            jq -r '.metadata | "HTML文件数: \(.total_html_files)\nR版本: \(.r_versions | join(", "))\n包总数: " + (.packages | length | tostring)' metadata/figureya_packages.json
+          else
+            echo "jq not available, showing raw file preview:"
+            head -20 metadata/figureya_packages.json
           fi
         else
-          echo "No packages directory found"
+          echo "❌ 提取失败，没有生成输出文件"
+          exit 1
         fi
     
-    - name: Handle large files
-      run: |
-        # 将大于100MB的文件移动到单独的目录，准备上传到releases
-        if [ -d "packages" ]; then
-          mkdir -p large_files_for_release
-          
-          find packages/ -type f -size +100M -exec mv {} large_files_for_release/ \; 2>/dev/null || true
-          
-          if [ -n "$(ls -A large_files_for_release 2>/dev/null)" ]; then
-            echo "Moved large files to large_files_for_release/"
-            ls -lh large_files_for_release/
-            
-            # 创建大文件清单
-            echo "# Large Files (>100MB)" > large_files_manifest.md
-            echo "These files are too large for direct git storage and should be uploaded to releases:" >> large_files_manifest.md
-            echo "" >> large_files_manifest.md
-            ls -lh large_files_for_release/ >> large_files_manifest.md
-          fi
-        fi
-    
-    - name: Safe commit and push
+    - name: Commit extraction results
       shell: bash
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "FigureYa Package Sync"
         
-        echo "large_files_for_release/" >> .gitignore
-        echo "*.tar.gz.large" >> .gitignore
-        
         git add metadata/ || echo "No metadata to add"
-        git add packages/ || echo "No packages to add"
-        git add .gitignore || echo "No gitignore changes"
-        git add large_files_manifest.md || echo "No manifest to add"
+        git add scripts/ || echo "No scripts to add"
         
         if git diff --staged --quiet; then
           echo "No changes to commit"
-          exit 0
+        else
+          git pull --rebase origin main || echo "Pull failed, continuing"
+          
+          commit_msg="Extract package versions from FigureYa - $(date -u '+%Y-%m-%d %H:%M:%S UTC') - Run ${{ github.run_number }}"
+          
+          git commit -m "$commit_msg"
+          git push origin main || git push --force-with-lease origin main
         fi
-        
-        current_branch=$(git branch --show-current)
-        echo "Current branch: $current_branch"
-        
-        echo "Pulling latest changes..."
-        git pull --rebase origin $current_branch || {
-          echo "Pull failed, trying fetch and merge"
-          git fetch origin
-          git merge origin/$current_branch --no-edit || {
-            echo "Merge failed, proceeding with current state"
-          }
-        }
-        
-        # 计算统计信息
-        total_packages=0
-        total_size="0MB"
-        if [ -d "packages" ]; then
-          total_packages=$(find packages/ -name "*.tar.gz" | wc -l)
-          total_size=$(du -sh packages/ | cut -f1)
-        fi
-        
-        large_files_count=0
-        if [ -d "large_files_for_release" ]; then
-          large_files_count=$(ls -1 large_files_for_release/ 2>/dev/null | wc -l || echo "0")
-        fi
-        
-        # 构建commit message - 使用单行格式
-        commit_msg="Update R packages repository: Synced from ying-ge/FigureYa, Total packages: ${total_packages}, Repository size: ${total_size}, Large files: ${large_files_count}, Updated: $(date -u '+%Y-%m-%d %H:%M:%S UTC'), Workflow run: ${{ github.run_number }}"
-        
-        echo "Committing changes..."
-        git commit -m "$commit_msg"
-        
-        echo "Pushing changes..."
-        git push origin $current_branch || {
-          echo "Push failed, trying force push"
-          git push --force-with-lease origin $current_branch
-        }
