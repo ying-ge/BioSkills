@@ -1,0 +1,7 @@
+Package: xgboost
+Version: 1.7.11.1
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/xgboost_1.7.11.1.tar.gz
+Size: 1.04 MB
+Download Date: 2025-10-14
+
