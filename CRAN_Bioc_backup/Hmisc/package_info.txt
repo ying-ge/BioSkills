@@ -1,0 +1,7 @@
+Package: Hmisc
+Version: 5.2-4
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/Hmisc_5.2-4.tar.gz
+Size: 0.86 MB
+Download Date: 2025-10-14
+
