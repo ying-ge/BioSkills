@@ -1,0 +1,289 @@
+name: Backup GitHub R Packages
+ 
+on:
+  workflow_dispatch:
+  schedule:
+    # 每周备份一次，避免过于频繁
+    - cron: "0 2 * * 0"  # 每周日凌晨2点
+ 
+permissions:
+  contents: write
+  actions: read
+ 
+jobs:
+  backup-packages:
+    runs-on: ubuntu-latest
+    
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}  # 使用内置token避免API限制
+ 
+    steps:
+    # 检出代码
+    - name: Checkout repository
+      uses: actions/checkout@v4  # 使用最新版本
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        fetch-depth: 0  # 获取完整历史
+ 
+    # 设置 R 环境
+    - name: Set up R
+      uses: r-lib/actions/setup-r@v2
+      with:
+        r-version: "4.3"  # 使用较新的R版本
+        use-public-rspm: true  # 使用公共包管理器加速安装
+ 
+    # 安装必要的R包
+    - name: Install R dependencies
+      uses: r-lib/actions/setup-r-dependencies@v2
+      with:
+        packages: |
+          any::jsonlite
+          any::httr
+          any::devtools
+        cache-version: 2
+ 
+    # 创建备份脚本
+    - name: Create backup script
+      run: |
+        cat > backup_repos.R << 'EOF'
+        library(jsonlite)
+        library(httr)
+        
+        # 设置GitHub token（如果可用）
+        github_token <- Sys.getenv("GITHUB_PAT")
+        if (github_token != "") {
+          httr::set_config(httr::add_headers(Authorization = paste("token", github_token)))
+        }
+        
+        # 读取仓库列表函数
+        read_github_repos <- function(file_path) {
+          if (!file.exists(file_path)) {
+            stop("文件不存在: ", file_path)
+          }
+          
+          lines <- readLines(file_path, warn = FALSE)
+          lines <- lines[lines != "" & !grepl("^#", lines)]
+          
+          repos <- character(0)
+          for (line in lines) {
+            if (grepl("github.com", line)) {
+              repo <- gsub(".*github.com/([^/]+/[^/]+).*", "\\1", line)
+              repos <- c(repos, repo)
+            } else if (grepl("^[^/]+/[^/]+$", trimws(line))) {
+              repos <- c(repos, trimws(line))
+            }
+          }
+          
+          return(unique(repos))
+        }
+        
+        # 备份函数
+        backup_repos_from_file <- function(repo_file, backup_dir = "R_packages_backup") {
+          cat("正在从文件读取仓库列表:", repo_file, "\n")
+          
+          if (!file.exists(repo_file)) {
+            cat("警告: 仓库列表文件不存在，使用示例列表\n")
+            github_repos <- c("tpq/kpmt", "cBioPortal/cgdsr")  # 示例
+          } else {
+            github_repos <- read_github_repos(repo_file)
+          }
+          
+          cat("找到", length(github_repos), "个仓库\n\n")
+          
+          if (!dir.exists(backup_dir)) {
+            dir.create(backup_dir, recursive = TRUE)
+          }
+          
+          backup_log <- data.frame(
+            repo = character(),
+            status = character(),
+            download_date = character(),
+            file_size = numeric(),
+            stringsAsFactors = FALSE
+          )
+          
+          for (i in seq_along(github_repos)) {
+            repo <- github_repos[i]
+            repo_name <- gsub("/", "_", repo)
+            repo_dir <- file.path(backup_dir, repo_name)
+            
+            if (!dir.exists(repo_dir)) {
+              dir.create(repo_dir)
+            }
+            
+            cat(sprintf("[%d/%d] 正在备份: %s\n", i, length(github_repos), repo))
+            
+            tryCatch({
+              # 尝试下载主分支
+              zip_urls <- c(
+                paste0("https://github.com/", repo, "/archive/refs/heads/master.zip"),
+                paste0("https://github.com/", repo, "/archive/refs/heads/main.zip")
+              )
+              
+              downloaded <- FALSE
+              final_file <- NULL
+              
+              for (j in seq_along(zip_urls)) {
+                branch_name <- c("master", "main")[j]
+                zip_file <- file.path(repo_dir, paste0(repo_name, "_", branch_name, ".zip"))
+                
+                tryCatch({
+                  download.file(zip_urls[j], zip_file, mode = "wb", quiet = TRUE)
+                  if (file.exists(zip_file) && file.size(zip_file) > 1000) {
+                    downloaded <- TRUE
+                    final_file <- zip_file
+                    break
+                  } else if (file.exists(zip_file)) {
+                    file.remove(zip_file)
+                  }
+                }, error = function(e) NULL)
+              }
+              
+              if (downloaded) {
+                # 尝试获取仓库信息（有token时）
+                if (github_token != "") {
+                  api_url <- paste0("https://api.github.com/repos/", repo)
+                  tryCatch({
+                    response <- httr::GET(api_url)
+                    if (httr::status_code(response) == 200) {
+                      repo_info <- httr::content(response, "text", encoding = "UTF-8")
+                      meta_file <- file.path(repo_dir, "repository_info.json")
+                      writeLines(repo_info, meta_file)
+                    }
+                  }, error = function(e) NULL)
+                }
+                
+                backup_log <<- rbind(backup_log, data.frame(
+                  repo = repo,
+                  status = "success",
+                  download_date = as.character(Sys.Date()),
+                  file_size = file.size(final_file)
+                ))
+                
+                cat("✓ 成功\n")
+              } else {
+                backup_log <<- rbind(backup_log, data.frame(
+                  repo = repo,
+                  status = "failed - no accessible branch",
+                  download_date = as.character(Sys.Date()),
+                  file_size = 0
+                ))
+                cat("✗ 失败\n")
+              }
+              
+            }, error = function(e) {
+              backup_log <<- rbind(backup_log, data.frame(
+                repo = repo,
+                status = paste("error:", e$message),
+                download_date = as.character(Sys.Date()),
+                file_size = 0
+              ))
+              cat("✗ 出错:", e$message, "\n")
+            })
+            
+            # 避免API限制
+            if (i %% 10 == 0) {
+              Sys.sleep(2)
+            }
+          }
+          
+          # 保存日志
+          log_file <- file.path(backup_dir, paste0("backup_log_", Sys.Date(), ".csv"))
+          write.csv(backup_log, log_file, row.names = FALSE)
+          
+          # 生成简要报告
+          success_count <- sum(backup_log$status == "success")
+          cat("\n=== 备份完成 ===\n")
+          cat("总数:", nrow(backup_log), "\n")
+          cat("成功:", success_count, "\n")
+          cat("失败:", nrow(backup_log) - success_count, "\n")
+          
+          return(backup_log)
+        }
+        
+        # 查找仓库列表文件
+        possible_paths <- c(
+          ".github/docs/github_library.txt",
+          "docs/github_library.txt", 
+          "github_library.txt",
+          "scripts/github_library.txt"
+        )
+        
+        repo_file <- NULL
+        for (path in possible_paths) {
+          if (file.exists(path)) {
+            repo_file <- path
+            break
+          }
+        }
+        
+        if (is.null(repo_file)) {
+          cat("未找到仓库列表文件，请检查以下路径:\n")
+          cat(paste(possible_paths, collapse = "\n"))
+          quit(status = 1)
+        }
+        
+        # 执行备份
+        backup_log <- backup_repos_from_file(repo_file)
+        EOF
+ 
+    # 运行备份脚本
+    - name: Run backup script
+      run: Rscript backup_repos.R
+ 
+    # 检查备份结果大小
+    - name: Check backup size
+      run: |
+        if [ -d "R_packages_backup" ]; then
+          echo "备份目录大小:"
+          du -sh R_packages_backup/
+          echo "文件数量:"
+          find R_packages_backup -type f | wc -l
+        else
+          echo "备份目录不存在"
+          exit 1
+        fi
+ 
+    # 配置Git（仅在有文件变更时）
+    - name: Configure Git
+      run: |
+        git config --global user.name "GitHub Actions Bot"
+        git config --global user.email "actions@github.com"
+ 
+    # 提交备份文件
+    - name: Commit and push backup
+      run: |
+        git add R_packages_backup/
+        if git diff --staged --quiet; then
+          echo "没有新的备份文件需要提交"
+        else
+          git commit -m "📦 Update R packages backup - $(date +'%Y-%m-%d')"
+          git push
+        fi
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+ 
+    # 创建备份摘要
+    - name: Create backup summary
+      if: always()
+      run: |
+        if [ -f "R_packages_backup/backup_log_$(date +'%Y-%m-%d').csv" ]; then
+          echo "## 📊 备份摘要 - $(date +'%Y-%m-%d')" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| 状态 | 数量 |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|------|" >> $GITHUB_STEP_SUMMARY
+          
+          # 统计成功失败数量
+          success_count=$(grep -c "success" "R_packages_backup/backup_log_$(date +'%Y-%m-%d').csv" || echo "0")
+          total_count=$(tail -n +2 "R_packages_backup/backup_log_$(date +'%Y-%m-%d').csv" | wc -l || echo "0")
+          failed_count=$((total_count - success_count))
+          
+          echo "| ✅ 成功 | $success_count |" >> $GITHUB_STEP_SUMMARY
+          echo "| ❌ 失败 | $failed_count |" >> $GITHUB_STEP_SUMMARY
+          echo "| 📦 总计 | $total_count |" >> $GITHUB_STEP_SUMMARY
+          
+          if [ -d "R_packages_backup" ]; then
+            backup_size=$(du -sh R_packages_backup/ | cut -f1)
+            echo "| 💾 大小 | $backup_size |" >> $GITHUB_STEP_SUMMARY
+          fi
+        fi
