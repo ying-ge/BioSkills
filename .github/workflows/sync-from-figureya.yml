@@ -38,17 +38,17 @@ jobs:
     
     - name: Extract package versions from FigureYa
       run: |
-        Rscript scripts/extract_versions_from_figureya.R
+        Rscript .github/scripts/extract_versions_from_figureya.R
       env:
         GITHUB_TOKEN: ${{ secrets.FIGUREYA2ACTION }}
     
     - name: Download packages
       run: |
-        Rscript scripts/download_packages.R
+        Rscript .github/scripts/download_packages.R
     
     - name: Generate package index
       run: |
-        Rscript scripts/generate_package_index.R
+        Rscript .github/scripts/generate_package_index.R
     
     - name: Check storage usage
       run: |
