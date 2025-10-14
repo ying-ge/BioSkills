@@ -1,0 +1,7 @@
+Package: BSgenome
+Version: 1.70.2
+Source: Bioconductor BioCsoft
+URL: https://bioconductor.org/packages/3.18/bioc/src/contrib/BSgenome_1.70.2.tar.gz
+Size: 5.64 MB
+Download Date: 2025-10-14
+
