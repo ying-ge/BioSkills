@@ -1,0 +1,7 @@
+Package: IlluminaHumanMethylation450kanno.ilmn12.hg19
+Version: 0.6.1
+Source: Bioconductor BioCann
+URL: https://bioconductor.org/packages/3.18/data/annotation/src/contrib/IlluminaHumanMethylation450kanno.ilmn12.hg19_0.6.1.tar.gz
+Size: 55.21 MB
+Download Date: 2025-10-14
+
