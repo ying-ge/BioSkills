@@ -1,0 +1,7 @@
+Package: ChAMP
+Version: 2.32.0
+Source: Bioconductor BioCsoft
+URL: https://bioconductor.org/packages/3.18/bioc/src/contrib/ChAMP_2.32.0.tar.gz
+Size: 7.94 MB
+Download Date: 2025-10-14
+
