@@ -47,45 +47,6 @@ jobs:
         if [ -f ".github/docs/library_list.txt" ]; then
           echo "✅ 找到文件: .github/docs/library_list.txt"
           cp .github/docs/library_list.txt package_list.txt
-        elif [ -f "docs/library_list.txt" ]; then
-          echo "✅ 找到文件: docs/library_list.txt"
-          cp docs/library_list.txt package_list.txt
-        elif [ -f "library_list.txt" ]; then
-          echo "✅ 找到文件: library_list.txt"
-          cp library_list.txt package_list.txt
-        else
-          echo "⚠️ 未找到R包列表文件，创建示例文件..."
-          cat > package_list.txt << 'EOF'
-# CRAN和Bioconductor R包列表
-# CRAN包
-ggplot2
-dplyr
-tidyr
-readr
-stringr
-lubridate
-purrr
-tibble
-forcats
-# Bioconductor包
-Biobase
-limma
-edgeR
-DESeq2
-GenomicRanges
-IRanges
-S4Vectors
-Biostrings
-GenomicFeatures
-AnnotationDbi
-# 其他常用包
-devtools
-roxygen2
-testthat
-knitr
-rmarkdown
-EOF
-          echo "✅ 已创建示例文件 package_list.txt"
         fi
         
         # 显示包列表信息
