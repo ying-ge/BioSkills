@@ -9,6 +9,7 @@ Biobase
 BiocParallel
 BlandAltmanLeh
 Boruta
+C50
 CMScaller
 Cairo
 CancerSubtypes
@@ -123,6 +124,7 @@ fmsb
 forcats
 foreign
 forestplot
+FSelector
 future
 future.apply
 gbm
@@ -174,6 +176,7 @@ jsonlite
 kableExtra
 ktplots
 lattice
+lars
 limma
 lme4
 lolR
@@ -191,13 +194,18 @@ minfi
 miscTools
 mixtools
 mlbench
+mlr3
+mlr3learners
+mlr3extralearners
 monocle
 monocle3
 motifbreakR
 msa
 msigdbr
 muhaz
+naivebayes
 networkD3
+neuralnet
 nlme
 nomogramEx
 officer
@@ -209,12 +217,15 @@ org.Mm.eg.db
 pROC
 pamr
 parallel
+party
 patchwork
 pathifier
 pbapply
 pec
 phangorn
 pheatmap
+plotly
+pls
 plsRcox
 plyr
 preprocessCore
@@ -240,6 +251,7 @@ rstatix
 rsvd
 rsvg
 rtracklayer
+RWekajars
 scMetabolism
 scales
 seqinr
@@ -278,6 +290,7 @@ tradeSeq
 usedist
 utils
 vegan
+VIM
 viper
 viridis
 wakefield
