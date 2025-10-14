@@ -1,0 +1,7 @@
+Package: smatr
+Version: 3.4-8
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/smatr_3.4-8.tar.gz
+Size: 0.05 MB
+Download Date: 2025-10-14
+
