@@ -1,102 +1,39 @@
-# .github/workflows/sync-from-figureya.yml
-name: Sync Packages from FigureYa
+# .github/workflows/test-basic.yml
+name: Test Basic Setup
  
 on:
   workflow_dispatch:
-    inputs:
-      force_update:
-        description: 'Force update all packages'
-        required: false
-        default: 'false'
-        type: boolean
  
 jobs:
-  sync-packages:
+  test:
     runs-on: ubuntu-latest
     
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-      with:
-        token: ${{ secrets.FIGUREYA2ACTION }}
+    - uses: actions/checkout@v4
+      # 完全不指定token参数，使用默认的GITHUB_TOKEN
     
-    - name: Setup R
-      uses: r-lib/actions/setup-r@v2
-      with:
-        r-version: 'release'
-    
-    - name: Install dependencies
-      shell: Rscript {0}
+    - name: Test environment
       run: |
-        install.packages(c("rvest", "stringr", "jsonlite", "httr"))
+        echo "Current repository: $GITHUB_REPOSITORY"
+        echo "Current ref: $GITHUB_REF"
+        echo "Working directory:"
+        pwd
+        ls -la
     
-    - name: Test token access
-      shell: bash
+    - name: Test custom token
       env:
-        GITHUB_TOKEN: ${{ secrets.FIGUREYA2ACTION }}
+        CUSTOM_TOKEN: ${{ secrets.FIGUREYA2ACTION }}
       run: |
-        echo "Testing GitHub API access..."
-        curl -H "Authorization: token $GITHUB_TOKEN" \
-             -H "Accept: application/vnd.github.v3+json" \
-             https://api.github.com/repos/ying-ge/FigureYa
-    
-    - name: Create and run extraction script
-      shell: bash
-      env:
-        GITHUB_TOKEN: ${{ secrets.FIGUREYA2ACTION }}
-      run: |
-        mkdir -p metadata
-        
-        cat > extract_simple.R << 'EOF'
-        library(httr)
-        library(jsonlite)
-        
-        GITHUB_TOKEN <- Sys.getenv("GITHUB_TOKEN")
-        
-        cat("Token available:", nchar(GITHUB_TOKEN) > 0, "\n")
-        
-        # 测试API访问
-        headers <- list(Authorization = paste("token", GITHUB_TOKEN))
-        response <- GET("https://api.github.com/repos/ying-ge/FigureYa", add_headers(.headers = headers))
-        
-        cat("API Status:", status_code(response), "\n")
-        
-        if(status_code(response) == 200) {
-          repo_info <- content(response)
-          cat("Repository:", repo_info$full_name, "\n")
-          cat("Stars:", repo_info$stargazers_count, "\n")
-        }
-        
-        # 创建示例输出
-        sample_data <- list(
-          packages = list(
-            ggplot2 = list(version = "3.4.0", source = "CRAN")
-          ),
-          metadata = list(
-            extraction_date = Sys.time(),
-            test_run = TRUE
-          )
-        )
-        
-        writeLines(toJSON(sample_data, pretty = TRUE), "metadata/test_output.json")
-        cat("Created test output file\n")
-        EOF
-        
-        Rscript extract_simple.R
-    
-    - name: Check results and commit
-      shell: bash
-      run: |
-        if [ -f "metadata/test_output.json" ]; then
-          echo "✅ Script executed successfully"
-          cat metadata/test_output.json
+        if [ -z "$CUSTOM_TOKEN" ]; then
+          echo "❌ FIGUREYA2ACTION secret not found"
         else
-          echo "❌ Script failed"
-          exit 1
+          echo "✅ FIGUREYA2ACTION secret available (length: ${#CUSTOM_TOKEN})"
         fi
-        
-        git config user.email "action@github.com"
-        git config user.name "GitHub Action"
-        git add .
-        git commit -m "Test run $(date)" || echo "No changes to commit"
-        git push
+    
+    - name: Test GitHub API with custom token
+      env:
+        GITHUB_TOKEN: ${{ secrets.FIGUREYA2ACTION }}
+      run: |
+        curl -H "Authorization: token $GITHUB_TOKEN" \
+             https://api.github.com/repos/ying-ge/FigureYa \
+             | head -10
