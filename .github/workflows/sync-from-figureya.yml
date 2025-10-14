@@ -1,4 +1,3 @@
-# .github/workflows/sync-from-figureya.yml
 name: Sync Packages from FigureYa
  
 on:
