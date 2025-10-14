@@ -1,0 +1,7 @@
+Package: openxlsx
+Version: 4.2.8
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/openxlsx_4.2.8.tar.gz
+Size: 1.35 MB
+Download Date: 2025-10-14
+
