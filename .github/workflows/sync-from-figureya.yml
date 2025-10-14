@@ -23,10 +23,10 @@ jobs:
         fetch-depth: 0
         token: ${{ secrets.FIGUREYA2ACTION }}
     
-    - name: Setup R
+    - name: Setup R (latest version)
       uses: r-lib/actions/setup-r@v2
       with:
-        r-version: 'latest'
+        r-version: 'release'  # 使用最新稳定版本
         use-public-rspm: true
     
     - name: Install R dependencies
@@ -37,73 +37,216 @@ jobs:
     
     - name: Extract package versions from FigureYa
       run: |
-        Rscript .github/scripts/extract_versions_from_figureya.R
+        Rscript scripts/extract_versions_from_figureya.R
       env:
         GITHUB_TOKEN: ${{ secrets.FIGUREYA2ACTION }}
     
-    - name: Download packages
+    - name: Download packages with size check
       run: |
-        Rscript .github/scripts/download_packages.R
+        Rscript scripts/download_packages_with_size_check.R
     
-    - name: Generate package index
+    - name: Check file sizes and storage usage
       run: |
-        Rscript .github/scripts/generate_package_index.R
-    
-    - name: Check storage usage
-      run: |
-        echo "Package directory size:"
-        du -sh packages/
+        echo "=== File Size Check ==="
+        # 检查是否有超过100MB的文件
+        large_files=$(find packages/ -type f -size +100M 2>/dev/null || true)
+        if [ -n "$large_files" ]; then
+          echo "❌ Found files larger than 100MB (GitHub limit):"
+          echo "$large_files"
+          find packages/ -type f -size +100M -exec ls -lh {} \; 2>/dev/null || true
+          echo "These files will be moved to releases or external storage"
+        else
+          echo "✅ All files are under 100MB limit"
+        fi
         
-        echo "Detailed breakdown:"
-        du -sh packages/*
-        
-        # 如果超过1GB，发出警告
-        size_mb=$(du -sm packages/ | cut -f1)
-        if [ "$size_mb" -gt 1024 ]; then
-          echo "Warning: Package directory is ${size_mb}MB, consider cleanup"
+        echo ""
+        echo "=== Storage Summary ==="
+        if [ -d "packages" ]; then
+          echo "Package directory size:"
+          du -sh packages/
+          
+          echo "Breakdown by R version:"
+          du -sh packages/*/* 2>/dev/null || echo "No version subdirectories"
+          
+          echo "File count by type:"
+          find packages/ -name "*.tar.gz" | wc -l | xargs echo "tar.gz files:"
+          
+          # 计算总大小（MB）
+          total_size_mb=$(du -sm packages/ | cut -f1)
+          echo "Total size: ${total_size_mb}MB"
+          
+          # GitHub仓库建议限制在1GB以下
+          if [ "$total_size_mb" -gt 1000 ]; then
+            echo "⚠️  Warning: Repository size (${total_size_mb}MB) is getting large"
+            echo "Consider implementing cleanup strategy"
+          fi
+        else
+          echo "No packages directory found"
         fi
     
-    - name: Commit and push changes
+    - name: Handle large files
+      run: |
+        # 将大于100MB的文件移动到单独的目录，准备上传到releases
+        if [ -d "packages" ]; then
+          mkdir -p large_files_for_release
+          
+          find packages/ -type f -size +100M -exec mv {} large_files_for_release/ \; 2>/dev/null || true
+          
+          if [ -n "$(ls -A large_files_for_release 2>/dev/null)" ]; then
+            echo "Moved large files to large_files_for_release/"
+            ls -lh large_files_for_release/
+            
+            # 创建大文件清单
+            echo "# Large Files (>100MB)" > large_files_manifest.md
+            echo "These files are too large for direct git storage and should be uploaded to releases:" >> large_files_manifest.md
+            echo "" >> large_files_manifest.md
+            ls -lh large_files_for_release/ >> large_files_manifest.md
+          fi
+        fi
+    
+    - name: Safe commit and push with conflict resolution
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "FigureYa Package Sync"
         
-        git add metadata/
-        git add packages/
+        # 设置合并策略
+        git config pull.rebase true
+        git config rebase.autoStash true
+        
+        # 添加.gitignore来忽略大文件目录
+        echo "large_files_for_release/" >> .gitignore
+        echo "*.tar.gz.large" >> .gitignore
+        
+        # 暂存更改
+        git add metadata/ || echo "No metadata to add"
+        git add packages/ || echo "No packages to add"
+        git add .gitignore || echo "No gitignore changes"
+        git add large_files_manifest.md || echo "No large files manifest"
         
         if git diff --staged --quiet; then
           echo "No changes to commit"
-        else
-          # 统计包数量
-          total_packages=$(find packages/ -name "*.tar.gz" | wc -l)
-          
-          git commit -m "Update R packages repository
-          
-          - Synced from ying-ge/FigureYa
-          - Total packages: ${total_packages}
-          - Updated: $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
-          
-          git push
+          exit 0
         fi
-    
-    - name: Create release summary
-      if: github.ref == 'refs/heads/main'
-      run: |
-        if [ -f "metadata/download_logs/download_"*".json" ]; then
-          latest_log=$(ls -t metadata/download_logs/download_*.json | head -1)
-          echo "## Package Sync Summary" > sync_summary.md
-          echo "Date: $(date)" >> sync_summary.md
-          echo "" >> sync_summary.md
+        
+        # 获取当前分支
+        current_branch=$(git branch --show-current)
+        echo "Current branch: $current_branch"
+        
+        # 尝试多种pull策略
+        echo "📥 Pulling latest changes..."
+        pull_success=false
+        
+        # 策略1: 正常pull with rebase
+        if git pull --rebase origin $current_branch 2>/dev/null; then
+          echo "✅ Normal pull successful"
+          pull_success=true
+        else
+          echo "⚠️  Normal pull failed, trying alternative methods..."
           
-          jq -r '"**Total Packages:** \(.total_packages)
-**Successful Downloads:** \(.summary.success)  
-**Failed Downloads:** \(.summary.failed)
-**Skipped:** \(.summary.skipped)
-**Duration:** \(.duration) minutes"' "$latest_log" >> sync_summary.md
+          # 策略2: fetch + rebase
+          if git fetch origin && git rebase origin/$current_branch 2>/dev/null; then
+            echo "✅ Fetch + rebase successful"
+            pull_success=true
+          else
+            echo "⚠️  Rebase failed, trying merge strategy..."
+            git rebase --abort 2>/dev/null || true
+            
+            # 策略3: fetch + merge
+            if git fetch origin && git merge origin/$current_branch --no-edit 2>/dev/null; then
+              echo "✅ Fetch + merge successful"
+              pull_success=true
+            else
+              echo "⚠️  Merge also failed, checking for conflicts..."
+              
+              # 策略4: 重置并重新应用更改
+              echo "🔄 Resetting and reapplying changes..."
+              git reset --soft HEAD~1 2>/dev/null || true
+              git fetch origin
+              git reset --hard origin/$current_branch
+              
+              # 重新添加我们的更改
+              git add metadata/ packages/ .gitignore large_files_manifest.md 2>/dev/null || true
+              pull_success=true
+            fi
+          fi
+        fi
+        
+        if [ "$pull_success" = false ]; then
+          echo "❌ All pull strategies failed, proceeding with caution..."
+        fi
+        
+        # 检查并解决冲突
+        if git status --porcelain | grep -q "^UU\|^AA\|^DD\|^DU\|^UD"; then
+          echo "🔧 Resolving merge conflicts..."
           
-          echo "" >> sync_summary.md
-          echo "### Package Directory Structure" >> sync_summary.md
-          tree packages/ -L 3 >> sync_summary.md || find packages/ -type d | head -20 >> sync_summary.md
+          # 对于我们关心的文件，使用我们的版本
+          git checkout --ours metadata/ 2>/dev/null || true
+          git checkout --ours packages/ 2>/dev/null || true
+          git checkout --ours .gitignore 2>/dev/null || true
           
-          cat sync_summary.md
+          git add metadata/ packages/ .gitignore 2>/dev/null || true
+          echo "✅ Conflicts resolved"
+        fi
+        
+        # 准备commit信息
+        total_packages=0
+        total_size="0MB"
+        if [ -d "packages" ]; then
+          total_packages=$(find packages/ -name "*.tar.gz" | wc -l)
+          total_size=$(du -sh packages/ | cut -f1)
+        fi
+        
+        large_files_count=0
+        if [ -d "large_files_for_release" ]; then
+          large_files_count=$(ls -1 large_files_for_release/ 2>/dev/null | wc -l)
+        fi
+        
+        commit_message="Update R packages repository
+ 
+- Synced from ying-ge/FigureYa  
+- Total packages: ${total_packages}
+- Repository size: ${total_size}
+- Large files (for releases): ${large_files_count}
+- Updated: $(date -u '+%Y-%m-%d %H:%M:%S UTC')
+- Workflow run: ${{ github.run_number }}"
+        
+        # Commit
+        echo "💾 Committing changes..."
+        if git commit -m "$commit_message"; then
+          echo "✅ Commit successful"
+          
+          # Push with retry logic
+          echo "📤 Pushing changes..."
+          max_retries=3
+          retry_count=0
+          
+          while [ $retry_count -lt $max_retries ]; do
+            if git push origin $current_branch; then
+              echo "✅ Push successful"
+              break
+            else
+              retry_count=$((retry_count + 1))
+              echo "⚠️  Push attempt $retry_count failed"
+              
+              if [ $retry_count -lt $max_retries ]; then
+                echo "🔄 Retrying in 5 seconds..."
+                sleep 5
+                
+                # 再次尝试pull
+                git pull --rebase origin $current_branch 2>/dev/null || true
+              else
+                echo "❌ All push attempts failed"
+                echo "📊 Repository status:"
+                git status
+                echo "📝 Recent commits:"
+                git log --oneline -5
+                exit 1
+              fi
+            fi
+          done
+        else
+          echo "❌ Commit failed"
+          echo "📊 Repository status:"
+          git status
+          exit 1
         fi
