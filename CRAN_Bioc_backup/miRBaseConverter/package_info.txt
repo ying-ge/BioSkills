@@ -1,0 +1,7 @@
+Package: miRBaseConverter
+Version: 1.26.0
+Source: Bioconductor BioCsoft
+URL: https://bioconductor.org/packages/3.18/bioc/src/contrib/miRBaseConverter_1.26.0.tar.gz
+Size: 1.94 MB
+Download Date: 2025-10-14
+
