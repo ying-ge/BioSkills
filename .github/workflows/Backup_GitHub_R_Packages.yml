@@ -177,9 +177,6 @@ jobs:
         # 查找仓库列表文件
         possible_paths <- c(
           ".github/docs/github_library.txt",
-          "docs/github_library.txt", 
-          "github_library.txt",
-          "scripts/github_library.txt"
         )
         
         repo_file <- NULL
