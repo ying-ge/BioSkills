@@ -1,0 +1,481 @@
+name: Backup CRAN and Bioconductor R Packages
+ 
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 3 * * 0"  # 每周日凌晨3点
+ 
+permissions:
+  contents: write
+  actions: read
+ 
+jobs:
+  backup-packages:
+    runs-on: ubuntu-latest
+    
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+ 
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        fetch-depth: 0
+ 
+    - name: Set up R
+      uses: r-lib/actions/setup-r@v2
+      with:
+        r-version: "4.3"
+        use-public-rspm: true
+ 
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev
+ 
+    - name: Configure Git
+      run: |
+        git config --global user.name "GitHub Actions Bot"
+        git config --global user.email "actions@github.com"
+ 
+    - name: Check and prepare package list
+      run: |
+        echo "🔍 检查R包列表文件..."
+        
+        # 检查可能的文件位置
+        if [ -f ".github/docs/library_list.txt" ]; then
+          echo "✅ 找到文件: .github/docs/library_list.txt"
+          cp .github/docs/library_list.txt package_list.txt
+        elif [ -f "docs/library_list.txt" ]; then
+          echo "✅ 找到文件: docs/library_list.txt"
+          cp docs/library_list.txt package_list.txt
+        elif [ -f "library_list.txt" ]; then
+          echo "✅ 找到文件: library_list.txt"
+          cp library_list.txt package_list.txt
+        else
+          echo "⚠️ 未找到R包列表文件，创建示例文件..."
+          cat > package_list.txt << 'EOF'
+# CRAN和Bioconductor R包列表
+# CRAN包
+ggplot2
+dplyr
+tidyr
+readr
+stringr
+lubridate
+purrr
+tibble
+forcats
+# Bioconductor包
+Biobase
+limma
+edgeR
+DESeq2
+GenomicRanges
+IRanges
+S4Vectors
+Biostrings
+GenomicFeatures
+AnnotationDbi
+# 其他常用包
+devtools
+roxygen2
+testthat
+knitr
+rmarkdown
+EOF
+          echo "✅ 已创建示例文件 package_list.txt"
+        fi
+        
+        # 显示包列表信息
+        echo "📄 R包列表内容:"
+        cat package_list.txt | head -20
+        echo ""
+        echo "📊 统计: $(grep -v '^#' package_list.txt | grep -v '^$' | wc -l) 个R包"
+ 
+    - name: Run CRAN/Bioconductor backup script
+      run: |
+        cat > cran_bioc_backup.R << 'EOF'
+        cat("🚀 开始CRAN/Bioconductor包备份脚本...\n")
+        
+        # 设置镜像
+        options(repos = c(
+          CRAN = "https://cloud.r-project.org/",
+          BioCsoft = "https://bioconductor.org/packages/release/bioc",
+          BioCann = "https://bioconductor.org/packages/release/data/annotation",
+          BioCexp = "https://bioconductor.org/packages/release/data/experiment"
+        ))
+        
+        # 尝试安装BiocManager（如果需要）
+        if (!requireNamespace("BiocManager", quietly = TRUE)) {
+          tryCatch({
+            install.packages("BiocManager")
+            cat("✅ BiocManager安装成功\n")
+          }, error = function(e) {
+            cat("⚠️ BiocManager安装失败，将只处理CRAN包\n")
+          })
+        }
+        
+        # 读取包列表
+        package_file <- "package_list.txt"
+        if (!file.exists(package_file)) {
+          stop("R包列表文件不存在")
+        }
+        
+        lines <- readLines(package_file, warn = FALSE)
+        packages <- lines[nchar(trimws(lines)) > 0 & !grepl("^#", lines)]
+        packages <- trimws(packages)
+        
+        cat("找到", length(packages), "个R包\n")
+        
+        # 创建备份目录
+        backup_dir <- "CRAN_Bioc_backup"
+        if (!dir.exists(backup_dir)) {
+          dir.create(backup_dir, recursive = TRUE)
+        }
+        
+        # 获取包信息的函数
+        get_package_info <- function(pkg_name) {
+          info <- list(
+            name = pkg_name,
+            source = "unknown",
+            version = "unknown",
+            url = NULL,
+            success = FALSE
+          )
+          
+          # 首先尝试从CRAN获取
+          tryCatch({
+            cran_info <- available.packages(repos = "https://cloud.r-project.org/")
+            if (pkg_name %in% rownames(cran_info)) {
+              info$source <- "CRAN"
+              info$version <- cran_info[pkg_name, "Version"]
+              info$url <- sprintf("https://cloud.r-project.org/src/contrib/%s_%s.tar.gz", 
+                                 pkg_name, info$version)
+              info$success <- TRUE
+              return(info)
+            }
+          }, error = function(e) NULL)
+          
+          # 如果CRAN没有，尝试Bioconductor
+          if (requireNamespace("BiocManager", quietly = TRUE)) {
+            tryCatch({
+              # 获取Bioconductor包信息
+              bioc_repos <- BiocManager::repositories()
+              
+              for (repo_name in names(bioc_repos)) {
+                repo_url <- bioc_repos[repo_name]
+                tryCatch({
+                  bioc_info <- available.packages(repos = repo_url)
+                  if (pkg_name %in% rownames(bioc_info)) {
+                    info$source <- paste("Bioconductor", repo_name)
+                    info$version <- bioc_info[pkg_name, "Version"]
+                    
+                    # 构建下载URL
+                    if (grepl("bioc$", repo_url)) {
+                      info$url <- sprintf("%s/src/contrib/%s_%s.tar.gz", 
+                                         repo_url, pkg_name, info$version)
+                    } else if (grepl("annotation$", repo_url)) {
+                      info$url <- sprintf("%s/src/contrib/%s_%s.tar.gz", 
+                                         repo_url, pkg_name, info$version)
+                    } else {
+                      info$url <- sprintf("%s/src/contrib/%s_%s.tar.gz", 
+                                         repo_url, pkg_name, info$version)
+                    }
+                    
+                    info$success <- TRUE
+                    return(info)
+                  }
+                }, error = function(e) NULL)
+              }
+            }, error = function(e) NULL)
+          }
+          
+          return(info)
+        }
+        
+        # 下载单个包的函数
+        download_package <- function(pkg_name, backup_dir, max_size_mb = 100) {
+          cat(sprintf("🔍 查找包: %s\n", pkg_name))
+          
+          # 创建包目录
+          pkg_dir <- file.path(backup_dir, pkg_name)
+          if (dir.exists(pkg_dir)) {
+            unlink(pkg_dir, recursive = TRUE)
+          }
+          dir.create(pkg_dir)
+          
+          result <- list(
+            package = pkg_name,
+            status = "failed",
+            source = "unknown",
+            version = "unknown",
+            file_size_mb = 0,
+            date = as.character(Sys.Date())
+          )
+          
+          # 获取包信息
+          pkg_info <- get_package_info(pkg_name)
+          
+          if (!pkg_info$success) {
+            cat(sprintf("❌ 包 %s 未找到\n", pkg_name))
+            result$status <- "not_found"
+            unlink(pkg_dir, recursive = TRUE)
+            return(result)
+          }
+          
+          cat(sprintf("📦 找到包: %s v%s (%s)\n", pkg_name, pkg_info$version, pkg_info$source))
+          
+          result$source <- pkg_info$source
+          result$version <- pkg_info$version
+          
+          # 下载包
+          tryCatch({
+            tar_file <- file.path(pkg_dir, sprintf("%s_%s.tar.gz", pkg_name, pkg_info$version))
+            
+            cat(sprintf("⬇️ 下载中: %s\n", pkg_info$url))
+            download.file(pkg_info$url, tar_file, mode = "wb", quiet = TRUE)
+            
+            if (file.exists(tar_file) && file.size(tar_file) > 100) {
+              file_size_mb <- file.size(tar_file) / (1024^2)
+              
+              if (file_size_mb > max_size_mb) {
+                cat(sprintf("⚠️ 文件过大: %.1f MB，跳过\n", file_size_mb))
+                result$status <- sprintf("skipped_large_%.1fMB", file_size_mb)
+                result$file_size_mb <- file_size_mb
+                file.remove(tar_file)
+                unlink(pkg_dir, recursive = TRUE)
+              } else {
+                cat(sprintf("✅ 下载成功: %.1f MB\n", file_size_mb))
+                result$status <- "success"
+                result$file_size_mb <- round(file_size_mb, 2)
+                
+                # 保存包信息
+                pkg_info_file <- file.path(pkg_dir, "package_info.txt")
+                info_content <- sprintf(
+                  "Package: %s\nVersion: %s\nSource: %s\nURL: %s\nSize: %.2f MB\nDownload Date: %s\n",
+                  pkg_name, pkg_info$version, pkg_info$source, 
+                  pkg_info$url, file_size_mb, Sys.Date()
+                )
+                writeLines(info_content, pkg_info_file)
+              }
+            } else {
+              cat(sprintf("❌ 下载失败或文件损坏\n"))
+              result$status <- "download_failed"
+              unlink(pkg_dir, recursive = TRUE)
+            }
+            
+          }, error = function(e) {
+            cat(sprintf("❌ 下载错误: %s\n", e$message))
+            result$status <- paste("error:", substr(e$message, 1, 50))
+            unlink(pkg_dir, recursive = TRUE)
+          })
+          
+          return(result)
+        }
+        
+        # 初始化结果记录
+        results <- data.frame(
+          package = character(),
+          status = character(),
+          source = character(),
+          version = character(),
+          file_size_mb = numeric(),
+          date = character(),
+          stringsAsFactors = FALSE
+        )
+        
+        # 逐个处理包
+        for (i in seq_along(packages)) {
+          pkg <- packages[i]
+          cat(sprintf("\n=== [%d/%d] 处理包: %s ===\n", i, length(packages), pkg))
+          
+          # 下载包
+          result <- download_package(pkg, backup_dir, max_size_mb = 100)
+          
+          # 记录结果
+          results <- rbind(results, data.frame(
+            package = result$package,
+            status = result$status,
+            source = result$source,
+            version = result$version,
+            file_size_mb = result$file_size_mb,
+            date = result$date,
+            stringsAsFactors = FALSE
+          ))
+          
+          # 保存进度
+          progress_info <- sprintf("%s|%s|%s|%s|%.2f", 
+                                  result$package, result$status, result$source, 
+                                  result$version, result$file_size_mb)
+          writeLines(progress_info, "progress.txt")
+          
+          # 每处理5个包暂停一下
+          if (i %% 5 == 0) {
+            cat("⏸️ 暂停2秒...\n")
+            Sys.sleep(2)
+          }
+        }
+        
+        # 保存最终结果
+        log_file <- file.path(backup_dir, paste0("backup_log_", Sys.Date(), ".csv"))
+        write.csv(results, log_file, row.names = FALSE)
+        
+        # 统计结果
+        success_count <- sum(results$status == "success")
+        skipped_count <- sum(grepl("skipped_large", results$status))
+        notfound_count <- sum(results$status == "not_found")
+        failed_count <- nrow(results) - success_count - skipped_count - notfound_count
+        total_size <- sum(results$file_size_mb[results$status == "success"])
+        
+        cran_count <- sum(results$source == "CRAN" & results$status == "success")
+        bioc_count <- sum(grepl("Bioconductor", results$source) & results$status == "success")
+        
+        cat("\n=== 最终统计 ===\n")
+        cat("✅ 成功:", success_count, sprintf("(CRAN: %d, Bioconductor: %d)\n", cran_count, bioc_count))
+        cat("⚠️ 跳过(大文件):", skipped_count, "\n")
+        cat("❓ 未找到:", notfound_count, "\n")
+        cat("❌ 失败:", failed_count, "\n")
+        cat("💾 总大小:", round(total_size, 1), "MB\n")
+        
+        # 保存统计
+        summary_info <- sprintf("%d|%d|%d|%d|%.1f|%d|%d", 
+                               success_count, skipped_count, notfound_count, 
+                               failed_count, total_size, cran_count, bioc_count)
+        writeLines(summary_info, "final_summary.txt")
+        
+        cat("🎉 CRAN/Bioconductor包备份完成！\n")
+        EOF
+        
+        # 运行R脚本
+        echo "🚀 开始CRAN/Bioconductor包备份..."
+        Rscript cran_bioc_backup.R &
+        r_pid=$!
+        
+        # 监控进度并逐一提交
+        echo "🔄 监控备份进度..."
+        last_progress=""
+        commit_count=0
+        
+        while kill -0 $r_pid 2>/dev/null; do
+          if [ -f "progress.txt" ]; then
+            current_progress=$(cat progress.txt 2>/dev/null || echo "")
+            
+            if [ "$current_progress" != "$last_progress" ] && [ -n "$current_progress" ]; then
+              package_name=$(echo "$current_progress" | cut -d'|' -f1)
+              status=$(echo "$current_progress" | cut -d'|' -f2)
+              source=$(echo "$current_progress" | cut -d'|' -f3)
+              version=$(echo "$current_progress" | cut -d'|' -f4)
+              size=$(echo "$current_progress" | cut -d'|' -f5)
+              
+              echo "📦 处理完成: $package_name v$version ($source) - $status"
+              
+              # 如果成功，立即提交
+              if [ "$status" = "success" ]; then
+                if [ -d "CRAN_Bioc_backup/$package_name" ]; then
+                  echo "💾 提交 $package_name..."
+                  
+                  git add "CRAN_Bioc_backup/$package_name/"
+                  git add "CRAN_Bioc_backup/"*.csv 2>/dev/null || true
+                  
+                  if git commit -m "📦 Add $package_name v$version ($source, ${size}MB) - $(date +'%m-%d %H:%M')"; then
+                    echo "🚀 推送中..."
+                    
+                    # 推送重试机制
+                    retry=0
+                    while [ $retry -lt 3 ]; do
+                      if git push origin main; then
+                        echo "✅ $package_name 推送成功"
+                        commit_count=$((commit_count + 1))
+                        break
+                      else
+                        retry=$((retry + 1))
+                        echo "⚠️ 推送失败，重试 $retry/3..."
+                        sleep $((retry * 2))
+                      fi
+                    done
+                    
+                    if [ $retry -eq 3 ]; then
+                      echo "❌ $package_name 推送失败"
+                    fi
+                  else
+                    echo "❌ $package_name 提交失败"
+                  fi
+                  
+                  # 推送成功后短暂暂停
+                  sleep 1
+                fi
+              fi
+              
+              last_progress="$current_progress"
+            fi
+          fi
+          
+          sleep 3
+        done
+        
+        # 等待R脚本完成
+        wait $r_pid
+        echo "🎉 R脚本执行完成"
+        
+        # 最终清理和提交
+        echo "📊 执行最终提交..."
+        git add CRAN_Bioc_backup/ 2>/dev/null || true
+        if ! git diff --staged --quiet; then
+          git commit -m "📊 Final CRAN/Bioconductor backup - $(date +'%Y-%m-%d')" 2>/dev/null || true
+          git push origin main 2>/dev/null || true
+        fi
+        
+        echo "✅ 总计提交了 $commit_count 个成功的R包"
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+ 
+    - name: Show final summary
+      if: always()
+      run: |
+        if [ -f "final_summary.txt" ]; then
+          summary=$(cat final_summary.txt)
+          success=$(echo "$summary" | cut -d'|' -f1)
+          skipped=$(echo "$summary" | cut -d'|' -f2)
+          notfound=$(echo "$summary" | cut -d'|' -f3)
+          failed=$(echo "$summary" | cut -d'|' -f4)
+          total_size=$(echo "$summary" | cut -d'|' -f5)
+          cran_count=$(echo "$summary" | cut -d'|' -f6)
+          bioc_count=$(echo "$summary" | cut -d'|' -f7)
+          
+          echo "## 📦 CRAN/Bioconductor备份结果 - $(date +'%Y-%m-%d')" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| 状态 | 数量 | 备注 |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|------|------|" >> $GITHUB_STEP_SUMMARY
+          echo "| ✅ 成功 | $success | CRAN: $cran_count, Bioconductor: $bioc_count |" >> $GITHUB_STEP_SUMMARY
+          echo "| ⚠️ 跳过 | $skipped | 文件>100MB |" >> $GITHUB_STEP_SUMMARY
+          echo "| ❓ 未找到 | $notfound | 包不存在 |" >> $GITHUB_STEP_SUMMARY
+          echo "| ❌ 失败 | $failed | 下载失败 |" >> $GITHUB_STEP_SUMMARY
+          echo "| 💾 总大小 | ${total_size}MB | 实际推送数据 |" >> $GITHUB_STEP_SUMMARY
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📊 来源分布" >> $GITHUB_STEP_SUMMARY
+          echo "- **CRAN包**: $cran_count 个" >> $GITHUB_STEP_SUMMARY
+          echo "- **Bioconductor包**: $bioc_count 个" >> $GITHUB_STEP_SUMMARY
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🔧 备份特点" >> $GITHUB_STEP_SUMMARY
+          echo "- 📁 保存源码包(.tar.gz)和包信息" >> $GITHUB_STEP_SUMMARY
+          echo "- 🔍 自动识别CRAN/Bioconductor来源" >> $GITHUB_STEP_SUMMARY
+          echo "- 📝 记录版本号和下载日期" >> $GITHUB_STEP_SUMMARY
+          echo "- ⚡ 逐包下载推送，避免累积大文件" >> $GITHUB_STEP_SUMMARY
+          echo "- 🛡️ 100MB大小限制保护仓库空间" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "## ❌ 备份失败" >> $GITHUB_STEP_SUMMARY
+          echo "未找到结果文件，请检查日志" >> $GITHUB_STEP_SUMMARY
+        fi
+        
+        # 显示实际备份情况
+        if [ -d "CRAN_Bioc_backup" ]; then
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📁 备份目录状态" >> $GITHUB_STEP_SUMMARY
+          echo "- R包目录数: $(find CRAN_Bioc_backup -maxdepth 1 -type d | wc -l)" >> $GITHUB_STEP_SUMMARY
+          echo "- 文件总数: $(find CRAN_Bioc_backup -type f | wc -l)" >> $GITHUB_STEP_SUMMARY
+          echo "- 磁盘使用: $(du -sh CRAN_Bioc_backup 2>/dev/null | cut -f1 || echo '未知')" >> $GITHUB_STEP_SUMMARY
+        fi
