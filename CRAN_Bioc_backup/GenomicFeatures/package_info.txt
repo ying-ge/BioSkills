@@ -1,0 +1,7 @@
+Package: GenomicFeatures
+Version: 1.54.4
+Source: Bioconductor BioCsoft
+URL: https://bioconductor.org/packages/3.18/bioc/src/contrib/GenomicFeatures_1.54.4.tar.gz
+Size: 1.12 MB
+Download Date: 2025-10-14
+
