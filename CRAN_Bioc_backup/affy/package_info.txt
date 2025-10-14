@@ -1,0 +1,7 @@
+Package: affy
+Version: 1.80.0
+Source: Bioconductor BioCsoft
+URL: https://bioconductor.org/packages/3.18/bioc/src/contrib/affy_1.80.0.tar.gz
+Size: 1.17 MB
+Download Date: 2025-10-14
+
