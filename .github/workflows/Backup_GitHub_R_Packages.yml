@@ -113,6 +113,8 @@ jobs:
         woobe/rPlotter
         xlucpu/MOVICS
         zzwch/crosslink
+        fbertran/plsRcox
+        binderh/CoxBoost
         EOF
         
         echo "✅ 创建了包含 $(wc -l < repo_list.txt) 个仓库的列表"
