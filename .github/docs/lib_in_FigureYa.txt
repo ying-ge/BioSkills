@@ -18,6 +18,7 @@ ChAMP
 ChAMPdata
 ChIPseeker
 ClassDiscovery
+clusterProfiler
 ComparisonSurv
 ComplexHeatmap
 ConsensusClusterPlus
@@ -30,6 +31,7 @@ DealGPL570
 EPIC
 EnvStats
 GEOquery
+ggtree
 GO.db
 GOSemSim
 GOplot
