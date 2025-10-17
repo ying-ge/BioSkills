@@ -1,0 +1,11 @@
+bibentry(
+  bibtype  = "Article",
+  title    = "pubmed.mineR: an R package with text-mining algorithms to analyse PubMed abstracts",
+  author   = c("Jyoti Rani", "A B Rauf Shah", "Srinivasan Ramachandran"),
+  journal  = "Journal of biosciences",
+  year     = "2015",
+  volume   = "40",
+  number   = "40",
+  pages    = "671-682",
+  doi      = "10.1007/s12038-015-9552-2"
+)
