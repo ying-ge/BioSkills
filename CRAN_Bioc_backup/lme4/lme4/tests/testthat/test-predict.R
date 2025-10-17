@@ -1,0 +1,521 @@
+library("testthat")
+library("lme4")
+library("lattice")
+testLevel <- if (nzchar(s <- Sys.getenv("LME4_TEST_LEVEL"))) as.numeric(s) else 1
+
+## use old (<=3.5.2) sample() algorithm if necessary
+if ("sample.kind" %in% names(formals(RNGkind))) {
+    suppressWarnings(RNGkind("Mersenne-Twister", "Inversion", "Rounding"))
+}
+
+do.plots <- TRUE
+
+L <- load(system.file("testdata/lme-tst-fits.rda",
+                      package="lme4", mustWork=TRUE))
+
+if (getRversion() > "3.0.0") {
+    ## saved fits are not safe with old R versions
+    gm1 <- fit_cbpp_1
+    fm1 <- fit_sleepstudy_1
+    fm2 <- fit_sleepstudy_2
+    fm3 <- fit_penicillin_1
+    fm4 <- fit_cake_1
+} else {
+    gm1 <- glmer(cbind(incidence, size - incidence) ~ period + (1 | herd),
+                 data = cbpp, family = binomial)
+    fm1 <- lmer(Reaction ~ Days + (1|Subject), sleepstudy)
+    fm2 <- lmer(Reaction ~ Days + (Days|Subject), sleepstudy)
+    fm3 <- lmer(diameter ~ (1|plate) + (1|sample), Penicillin)
+    fm4 <- lmer(angle ~ temp + recipe + (1 | replicate), data=cake)
+}
+
+if (testLevel>1) {
+context("predict")
+test_that("fitted values", {
+    p0 <- predict(gm1)
+    p0B <- predict(gm1, newdata=cbpp)
+    expect_equal(p0, p0B, tolerance=2e-5) ## ? not sure why high tolerance necessary ? works OK on Linux/R 3.5.0
+
+    ## fitted values, unconditional (level-0)
+    p1 <- predict(gm1, re.form=NA)
+    expect_true(length(unique(p1))==length(unique(cbpp$period)))
+
+    ## fitted values, random-only
+    p1R <- predict(gm1, random.only=TRUE)
+    expect_equal(p1+p1R,p0)
+
+    if (do.plots) matplot(cbind(p0,p1),col=1:2,type="b")
+
+    ## neither fixed nor random -- all zero
+    expect_equal(unique(predict(gm1,re.form=NA,random.only=TRUE)),0)
+
+})
+
+test_that("predict with newdata", {
+
+    newdata <- with(cbpp, expand.grid(period=unique(period),herd=unique(herd)))
+    ## new data, all RE
+    p2 <- predict(gm1,newdata)
+    ## new data, level-0
+    p3 <- predict(gm1,newdata, re.form=NA)
+    p3R <- predict(gm1,newdata, random.only=TRUE)
+    expect_equal(p3+p3R,p2)
+
+    if (do.plots) matplot(cbind(p2,p3),col=1:2,type="b")
+
+})
+
+test_that("predict on response scale", {
+    p0 <- predict(gm1)
+    p5 <- predict(gm1,type="response")
+    expect_equal(p5, plogis(p0))
+})
+
+test_that("predict with newdata and RE", {
+
+    newdata <- with(cbpp,expand.grid(period=unique(period),herd=unique(herd)))
+    ## explicitly specify RE
+    p2 <- predict(gm1,newdata)
+    p4 <- predict(gm1,newdata, re.form=~(1|herd))
+    expect_equal(p2, p4)
+
+})
+
+test_that("effects of new RE levels", {
+
+    newdata <- with(cbpp, expand.grid(period=unique(period), herd=unique(herd)))
+    newdata2 <- rbind(newdata,
+                      data.frame(period=as.character(1:4), herd=rep("new",4)))
+    expect_error(predict(gm1, newdata2), "new levels detected in newdata: new")
+
+    newdata3 <- rbind(newdata,
+                      data.frame(period=as.character(1),
+                                 herd = paste0("new", 1:50)))
+
+    expect_error(predict(gm1, newdata3),
+                 "new levels detected in newdata: new1, new2,")
+
+
+    p2 <- predict(gm1, newdata)
+    p6 <- predict(gm1, newdata2, allow.new.levels=TRUE)
+    expect_equal(p2, p6[1:length(p2)])  ## original values should match
+    ## last 4 values should match unconditional values
+    expect_true(all(tail(p6,4) ==
+                        predict(gm1, newdata=data.frame(period=factor(1:4)), re.form=NA)))
+})
+
+test_that("multi-group model", {
+
+    ## fitted values
+    p0 <- predict(fm3)
+    expect_equal(head(round(p0,4)),
+                 c(`1` = 25.9638, `2` = 22.7663, `3` = 25.7147, `4` = 23.6799,
+                   `5` = 23.7629, `6` = 20.773))
+    ## fitted values, unconditional (level-0)
+    p1 <- predict(fm3, re.form=NA)
+    expect_equal(unique(p1),22.9722222222251)
+
+    if (do.plots) matplot(cbind(p0,p1),col=1:2,type="b")
+})
+
+test_that("multi-group model with new data", {
+
+    newdata <- with(Penicillin,expand.grid(plate=unique(plate),sample=unique(sample)))
+    ## new data, all RE
+    p2 <- predict(fm3, newdata)
+    ## new data, level-0
+    p3 <- predict(fm3, newdata, re.form=NA)
+    ## explicitly specify RE
+    p4 <-  predict(fm3, newdata, re.form= ~(1|plate)+(~1|sample))
+    p4B <- predict(fm3, newdata, re.form= ~(1|sample)+(~1|plate)) ## ****
+    expect_equal(p2,p4)
+    expect_equal(p4,p4B)
+
+    p5 <- predict(fm3,newdata, re.form=~(1|sample))
+    p6 <- predict(fm3,newdata, re.form=~(1|plate))
+    if (do.plots) matplot(cbind(p2,p3,p5,p6),type="b",lty=1,pch=16)
+})
+
+test_that("random-slopes model", {
+    p0 <- predict(fm2)
+    p1 <- predict(fm2, re.form=NA)
+    ## linear model, so results should be identical patterns but smaller --
+    ##   not including intermediate days
+    newdata <- with(sleepstudy,expand.grid(Days=range(Days),Subject=unique(Subject)))
+    newdata$p2 <- predict(fm2,newdata)
+    newdata$p3 <- predict(fm2,newdata, re.form=NA)
+    newdata$p4 <- predict(fm2,newdata, re.form=~(0+Days|Subject))
+    newdata$p5 <- predict(fm2,newdata, re.form=~(1|Subject))
+
+    ## reference values from an apparently-working run
+    refval <- structure(
+        list(Days = c(0, 9, 0, 9, 0, 9),
+             Subject = structure(c(1L, 1L, 2L, 2L, 3L, 3L),
+                                 .Label = c("308", "309", "310", "330", "331", "332",
+                                            "333", "334", "335", "337", "349", "350",
+                                            "351", "352", "369", "370", "371", "372"), class = "factor"),
+             p2 = c(253.663652396798, 430.66001930835, 211.006415533628, 227.634788908917, 212.444742696829, 257.61053840953),
+             p3 = c(251.405104848485, 345.610678484848, 251.405104848485, 345.610678484848, 251.405104848485, 345.610678484848),
+             p4 = c(251.405104848485, 428.401471760037, 251.405104848485, 268.033478223774, 251.405104848485, 296.570900561186),
+             p5 = c(253.663652396798, 347.869226033161, 211.006415533628, 305.211989169991, 212.444742696829, 306.650316333193)),
+        out.attrs =
+            list(dim = c(Days = 2L, Subject = 18L),
+                 dimnames = list(
+                     Days = c("Days=0", "Days=9"),
+                     Subject = c("Subject=308", "Subject=309", "Subject=310", "Subject=330", "Subject=331", "Subject=332",
+                                 "Subject=333", "Subject=334", "Subject=335", "Subject=337", "Subject=349", "Subject=350",
+                                 "Subject=351", "Subject=352", "Subject=369", "Subject=370", "Subject=371", "Subject=372")) ),
+        row.names = c(NA, 6L), class = "data.frame")
+
+    expect_equal(head(newdata), refval, tol=5e-7)
+})
+
+test_that("predict and plot random slopes", {
+
+    tmpf <- function(data,...) {
+        data$Reaction <- predict(fm2,data,...)
+        if (do.plots) xyplot(Reaction~Days,group=Subject,data=data,type="l")
+        return(unname(head(round(data$Reaction,3))))
+    }
+    expect_equal(tmpf(sleepstudy),c(253.664, 273.33, 292.996, 312.662, 332.329, 351.995))
+    expect_equal(tmpf(sleepstudy, re.form=NA), c(251.405, 261.872, 272.34, 282.807, 293.274, 303.742))
+    expect_equal(tmpf(sleepstudy, re.form= ~(0+Days|Subject)),
+                 c(251.405, 271.071, 290.738, 310.404, 330.07, 349.736))
+    expect_equal(tmpf(sleepstudy, re.form= ~(1|Subject)),
+                 c(253.664, 264.131, 274.598, 285.066, 295.533, 306))
+
+})
+
+test_that("fewer random effect levels than original", {
+    ## from 'Colonel Triq'
+    summary(fm4)
+
+    ## replicate 1 only appears in rows 1:18.
+    ## rownames(cake[cake$replicate==1,])
+
+    predict(fm4, newdata=cake[-1:-17,], re.form=~ (1 | replicate))
+    predict(fm4, newdata=cake[-1:-18,], re.form=NA)
+    predict(fm4, newdata=cake[-1:-18,], re.form=~ (1 | replicate))
+    predict(fm4, newdata=cake[-1:-18,], re.form=~ (1 | replicate), allow.new.levels=TRUE)
+    ##
+
+    p0 <- predict(fm1,newdata=data.frame(Days=6,Subject=c("308","309")))
+    p1 <- predict(fm1,newdata=data.frame(Days=rep(6,4),
+                      Subject=c("308","309")))
+    expect_equal(rep(unname(p0),2),unname(p1))
+    p2 <- predict(fm1,newdata=data.frame(Days=6,Subject="308"))
+    nd <- data.frame(Days=6,
+                     Subject=factor("308",levels=levels(sleepstudy$Subject)))
+    p3 <- predict(fm1,newdata=nd)
+    expect_equal(p2,p3)
+    expect_equal(p2,p0[1])
+})
+
+test_that("only drop columns when using new data", {
+    ## Stack Overflow 34221564:
+    ##  should only drop columns from model matrix when using *new* data
+    ## NB: Fit depends on optimizer somewhat: "nloptwrap" is really better than "bobyqa"
+    library(splines)
+    sleep <- sleepstudy  #get the sleep data
+    set.seed(1234567)
+    sleep$age <- as.factor(sample(1:3,length(sleep),rep=TRUE))
+    form1 <- Reaction ~ Days + ns(Days, df=4) +
+        age + Days:age + (Days | Subject)
+    m4 <- lmer(form1, sleep) # fixed-effect model matrix is rank deficient so dropping 1 column / coefficient
+    expect_lte(REMLcrit(m4), 1713.171) # FIXME !? why this regression??  had 1700.6431;  "bobyqa" gave  1713.171
+    expect_equal(unname(head(predict(m4, re.form=NA))),
+                 c(255.203, 259.688, 265.71, 282.583, 294.784, 304.933),
+                 tolerance = 0.008)
+})
+
+test_that("only look for columns that exist in re.form", {
+    ## GH 457
+    set.seed(101)
+    n <- 200
+    dd <- data.frame(x=1:n,
+                     f=factor(rep(1:10,n/10)),
+                     g=factor(rep(1:20,each=n/20)),
+                     h=factor(rep(1:5,n/5)),
+                     y=rnorm(n))
+    m1 <- lmer(y~1 + f + (1|h/f) + (poly(x,2)|g), data=dd, control=lmerControl(calc.derivs=FALSE))
+    expect_equal(unname(predict(m1,re.form= ~1 | h/f,       newdata=dd[1,])), 0.14786, tolerance=1e-4)
+    expect_equal(unname(predict(m1,re.form= ~poly(x,2) | g, newdata=dd[1,])),
+                 0.1533, tolerance=.001)
+    ## *last* RE not included (off-by-one error)
+    m1B <- lmer(y~1 + f + (1|g) + (1|h), data=dd, control=lmerControl(calc.derivs=FALSE))
+    expect_equal(unname(predict(m1B,re.form=~(1|g),newdata=data.frame(f="1",g="2"))),0.1512895,tolerance=1e-5)
+    set.seed(101)
+    n <- 100
+    xx <- c("r1", "r2", "r3", "r4", "r5")
+    xxx <- c("e1", "e2", "e3")
+    p <- 0.3
+    School <- factor(sample(xxx, n, replace=TRUE), levels=xxx, ordered=FALSE)
+    Rank <-   factor(sample(xx,  n, replace=TRUE), levels=xx,  ordered=FALSE)
+    df1 <- data.frame(
+        ID = as.integer(runif(n, min = 1, max = n/7)),
+        xx1 = runif(n, min = 0, max = 10),
+        xx2 = runif(n, min = 0, max = 10),
+        xx3 = runif(n, min = 0, max = 10),
+        School,
+        Rank,
+        yx = as.factor(rbinom(n, size = 1, prob = p))
+    )
+    df1 <- df1[order(df1$ID, decreasing=FALSE),]
+    mm2 <- glmer(yx ~ xx1 + xx2 + xx3 + Rank +  (1 | ID) + (1 | School / Rank),
+                 data = df1,
+                 family = "binomial",control = glmerControl(calc.derivs =FALSE))
+    n11 <-  data.frame(School= factor("e1", levels = levels(df1$School),ordered=FALSE),
+                       Rank  = factor("r1", levels = levels(df1$Rank),  ordered=FALSE),
+                       xx1=8.58, xx2=8.75, xx3=7.92)
+
+    expect_equal(unname(predict(mm2, n11, type="response",re.form= ~(1 | School / Rank))),
+                 0.1174628,tolerance=1e-5)
+
+    ## bad factor levels
+    mm3 <- update(mm2, . ~ . - (1|ID))
+    n12 = data.frame(School="e3",Rank="r2",xx1=8.58,xx2=8.75,xx3=7.92)
+    expect_equal(unname(predict(mm3, n12, type="response")),0.1832894,tolerance=1e-5)
+
+    ## GH #452
+    ## FIXME: would like to find a smaller/faster example that would test the same warning (10+ seconds)
+    set.seed(101)
+    n <- 300
+    df2 <- data.frame(
+        xx1 = runif(n, min = 0, max = 10),
+        xx2 = runif(n, min = 0, max = 10),
+        xx3 = runif(n, min = 0, max = 10),
+        School = factor(sample(xxx, n,replace=TRUE)),
+        Rank = factor(sample(xx, n, replace=TRUE)),
+        yx = as.factor(rbinom(n, size = 1, prob = p))
+    )
+    mm4 <- suppressWarnings(glmer(yx ~ xx1 + xx2 + xx3 + Rank +  (Rank|School),
+                 data = df2,
+                 family = "binomial",control = glmerControl(calc.derivs =FALSE)))
+
+    ## set tolerance to 0.1 (!) to pass win-builder on R-devel/i386 (only:
+    ## tolerance = 3e-5 is OK for other combinations of (R-release, R-devel) x (i386,x64)
+    expect_equal(unname(predict(mm4, n11, type="response")), 0.2675081, tolerance=0.1)
+})
+
+test_that("simulation works with non-factor", {
+
+    set.seed(12345)
+    dd <- data.frame(a=gl(10,100), b = rnorm(1000))
+    test2 <- suppressMessages(simulate(~1+(b|a), newdata=dd, family=poisson,
+                                       newparams= list(beta = c("(Intercept)" = 1),
+                                                       theta = c(1,1,1))))
+    expect_is(test2,"data.frame")
+})
+
+
+set.seed(666)
+n <- 500
+df <- data.frame(y=statmod::rinvgauss(n, mean=1, shape=2),
+                 id=factor(1:20))
+model_fit <- glmer(y ~ 1 + (1|id),
+                   family = inverse.gaussian(link = "inverse"),
+                   data = df,
+                   control=glmerControl(check.conv.singular="ignore"))
+
+test_that("simulation works for inverse gaussian", {
+    expect_equal(mean(simulate(model_fit)[[1]]), 1.02704392575914,
+                 tolerance=1e-5)
+})
+
+test_that("simulation complains appropriately about bad family", {
+    ig <- inverse.gaussian()
+    ig$family <- "junk"
+    model_fit2 <- glmer(y ~ 1 + (1|id),
+                        family = ig,
+                        data = df,
+                        control=glmerControl(check.conv.singular="ignore"))
+    expect_error(simulate(model_fit2),"simulation not implemented for family")
+})
+
+test_that("prediction from large factors", {
+    set.seed(101)
+    N <- 50000
+    X <- data.frame(y=rpois(N, 5), obs=as.factor(1:N))
+    fm <- glmer(y ~ (1|obs), family="poisson", data=X,
+                control=glmerControl(check.conv.singular="ignore"))
+    ## FIXME: weak tests.  The main issue here is that these should
+    ##  be reasonably speedy and non-memory-hogging, but those are
+    ## hard to test portably ...
+    expect_is(predict(fm, re.form=~(1|obs)), "numeric")
+    expect_is(predict(fm, newdata=X), "numeric")
+})
+
+test_that("prediction with gamm4", {
+    if (suppressWarnings(requireNamespace("gamm4"))) {
+        ## loading gamm4 warngs "replacing previous import 'Matrix::update' by 'lme4::update' when loading 'gamm4'"
+        ## from ?gamm4
+        set.seed(0)
+         ## simulate 4 term additive truth
+        dat <- mgcv::gamSim(1,n=400,scale=2,verbose=FALSE)
+        ## Now add 20 level random effect `fac'...
+        dat$fac <- fac <- as.factor(sample(1:20,400,replace=TRUE))
+        dat$y <- dat$y + model.matrix(~fac-1)%*%rnorm(20)*.5
+        br <- gamm4::gamm4(y~s(x0)+x1+s(x2),data=dat,random=~(1|fac))
+        expect_warning(ss <- simulate(br$mer), "modified RE names")
+        expect_equal(dim(ss), c(400,1))
+    }
+})
+
+test_that("prediction with spaces in variable names", {
+    cbpp$`silly period` <- cbpp$period
+    m <- glmer(cbind(incidence,size-incidence) ~ `silly period` + (1|herd),
+               family=binomial, data=cbpp)
+    expect_equal(round(head(predict(m)),3),
+                 c(`1` = -0.809, `2` = -1.801,
+                   `3` = -1.937, `4` = -2.388, `5` = -1.697, `6` = -2.689))
+})
+
+if (requireNamespace("statmod")) {
+  test_that("simulate with rinvgauss", {
+    dd <- data.frame(f=factor(rep(1:20,each=10)))
+    dd$y <- simulate(~1+(1|f),
+                     seed=101,
+                     family=inverse.gaussian,
+                     newdata=dd,
+                     ## ?? gives NaN (sqrt(eta)) for low beta ?
+                     newparams=list(beta=5,theta=1,sigma=1))[[1]]
+    suppressMessages(m <- glmer(y~1+(1|f),
+                                family=inverse.gaussian,
+                                data=dd))
+    set.seed(101)
+    expect_equal(head(unlist(simulate(m))),
+                 c(sim_11 = 0.451329390087728, sim_12 = 0.629516371309772,
+                   sim_13 = 0.481236633500098,
+                   sim_14 = 0.170060386109077, sim_15 = 0.258742371516342,
+                   sim_16 = 0.949617440586848))
+  })
+}
+
+## GH 631
+
+test_that("sparse contrasts don't mess up predict()", {
+  dd <- expand.grid(f = factor(1:101), rep1 = factor(1:2), rep2 = 1:2)
+  dd$y <- suppressMessages(simulate(~1 + (rep1|f),
+                   seed = 101,
+                   newdata = dd,
+                   newparams = list(beta = 1,
+                                    theta = rep(1,3),
+                                    sigma = 1),
+                   family = gaussian)[[1]])
+  m1 <- lmer( y ~ 1 + (1|f), data = dd)
+  p1 <- predict(m1)
+  p2 <- predict(m1, newdata = dd)
+  expect_identical(p1, p2)
+})
+} ## testLevel > 1
+test_that("prediction with . in formula + newdata",
+{
+  set.seed(101)
+  mydata <- data.frame(
+      groups = rep(1:3, each = 100),
+      x = rnorm(300),
+      dv = rnorm(300)
+  )
+  train_subset <- sample(1:300, 300 * .8)
+  train <- mydata[train_subset,]
+  test <- mydata[-train_subset,]
+  mod <- lmer(dv ~ . - groups + (1 | groups), data = train)
+  p1 <- predict(mod, newdata = test)
+  mod2 <- lmer(dv ~ x + (1 | groups), data = train)
+  p2 <- predict(mod2, newdata = test)
+  expect_identical(p1, p2)
+})
+
+test_that("simulate with a factor with one level", {
+    set.seed(1241)
+    y <- factor(c(rep(0,1000), 1, rep(0,1000), 1), levels = c("0","1"))
+    x <- rep(c("A","B"),each = 1001)
+    mod <- glmer(y ~ 1 + (1|x),family = binomial,
+                 control = glmerControl(check.conv.singular = "ignore"))
+    s <- simulate(mod,newdata = data.frame(x = "A"), nsim = 10)
+    ## very low mean, all simulated values zero
+    expect_true(all(s == 0))
+})
+
+
+test_that("prediction standard error", {
+  # note that predict.lm returns a list with 
+  # fit, se.fit, df, residual.scale
+  
+  mod1 <- lmer(Petal.Width ~ Sepal.Length + (1 | Species), iris)
+  p1 <- predict(mod1, se.fit = TRUE)
+  p2 <- predict(mod1, se.fit = TRUE, newdata = iris)
+  p3 <- predict(mod1, se.fit = TRUE, re.form = NA, newdata = iris)
+  p4 <- predict(mod1, se.fit = TRUE, re.form = NA)
+  p5 <- predict(mod1, se.fit = TRUE, re.form = ~(1 | Species))
+  p6 <- predict(mod1, se.fit = TRUE, re.form = ~(1 | Species), newdata = iris)
+  p7 <- predict(mod1, se.fit = TRUE, newdata = iris, random.only = TRUE)
+  p8 <- predict(mod1, se.fit = TRUE, re.form = ~(1 | Species), random.only = TRUE)
+  p9 <- predict(mod1, se.fit = TRUE, re.form = ~(1 | Species), newdata = iris, random.only = TRUE)
+
+  expect_equal(unname(head(p1$se.fit)), 
+               c(0.0271816400250223, 0.0272298862268211, 0.0286188379907626, 
+                 0.0297645467444413, 0.0270330515271627, 0.0295876265523127))
+  # re.form = NA
+  expect_equal(unname(head(p3$se.fit)), 
+               c(0.451147865048879, 0.451497971849052, 0.451930732595154, 0.452178035807842, 
+                 0.451312573619068, 0.450778089845166))
+  # random.only may need checking -- tolerance maybe too high for this?
+  expect_equal(unname(p8$se.fit),
+               rep(0.451569712647126, 150), tolerance = 0.001)
+  expect_equal(p1, p2)  
+  expect_equal(p3, p4)  
+  expect_equal(p1, p5)  
+  expect_equal(p1, p6)  
+  expect_equal(p7, p8)  
+  expect_equal(p7, p9)  
+  
+})
+
+test_that("NA + re.form = NULL + simulate OK (GH #737)", {
+    d <- lme4::sleepstudy
+    d$Reaction[1] <- NA
+    fm1 <- lmer(Reaction ~ Days + (Days | Subject), d)
+    ss <- simulate(fm1, seed = 101, re.form = NULL)[[1]]
+    expect_equal(c(head(ss)),
+                   c(266.139101412856, 308.148180398426,
+                     296.081377893883, 338.367909016478, 
+                     360.294339946214, 401.91050930589))
+    ss0 <- simulate(fm1, seed = 101, re.form = NA)[[1]]
+    expect_equal(length(ss), length(ss0))
+    ## correct dimensions with na.exclude as well ?
+    fm2 <- update(fm1, na.action = na.exclude)
+    ss2 <- simulate(fm2, seed = 101, re.form = NULL)[[1]]
+    ss3 <- simulate(fm2, seed = 101, re.form = NA)[[1]]
+    expect_equal(length(ss2), nrow(d))
+    expect_equal(length(ss3), nrow(d))
+})
+
+## GH 691 parts 1 and 2
+test_that("predict works with factors in left-out REs", {
+    set.seed(101)
+    df2 <- data.frame(yield = rnorm(100),
+                      lc = factor(rep(1:2, 50)),
+                      g1 = factor(rep(1:10, 10)),
+                      g3 = factor(rep(1:10, each = 10)))
+    m1B <- lmer(yield ~ 1 + ( 1 | g1) + (lc |g3), data  = df2,
+                control = lmerControl(check.conv.singular = "ignore"))
+    expect_equal(head(predict(m1B, re.form = ~(1|g1)),1),
+                 c(`1` = 0.146787496519465),
+                 tolerance = 1e-4)
+})
+
+test_that("predict works with dummy() in left-out REs", {
+    set.seed(101)
+    df3 <- data.frame(v1 = rnorm(100),
+       		  v3 = factor(rep(1:10, each = 10)),
+		  v4 = factor(rep(1:2, each = 50)),
+		  v5 = factor(rep(1:10, 10)))
+    m1C  <- lmer(v1~(1|v3) + (0+dummy(v4,"1")|v5),
+                 data = df3,
+                 control=lmerControl(check.nobs.vs.nlev="ignore",
+                                     check.nobs.vs.nRE="ignore",
+                                     check.conv.singular = "ignore"))
+    expect_equal(head(predict(m1C, re.form = ~1|v3), 1),
+                 c(`1` = -0.035719520719991))
+})
