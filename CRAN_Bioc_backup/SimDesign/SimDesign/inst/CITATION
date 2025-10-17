@@ -1,0 +1,22 @@
+bibentry(
+  header = "To cite SimDesign in publications use:",
+  bibtype = "Article",
+  title        = "Writing effective and reliable {Monte Carlo} simulations with the {SimDesign} package",
+  author       = c(person(given = "R. Philip",
+                          family = "Chalmers",
+                          email = "rphilip.chalmers@gmail.com"),
+                   person(given = "Mark C.",
+                          family = "Adkins")),
+  journal      = "The Quantitative Methods for Psychology",
+  year         = "2020",
+  volume       = "16",
+  number       = "4",
+  pages        = "248--280",
+  doi          = "10.20982/tqmp.16.4.p248",
+
+  textVersion  =
+  paste("R.\ Philip Chalmers & Adkins, M. C. (2020).",
+        "Writing effective and reliable Monte Carlo simulations with the SimDesign package.",
+        "The Quantitative Methods for Psychology, 16(4), 248-280.",
+        "doi:10.20982/tqmp.16.4.p248")
+)

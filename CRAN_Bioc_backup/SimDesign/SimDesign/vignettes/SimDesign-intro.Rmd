@@ -1,0 +1,293 @@
+---
+title: "Introduction to the SimDesign package"
+author: "Phil Chalmers"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    fig_caption: false
+    number_sections: true 
+    toc: true
+    toc_float:
+      collapsed: false
+      smooth_scroll: false
+vignette: >
+  %\VignetteIndexEntry{Introduction to the SimDesign package}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r nomessages, echo = FALSE}
+knitr::opts_chunk$set(
+  warning = FALSE,
+  message = FALSE,
+  fig.height = 5,
+  fig.width = 5
+)
+options(digits=4)
+par(mar=c(3,3,1,1)+.1)
+```
+
+> Seek computer programs that allow you to do the thinking. -- George E. P. Box
+
+Whether you are interested in evaluating the performance of a new optimizer or estimation criteria, 
+re-evaluating previous research claims (e.g., ANOVA is 'robust' to violations of normality), 
+want to determine power rates for an upcoming research proposal (cf. the `Spower` package), 
+or simply wish to appease a strange thought in your head about a new statistical idea you heard about, 
+designing Monte Carlo simulations can be incredibly rewarding and are extremely important to those who are statistically oriented. 
+
+However, organizing simulations can be a challenge, particularly to those new to the topic, 
+where all too often investigators resort to the inefficient and error prone strategies (e.g., the dreaded 
+"for-loop" strategy, *for*-ever resulting in confusing, error prone, and simulation specific code). 
+The package `SimDesign` is one attempt to fix these and other issues that often arise when designing Monte Carlo simulation experiments, while also providing a templated setup that is designed to support many
+useful features that can be useful when evaluating simulation research for novice and advanced users.
+
+Generally speaking, Monte Carlo simulations can be broken into three major components:
+
+- **generate** your data from some model/probability density function given various **design** conditions to be studied (e.g., sample size,
+distributions, group sizes, etc),
+- **analyse** the generated data using whatever statistical analyses you are interested in (e.g., $t$-test,
+ANOVA, SEMs, IRT, etc), and collect the statistics/CIs/$p$-values/parameter estimates you are interested in, and
+- **summarise** the results after repeating the simulations $R$ number of times to obtain empirical estimates of the population's behavior.
+
+Each operation above represents the essential components of the `SimDesign` package. The **design** component
+is represented by a `tibble`-like object containing the simulation conditions to be investigated, while **generate**,
+**analyse**, and **summarise** represent user-defined functions which comprise the three steps in the simulation.
+Each of these components are constructed and passed to the `runSimulation()` function where the simulation 
+steps are evaluated, ultimately returning a `tibble`-like object containing the simulation results.
+
+# A general overview
+
+```{r include=FALSE}
+options(digits = 2)
+```
+
+After loading the `SimDesign` package, we begin by defining the required user-constructed functions. To expedite this process,
+a call to `SimFunctions()` can be used to create a suitable template, where all the necessary functional arguments have been pre-assigned and only the body of the functions need to be modified. The documentation of each argument can be found in the respective 
+R help files, however the organization is conceptually simple.
+
+To begin, the following code should be copied and saved to an external source (i.e., text) file.
+
+```{r comment=NA}
+library(SimDesign)
+SimFunctions()
+```
+
+Alternatively, if you are lazy (read: efficient) or just don't like copy-and-pasting, `SimFunctions()` can write the output to a file
+by providing a `filename` argument. The following creates a file (`mysim.R`) containing the simulation
+design/execution and required user-defined functions. For Rstudio users, this will also automatically open up the file in a new coding window.
+
+```{r eval=FALSE}
+SimDesign::SimFunctions('mysim')
+```
+
+For larger simulations, you may want to use two files, and if you'd prefer to 
+have helpful comments included then these can be achieved with the `singlefile` and `comments` arguments, respectively.
+
+```{r eval=FALSE}
+SimFunctions('mysim', singlefile = FALSE, comments = TRUE)
+```
+
+The choice of using a single file or not is entirely a matter of preference, and will not influence the overall simulation implementation. However, should you wish to include separate analysis or generate
+functions the arguments `nGenerate` and `nAnalyse` can be useful to compartmentalize generally distinct
+portions of the code (e.g., one analyse function for fitting and extracting components of a structural equation model, and one analyse function for fitting and extracting information form an item response theory model).
+
+# Simulation: Determine estimator efficiency
+
+As a toy example, let's consider how the following investigation using `SimDesign`: 
+
+*Question*: How does trimming affect recovering the mean of a distribution? Investigate this using
+different sample sizes with Gaussian and $\chi^2$ distributions. Also, demonstrate the effect of using the 
+median to recover the mean.
+
+## Define the conditions
+
+First, define the condition combinations that should be investigated. In this case we wish to study
+4 different sample sizes, and use a symmetric and skewed distribution. The use of `createDesign()` is
+required to create a completely crossed-design for each combination (there are 8 in total).
+
+```{r}
+Design <- createDesign(sample_size = c(30, 60, 120, 240), 
+                       distribution = c('norm', 'chi'))
+Design
+```
+
+Each row in `Design` represents a unique condition to be studied in the simulation. In this case, the first condition to be studied comes from row 1, where $N=30$ and the distribution is from the Gaussian/normal family. 
+
+## Define the functions
+
+We first start by defining the data generation functional component. The only argument accepted by this function is `condition`, which will always be a *single row from the Design data.frame object*. Conditions are run sequentially from row 1 to the last row in `Design`. It is also
+possible to pass a `fixed_objects` object to the function for including fixed sets of population parameters and other conditions, however for this simple simulation this input is not required.
+
+```{r}
+Generate <- function(condition, fixed_objects) {
+    N <- condition$sample_size
+    dist <- condition$distribution
+    if(dist == 'norm'){
+        dat <- rnorm(N, mean = 3)
+    } else if(dist == 'chi'){
+        dat <- rchisq(N, df = 3)
+    }
+    dat
+}
+```
+
+As we can see above, `Generate()` will return a numeric vector of length $N$ containing the data to
+be analysed, each with a population mean of 3 (because a $\chi^2$ distribution has a mean equal to its df).
+Next, we define the `analyse` component to analyse said data:
+
+```{r}
+Analyse <- function(condition, dat, fixed_objects) {
+    M0 <- mean(dat)
+    M1 <- mean(dat, trim = .1)
+    M2 <- mean(dat, trim = .2)
+    med <- median(dat)
+    
+    ret <- c(mean_no_trim=M0, mean_trim.1=M1, mean_trim.2=M2, median=med)
+    ret
+}
+```
+
+This function accepts the data previously returned from `Generate()` (`dat`), the condition vector previously
+mentioned, and returns 4 named elements. Note that the element names do not have to be constant across the row-conditions, however it will often make conceptual sense to do so.
+
+At this point, we may conceptually think of the first two functions as being evaluated independently $R$ times to obtain
+$R$ sets of results. In other words, if we wanted the number of replications to be 100, the first two functions
+would be independently run (at least) 100 times, the results from `Analyse()` would be stored, and we would 
+then need to summarise these 100 elements into meaningful meta statistics to describe their empirical properties.
+This is where computing meta-statistics such as bias, root mean-square error, detection rates, 
+and so on are of primary importance. Unsurprisingly, then, this is the purpose of the `summarise` component:
+
+```{r}
+Summarise <- function(condition, results, fixed_objects) {
+    obs_bias <- bias(results, parameter = 3)
+    obs_RMSE <- RMSE(results, parameter = 3)
+    ret <- c(bias=obs_bias, RMSE=obs_RMSE, RE=RE(obs_RMSE))
+    ret
+}
+```
+
+Again, `condition` is the same as was defined before, while `results` is a `matrix`
+containing all the results from `Analyse()`, where each row represents the result returned from each respective
+replication, and the number of columns is equal to the length of a single vector returned by `Analyse()`. 
+
+That sounds much more complicated than it is --- all you really need to know for this simulation 
+is that an $R$ x 4 matrix called `results` is available to build a suitable summary from. 
+Because the results is a matrix, `apply()` is useful to apply a function over each respective row. 
+The bias and RMSE are obtained for each respective statistic, and the overall result is returned as a vector.
+
+Stopping for a moment and thinking carefully, we know that each `condition` will be paired with a unique vector returned from
+`Summarise()`. Therefore, you might be thinking that the result returned from the simulation will be in
+a rectangular form, such as in a `matrix`, `data.frame`, or `tibble`. Well, you'd be right!
+
+## Putting it all together
+
+The last stage of the `SimDesign` work-flow is to pass the four defined elements to the `runSimulation()` 
+function which, unsurprisingly given its name, runs the simulation. 
+
+There are numerous options available in the 
+function, and these should be investigated by reading the `help(runSimulation)` HTML file. Options for 
+performing simulations in parallel, storing/resuming temporary results, debugging functions,
+and so on are available. Below we simply request that each condition be run 1000 times on a 
+single processor, and finally store the results to an object called `res`.
+
+```{r include=FALSE}
+set.seed(1234)
+```
+
+```{r}
+res <- runSimulation(Design, replications = 1000, generate=Generate, 
+                         analyse=Analyse, summarise=Summarise)
+
+# Final simulation object
+res
+```
+
+If `runSimulation(..., store_results = TRUE)` were used, which is the current default in the package if RAM is not an issue, then the complete stored results can be viewed using
+```{r}
+# Extract complete set of stored results
+results <- SimResults(res)
+results
+```
+
+
+As can be seen from the printed results from the `res` object, each result from the `Summarise()` function has been paired with their
+respective condition, meta-statistics have been properly named, and three additional columns have been appended
+to the results: `REPLICATIONS`, which indicates how many time the conditions were performed, `SIM_TIME`, indicating
+the time (in seconds) it took to completely finish the respective conditions, and `SEED`, which indicates the random seeds used by `SimDesign` for each condition (for reproducibility). A call to `View()` in the 
+R console may also be a nice way to sift through the `res` object.
+
+## Interpreting the results
+
+In this case, visually inspecting the simulation table is enough to understand what is occurring, though for
+other Monte Carlo simulations use of ANOVAs, marginalized tables, and graphics should be used to capture the
+essentially phenomenon in the results. Monte Carlo simulations are just like collecting and analysing data for experiments,
+so my advice would be to put on your analysis hats and present your data as though it were data collected from the real world. 
+
+In this particular simulation, it is readily apparent that using the un-adjusted mean will adequately recover
+the population mean with little bias. The precision also seems to increase as sample sizes increase, which 
+is indicated by the decreasing RMSE statistics. Generally, trimming causes less efficiency in the estimates,
+where greater amounts of trimming results in even less efficiency, and using the median as a proxy to estimate
+the mean is the least effective method. This is witnessed rather clearly in the following table, which 
+prints the relative efficiency of the estimators:
+
+```{r}
+REs <- res[,grepl('RE\\.', colnames(res))]
+data.frame(Design, REs)
+```
+
+Finally, when the $\chi^2$ distribution was investigated only the un-adjusted mean accurately portrayed the
+population mean. This isn't surprising, because the trimmed mean is, after all, making inferences about the 
+population trimmed mean, and the median is making inferences about, well, the median. Only when the
+distributions under investigation are symmetric are the statistics able to draw inferences about the same inferences about
+the mean of the population.
+
+# Conceptual walk-through of what runSimulation() is doing
+
+The following is a conceptual breakdown of what `runSimulation()` is actually doing behind the
+scenes. Here we demonstrate the results from the first condition (row 1 of `Design`) to show
+what each function returns. 
+
+A single replication in a Monte Carlo simulation results in the following objects:
+
+```{r, include=FALSE}
+set.seed(1)
+```
+
+```{r}
+(condition <- Design[1, ])
+dat <- Generate(condition)
+dat
+
+res <- Analyse(condition, dat)
+res
+```
+
+We can see that `Generate()` returns a `numeric` vector which is accepted by `Analyse()`. The `Analyse()` function then completes the analysis portion using the generated data, and returns a 
+named vector with the observed parameter estimates. Of course, this is only a single replication, and therefore is not really meaningful in the grand scheme of things; so, it must be repeated a number of times.
+
+```{r}
+# repeat 1000x
+results <- matrix(0, 1000, 4)
+colnames(results) <- names(res)
+for(i in 1:1000){
+    dat <- Generate(condition)
+    res <- Analyse(condition, dat)
+    results[i, ] <- res
+}
+head(results)
+```
+
+The matrix stored in `results` contains 1000 parameter estimates returned from each statistic. 
+After this is obtained, we can move on to summarising the output through the `Summarise()` function
+to obtain average estimates, their associated sampling error, their efficiency, and so on.
+
+```{r}
+Summarise(condition, results) 
+```
+
+This process is then repeated for each row `condition` in the `Design` object until the entire simulation study
+is complete. 
+
+Of course, `runSimulation()` does much more than this conceptual outline, which is why it exists. Namely, errors and warnings are controlled and tracked, data is re-drawn when needed, parallel processing is supported, debugging is easier with the `debug` input (or by inserting `browser()` directly), temporary and full results can be saved to external files, the simulation state can be saved/restored, build-in safety features are included, and more. The point, however, is that you as the user *should not be bogged down with the nitty-gritty details of setting up the simulation work-flow/features*; instead, you should be focusing your time on the important generate-analyse-summarise steps, organized in the body of the above functions, that are required to obtain your interesting simulation results. After all, the point designing a computer simulation experiment is to understand the resulting output, not to become a master of all aspects of your select computing language pertaining to object storage, parallel processing, RAM storage, defensive coding, progress reporting, reproducibility, post-processing, ..., ad nauseam. 
+
+To access further examples and instructions feel free to visit the [package wiki on Github](https://github.com/philchalmers/SimDesign/wiki)
