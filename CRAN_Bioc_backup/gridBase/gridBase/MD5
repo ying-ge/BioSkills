@@ -1,0 +1,17 @@
+6357f2ece12d167c6edfc70a9efe76d7 *DESCRIPTION
+c23517ab9923f0ec0d87802ff359413a *NAMESPACE
+519be1dbab635db1db865c24cc09dfba *R/base.R
+921e99fcb1c256cd1f6ad6475d7dc737 *R/grid.R
+0433ce02f1d7d8db515c259aabb64f1b *R/zzz.R
+f4d0a523b792fe11d3d89aa1ed8dc50e *build/vignette.rds
+97c6d4a0460b64a8e6ac40a24cddb33c *demo/00Index
+b0f31e33f859785fb0058f30dd3bcbb6 *demo/gridBase.R
+bc3aecdea068b8689e959dc5464b2ecb *inst/doc/changes.txt
+444f2b1f2d8472ae45c05d9f86321e46 *inst/doc/chinasea.txt
+04bf5e05f35567c9233a8874af544daf *inst/doc/gridBase.R
+7d84d0cdabfa9877c817064d35ca47b6 *inst/doc/gridBase.Rnw
+df58ed5b9c51efa05f0de0f6ad12a429 *inst/doc/gridBase.pdf
+1cb988e34f020de26f286dc9684e2ebc *man/baseViewports.Rd
+dd062f90a9221e7f2a1241cb9fbbddc1 *man/gridOMI.Rd
+7d84d0cdabfa9877c817064d35ca47b6 *vignettes/gridBase.Rnw
+6506cce9c6756dc2b0e4f061542f2404 *vignettes/gridBase.bib
