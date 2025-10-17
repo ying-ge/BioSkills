@@ -1,0 +1,13 @@
+19d7e97a0b66a4437895b0b99026551c *DESCRIPTION
+e5e60c851b06d2443febb417e640b28f *NAMESPACE
+acd0be7ae8ad785a0176d47644c160b2 *R/PEFR.R
+f87aefa7c644fdfe0ceebb273e749ef2 *R/bland.altman.R
+4d9e94764240e5f38c1de1c44802b762 *build/vignette.rds
+a5ba0c54b702be9571d38ddc1bb4b661 *inst/doc/Intro.R
+e31d4bb110429fe0c4b0255e82fef931 *inst/doc/Intro.Rmd
+57169abab62d2032e7b8ba2d0e2ef1e4 *inst/doc/Intro.html
+7a5df975f726e37671165ad62ce4285e *man/BlandAltmanLeh-package.Rd
+ff875f18486654d1ffdc38bafd0d7125 *man/bland.altman.PEFR.Rd
+390ae4d1013787f3b7bdc90a12ab26f9 *man/bland.altman.plot.Rd
+cfce1a6ad9b7c0a1c25014cf4c826423 *man/bland.altman.stats.Rd
+e31d4bb110429fe0c4b0255e82fef931 *vignettes/Intro.Rmd
