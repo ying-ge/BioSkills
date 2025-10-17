@@ -1,0 +1,4 @@
+citHeader("To cite package 'BoolNet' in publications use:")
+     
+bibentry(bibtype = "Article",         title = "BoolNet - an R package for generation, reconstruction and analysis of Boolean networks",         author = c(person("Christoph","Muessel",role= "aut"), person("Martin","Hopfensitz", role="aut"), person(c("Hans", "A."),"Kestler", role="aut", email="hans.kestler@uni-ulm.de")),        journal = "Bioinformatics",        volume = 26,        number = 10,        pages = "1378--1380",        year = 2010,
+	doi = "10.1093/bioinformatics/btq124")

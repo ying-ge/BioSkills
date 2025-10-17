@@ -1,0 +1,62 @@
+useDynLib(BoolNet, .registration = TRUE)
+
+import("igraph", "XML")
+importFrom("graphics", "abline", "arrows", "axis", "hist", "legend", "lines", "par", "plot", "rect", "text")
+importFrom("grDevices", "adjustcolor")
+importFrom("grDevices", "dev.interactive")
+importFrom("stats", "dist", "kmeans", "quantile", "rnorm", "rpois", "runif")
+importFrom("utils", "installed.packages", "tail")
+
+S3method(print, AttractorInfo)
+S3method(print, SymbolicSimulation)
+S3method(print, BooleanNetwork)
+S3method(print, SymbolicBooleanNetwork)
+S3method(print, BooleanNetworkCollection)
+S3method(print, ProbabilisticBooleanNetwork)
+S3method(print, BooleanStateInfo)
+S3method(print, TransitionTable)
+S3method(print, MarkovSimulation)
+
+export(
+loadNetwork,
+loadBioTapestry,
+loadSBML,
+saveNetwork,
+getAttractors,
+plotAttractors,
+plotSequence,
+plotStateGraph,
+plotNetworkWiring,
+plotPBNTransitions,
+attractorsToLaTeX,
+sequenceToLaTeX,
+stateTransition,
+getAttractorSequence,
+getTransitionTable,
+getStateSummary,
+getBasinOfAttraction,
+getPathToAttractor,
+getTransitionProbabilities,
+toPajek,
+toSBML,
+generateRandomNKNetwork,
+generateCanalyzing,
+generateNestedCanalyzing,
+generateState,
+generateTimeSeries,
+perturbNetwork,
+perturbTrajectories,
+simplifyNetwork,
+simulateSymbolicModel,
+reconstructNetwork,
+chooseNetwork,
+fixGenes,
+binarizeTimeSeries,
+markovSimulation,
+testNetworkProperties,
+testAttractorRobustness,
+testTransitionRobustness,
+testIndegree,
+truthTableToSymbolic,
+symbolicToTruthTable)
+
