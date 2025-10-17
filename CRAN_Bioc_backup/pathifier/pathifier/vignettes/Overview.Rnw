@@ -1,0 +1,135 @@
+%\VignetteIndexEntry{Quantify deregulation of pathways in cancer}
+%\VignetteKeywords{Computional biology, cancer, pathways, expression}
+%\VignetteDepends{pathifier}
+%\VignettePackage{pathifier}
+
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{fullpage} % standard 1 inch margins 
+
+\newcommand{\Robject}[1]{{\texttt{#1}}}
+\newcommand{\Rfunction}[1]{{\texttt{#1}}}
+\newcommand{\Rpackage}[1]{{\textit{#1}}}
+\newcommand{\Rclass}[1]{{\textit{#1}}}
+\newcommand{\Rmethod}[1]{{\textit{#1}}}
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\email}[1]{\texttt{#1}}
+
+%%% Hyperlinks for ``PDF Latex'' :
+\ifx\pdfoutput\undefined%%--- usual ``latex'' :
+  %% Stuff w/out hyperref
+\else%%---------------------- `` pdflatex '' : -- still gives funny errors
+  \RequirePackage{hyperref}
+  %% The following is R's share/texmf/hyperref.cfg :
+  %% Stuff __with__ hyperref :
+  \hypersetup{%
+    %default: hyperindex,%
+    colorlinks,%
+    %default: pagebackref,%
+    linktocpage,%
+    %%plainpages=false,%
+    linkcolor=Green,%
+    citecolor=Blue,%
+    urlcolor=Red,%
+    pdfstartview=Fit,%
+    pdfview={XYZ null null null}%
+    }
+  \RequirePackage{color}
+  \definecolor{Blue}{rgb}{0,0,0.8}
+  \definecolor{Green}{rgb}{0.1,0.75,0.1}
+  \definecolor{Red}{rgb}{0.7,0,0}
+  %% ESS JCGS v2 :
+  %%\hypersetup{backref,colorlinks=true,pagebackref=true,hyperindex=true}
+  %%\hypersetup{backref,colorlinks=false,pagebackref=true,hyperindex=true}
+\fi
+
+\usepackage{Sweave}
+\SweaveOpts{keep.source=TRUE}
+\begin{document}
+\title{Quantify deregulation of pathways in cancer}
+\author{
+        Yotam Drier
+        }
+
+\maketitle
+\tableofcontents
+
+
+\section{Introduction}
+The \Rpackage{pathifier} is an algorithm that infers pathway deregulation scores for each tumor sample on the basis of expression data. This score is determined, in a context-specific manner, for every particular dataset and type of cancer that is being investigated. The algorithm transforms gene-level information into pathway-level information, generating a compact and biologically relevant representation of each sample
+\cite{Drier:2013}. As the algorithm learns the pathway normal flow from normal samples, expression of relevant normal samples must be supplied, however, the structure of the pathway need not be given, just the identity of genes taking part in each pathway.
+
+\section{Analyzing data set using \code{pathifier} library}
+
+\subsection{Load the library}
+
+Load the pathifier library:
+<<echo=TRUE, eval=TRUE>>=
+library(pathifier) 
+@ 
+
+\subsection{Load the data set}
+Load the data set `Sheffer' (built in Pathifier package) \cite{Sheffer:2009}.
+
+<<echo=TRUE, eval=TRUE>>=
+data(Sheffer)
+@
+
+\subsection{Load pathway database}
+Load the two pathways (MISMATCH REPAIR and REGULATION OF AUTOPHAGY) by KEGG \cite{Kanehisa:2012} (supplied with the package)
+
+<<echo=TRUE, eval=TRUE>>=
+data(KEGG)
+@
+
+\subsection{Quantify deregulation of pathways}
+Calculate the deregulation score by running pathifier
+
+<<echo=TRUE, eval=TRUE, tidy=TRUE,highlight=FALSE>>=
+PDS<-quantify_pathways_deregulation(sheffer$data, sheffer$allgenes,
+  kegg$gs, kegg$pathwaynames, sheffer$normals, attempts = 100,
+  min_exp=sheffer$minexp, min_std=sheffer$minstd)
+@
+The deregulation scores are now in \code{PDS\$scores}, ready for further analysis. 
+
+\subsection{Brief analysis}
+Show scores for normals samples are genereally lower
+<<echo=TRUE, eval=TRUE, fig=TRUE>>=
+x<-NULL
+x$normals<-PDS$scores$MISMATCH_REPAIR[sheffer$normals]
+x$tumors<-PDS$scores$MISMATCH_REPAIR[!sheffer$normals]
+boxplot(x)
+boxplot(x,ylab="score")
+@
+
+List samples whose regulation of autophagy is highly deregulated
+<<echo=TRUE, eval=TRUE>>=
+as.character(sheffer$samples[PDS$scores$REGULATION_OF_AUTOPHAGY>0.8])
+@
+
+\begin{thebibliography}{10}
+\expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
+\expandafter\ifx\csname url\endcsname\relax
+  \def\url#1{{\tt #1}}\fi
+
+\bibitem{Drier:2013}
+Drier Y, Sheffer M and Domany E,
+\newblock {Pathway-based personalized analysis of cancer},
+\newblock {\em PNAS}, 2013, vol. 110(16) pp:6388-6393.
+
+\bibitem{Sheffer:2009}
+Sheffer M, Bacolod MD, Zuk O, Giardina SF, Pincas H, et al.
+\newblock {Association of survival and disease progression with chromosomal instability: A genomic exploration of colorectal cancer.},
+\newblock {\em PNAS}, 2009, Vol 106(17) pp:7131–7136.
+
+\bibitem{Kanehisa:2012}
+Kanehisa M, Goto S, Sato Y, Furumichi M and Tanabe M.
+\newblock {KEGG for integration and interpretation of large-scale molecular datasets},
+\newblock {\em Nucleic Acids Res}, 2012, Vol 40(Database issue):D109–D114.
+
+\end{thebibliography}
+
+\end{document}

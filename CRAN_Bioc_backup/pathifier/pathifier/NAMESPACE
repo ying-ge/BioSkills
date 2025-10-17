@@ -1,0 +1,3 @@
+importFrom("R.oo", trim)
+importFrom("princurve", principal_curve)
+exportPattern("^[[:alpha:]]+")

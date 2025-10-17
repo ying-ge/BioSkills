@@ -1,0 +1,15 @@
+citEntry(entry="article",
+         title = "Pathway-based personalized analysis of cancer",
+         author = personList( as.person("Yotam Drier" ),
+                              as.person("Michal Sheffer" ),
+                              as.person("Eytan Domany" ) ),
+         year = 2013,
+         journal = "Proceedings of the National Academy of Sciences",       
+         doi = "10.1073/pnas.1219651110",
+         volume = "110 (16)",
+         pages = "6388-6393",	
+         textVersion = 
+         paste("Y. Drier, M. Sheffer and E. Domany (2013):", 
+               "\"Pathway-based personalized analysis of cancer\".", 
+               "Proceedings of the National Academy of Sciences, vol 110 (16), pp: 6388-6393 " ) )
+
