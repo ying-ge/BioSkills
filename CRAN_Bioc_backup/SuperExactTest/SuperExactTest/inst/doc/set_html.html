@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="Minghui Wang, Yongzhong Zhao, Bin Zhang" />
+
+<meta name="date" content="2022-03-23" />
+
+<title>Multi-set Intersection Analysis Using SuperExactTest</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+<script>// Hide empty <a> tag within highlighted CodeBlock for screen reader accessibility (see https://github.com/jgm/pandoc/issues/6352#issuecomment-626106786) -->
+// v0.0.1
+// Written by JooYoung Seo (jooyoung@psu.edu) and Atsushi Yasumoto on June 1st, 2020.
+
+document.addEventListener('DOMContentLoaded', function() {
+  const codeList = document.getElementsByClassName("sourceCode");
+  for (var i = 0; i < codeList.length; i++) {
+    var linkList = codeList[i].getElementsByTagName('a');
+    for (var j = 0; j < linkList.length; j++) {
+      if (linkList[j].innerHTML === "") {
+        linkList[j].setAttribute('aria-hidden', 'true');
+      }
+    }
+  }
+});
+</script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Multi-set Intersection Analysis Using SuperExactTest</h1>
+<h4 class="author">Minghui Wang, Yongzhong Zhao, Bin Zhang</h4>
+<h4 class="date">2022-03-23</h4>
+
+
+
+<div id="scope" class="section level2">
+<h2>Scope</h2>
+<p>This guide provides an overview of using the <code>R</code> package <code>SuperExactTest</code> for statistical testing and visualization of mult-set intersections. In this package, we implemented a theoretical framework for computing the exact statistical distributions of multi-set intersections (Wang et al 2015). Utilizing a forward algorithm based procedure with the computational complexity linear to the number of sets, we are able to efficiently calculate the intersection probability among a large number of sets. Multiple efficient and scalable visualization techniques are provided for illustrating multi-set intersections and the corresponding intersection statistics.</p>
+</div>
+<div id="citing-superexacttest" class="section level2">
+<h2>Citing <code>SuperExactTest</code></h2>
+<p>If you use the <code>SuperExactTest</code> package, please cite the following paper:</p>
+<p>Minghui Wang, Yongzhong Zhao, and Bin Zhang (2015) Efficient Test and Visualization of Multi-Set Intersections. <em>Scientific Reports</em> 5: 16923.</p>
+</div>
+<div id="case-study" class="section level2">
+<h2>Case study</h2>
+<p>We demonstrate the utility of the package through analyzing multiple sets of expression quantitative trait loci (eQTLs) identified from several tissues. eQTLs are the genomic loci (as represented by genetic variants in practice) that regulate the gene expression. Identifying expression regulators is considered a powerful tool in dissecting the architecture of the genetics of disease and other complex phenotypes. It is widely believed that the gene expression regulation are both spatially (cell-type and tissue specificity) and temporally (different developmental stages).</p>
+<p>As an example, we downloaded four sets of genes with <em>cis</em>-eQTLs (i.e. gene expression regulated by local genetic variants) detected in four different brain regions (Gibbs et al 2010) which had been deposited in the eQTL Browser database (www.ncbi.nlm.nih.gov/ projects/gap/eqtl/index.cgi; url no longer accessible) and performed statistical analyses of the intersections among the gene sets. For convenience, we pre-compiled the <em>cis</em>-eQTL genes into a list which has been included in the present package. After loading the package, the pre-compiled dataset can be imported as follows:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">library</span>(<span class="st">&quot;SuperExactTest&quot;</span>)</span></code></pre></div>
+<pre><code>## Loading required package: grid</code></pre>
+<pre><code>## 
+## Attaching package: &#39;SuperExactTest&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:base&#39;:
+## 
+##     intersect, union</code></pre>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="kw">data</span>(<span class="st">&quot;eqtls&quot;</span>)</span></code></pre></div>
+<p>The loaded data object is a list called <code>cis.eqtls</code> which contains four vectors of gene symbols. To check the structure of the imported object, we can use command:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="kw">str</span>(cis.eqtls)</span></code></pre></div>
+<pre><code>## List of 4
+##  $ CB  : chr [1:147] &quot;KCTD10&quot; &quot;CHURC1&quot; &quot;C10orf85&quot; &quot;AMFR&quot; ...
+##  $ FC  : chr [1:164] &quot;CHURC1&quot; &quot;KCTD10&quot; &quot;AMFR&quot; &quot;SCG3&quot; ...
+##  $ TC  : chr [1:137] &quot;CHURC1&quot; &quot;SCG3&quot; &quot;AMFR&quot; &quot;KCTD10&quot; ...
+##  $ PONS: chr [1:101] &quot;CHURC1&quot; &quot;KCTD10&quot; &quot;PEX6&quot; &quot;HMBOX1&quot; ...</code></pre>
+<p>The names of the gene sets preserve the brain tissue information: CB (cerebellum), FC (frontal cortex), TC (temporal cortex) and PONS (pons region). It needs to be stressed that these <em>cis</em>-eQTL gene sets were detected from genome-wide gene expression profiling of 18,196 unique genes (Gibbs et al 2010).</p>
+<p>The length of the <em>cis</em>-eQTL gene sets varies from 101 to 164:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a>(<span class="dt">length.gene.sets=</span><span class="kw">sapply</span>(cis.eqtls,length))</span></code></pre></div>
+<pre><code>##   CB   FC   TC PONS 
+##  147  164  137  101</code></pre>
+<p>Assuming the <em>cis</em>-eQTL gene sets were independently and randomly sampled from the population of 18,196 unique genes profiled in the eQTL study, the probability of the number of common genes shared by the four <em>cis</em>-eQTL gene sets can be computed using function <code>dpsets</code> which implements the exact probability calculation of multi-set intersection developed in this study. Before we perform the statistical test of the intersection among the four gene sets, let us firstly calculate the expected overlap size:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a>total=<span class="dv">18196</span></span>
+<span id="cb10-2"><a href="#cb10-2"></a>(<span class="dt">num.expcted.overlap=</span>total<span class="op">*</span><span class="kw">do.call</span>(prod,<span class="kw">as.list</span>(length.gene.sets<span class="op">/</span>total)))</span></code></pre></div>
+<pre><code>## [1] 5.53701e-05</code></pre>
+<p>Due to the large background population gene size whereas small gene set sizes, the expected intersection size is close to 0. It is obvious that the possible number of genes shared among the four <em>cis</em>-eQTL gene sets is from 0 to 101. We can compute the probability density distribution of the possible intersection sizes using the <code>dpsets</code> function:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a>(<span class="dt">p=</span><span class="kw">sapply</span>(<span class="dv">0</span><span class="op">:</span><span class="dv">101</span>,<span class="cf">function</span>(i) <span class="kw">dpsets</span>(i, length.gene.sets, <span class="dt">n=</span>total)))</span></code></pre></div>
+<pre><code>##   [1]  9.999446e-01  5.536713e-05  1.487462e-09  2.584596e-14  3.266929e-19
+##   [6]  3.203379e-24  2.537574e-29  1.669915e-34  9.317026e-40  4.476026e-45
+##  [11]  1.874211e-50  6.907188e-56  2.258521e-61  6.596148e-67  1.730423e-72
+##  [16]  4.097358e-78  8.793254e-84  1.716552e-89  3.057708e-95 4.983934e-101
+##  [21] 7.451607e-107 1.024173e-112 1.296529e-118 1.514351e-124 1.634467e-130
+##  [26] 1.632415e-136 1.510523e-142 1.296427e-148 1.033055e-154 7.649616e-161
+##  [31] 5.267943e-167 3.376250e-173 2.015080e-179 1.120610e-185 5.809401e-192
+##  [36] 2.808707e-198 1.266884e-204 5.332802e-211 2.095428e-217 7.687359e-224
+##  [41] 2.633520e-230 8.425576e-237 2.517649e-243 7.026430e-250 1.831520e-256
+##  [46] 4.458637e-263 1.013598e-269 2.151522e-276 4.263524e-283 7.885797e-290
+##  [51] 1.361041e-296 2.191414e-303 3.290550e-310 4.606280e-317 4.940656e-324
+##  [56]  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00
+##  [61]  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00
+##  [66]  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00
+##  [71]  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00
+##  [76]  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00
+##  [81]  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00
+##  [86]  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00
+##  [91]  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00
+##  [96]  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00
+## [101]  0.000000e+00  0.000000e+00</code></pre>
+<p>In the function call of <code>dpsets</code>, the first argument is the intersection size, the second argument is a vector of the set sizes, and option <span class="math inline">\(n\)</span> specifies the size of the background gene population from which the gene sets are collected. As expected, the probability density is maximized at intersection size 0 and decreases as the intersection size increases.</p>
+<p>Next, we compute the observed intersection among the four gene sets and then the corresponding fold enrichment (FE) by:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a>common.genes=<span class="kw">intersect</span>(cis.eqtls[[<span class="dv">1</span>]], cis.eqtls[[<span class="dv">2</span>]], cis.eqtls[[<span class="dv">3</span>]],</span>
+<span id="cb14-2"><a href="#cb14-2"></a> cis.eqtls[[<span class="dv">4</span>]])</span>
+<span id="cb14-3"><a href="#cb14-3"></a>(<span class="dt">num.observed.overlap=</span><span class="kw">length</span>(common.genes))</span></code></pre></div>
+<pre><code>## [1] 56</code></pre>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1"></a>(<span class="dt">FE=</span>num.observed.overlap<span class="op">/</span>num.expcted.overlap)</span></code></pre></div>
+<pre><code>## [1] 1011376</code></pre>
+<p>Note that we re-implement the built-in <code>R</code> function <code>intersect</code> to make it capable of handling more than two input vectors.</p>
+<p>The probability density of the observed intersection size is therefore:</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1"></a><span class="kw">dpsets</span>(num.observed.overlap, length.gene.sets, <span class="dt">n=</span>total)</span></code></pre></div>
+<pre><code>## [1] 0</code></pre>
+<p>The probability of observing 56 or more intersection genes can be calculated using the cumulative probability function <code>cpsets</code>:</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1"></a><span class="kw">cpsets</span>(num.observed.overlap<span class="dv">-1</span>, length.gene.sets, <span class="dt">n=</span>total, <span class="dt">lower.tail=</span><span class="ot">FALSE</span>)</span></code></pre></div>
+<pre><code>## [1] 0</code></pre>
+<p>Like function <code>dpsets</code>, <code>cpsets</code> takes similar arguments as input, with an additional argument <code>lower.tail</code> specifying which of the one-tail probabilities to be returned. <code>num.observed.overlap - 1</code> because the probability is <span class="math inline">\(P(X \leq x)\)</span> when <code>lower.tail = TRUE</code> while <span class="math inline">\(P(X &gt; x)\)</span> when <code>lower.tail = FALSE</code>.</p>
+<p>The extremly low one-tail probability (0 due to computation precision) of the observed intersection size underlies significant overlap of common <em>cis</em> regulators across four brain regions in the present <em>cis</em>-eQTL dataset, rejecting the null hypothesis that the <em>cis</em>-eQTL gene sets were independent random samples from the population of 18,196 unique genes profiled.</p>
+<p>Alternative to finding intersection and statistical test sequentially, we also implement a function <code>MSET</code> to perform the intersection operation and probability calculation in one go:</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1"></a>fit=<span class="kw">MSET</span>(cis.eqtls, <span class="dt">n=</span>total, <span class="dt">lower.tail=</span><span class="ot">FALSE</span>)</span>
+<span id="cb22-2"><a href="#cb22-2"></a>fit<span class="op">$</span>FE</span></code></pre></div>
+<pre><code>## [1] 1011376</code></pre>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1"></a>fit<span class="op">$</span>p.value</span></code></pre></div>
+<pre><code>## [1] 0</code></pre>
+<div id="analyzing-all-possible-intersections-among-four-cis-eqtls-gene-sets" class="section level3">
+<h3>Analyzing all possible intersections among four <em>cis</em>-eQTLs gene sets</h3>
+<p>In the above, we analyzed one specific intersection that is shared by all four gene sets. In practice, we may be also interested in the intersections among any combinations of the gene sets, such as overlap among any two or three gene sets in this case. To facilitate a comprehensive analysis of <span class="math inline">\(2^n-1\)</span> possible intersections for <span class="math inline">\(n\)</span> sets, we designed a function <code>supertest</code> to enumerate all possible intersections given a list of input vectors and perform the statistical tests of the intersections automatically. Again we illustrate the function usage with the four <em>cis</em>-eQTL gene sets:</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1"></a>res=<span class="kw">supertest</span>(cis.eqtls, <span class="dt">n=</span>total)</span></code></pre></div>
+<p>The returned variable <code>res</code> is an object of new <code>S3</code> class <code>&quot;msets&quot;</code> which is a specifically designed list holding the analysis results and can be processed by generic functions including <code>plot</code> and <code>summary</code>. For example, to visualize the analysis result, we can plot the analysis results in a circular layout as shown in the following figure:</p>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1"></a><span class="kw">plot</span>(res, <span class="dt">sort.by=</span><span class="st">&quot;size&quot;</span>, <span class="dt">margin=</span><span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">2</span>), <span class="dt">color.scale.pos=</span><span class="kw">c</span>(<span class="fl">0.85</span>,<span class="dv">1</span>), <span class="dt">legend.pos=</span><span class="kw">c</span>(<span class="fl">0.9</span>,<span class="fl">0.15</span>))</span></code></pre></div>
+<div class="figure">
+<img src="data:image/png;base64,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" alt />
+<p class="caption">A circular plot visualizing all possible intersections and the corresponding statistics amongst <em>cis</em>-eQTL gene sets.</p>
+</div>
+<p>The four tracks in the middle represent the four gene sets, with individual blocks showing “presence” (green) or “absence” (grey) of the gene sets in each intersection. To denote the four gene sets with different colors, set argument <code>color.on</code> to NULL or provide it with a vector of user-defined colors. The height of the bars in the outer layer is proportional to the intersection sizes, as indicated by the numbers on the top of the bars. The color intensity of the bars represents the P value significance of the intersections.</p>
+<p>As the option name suggests, <code>sort.by=&quot;size&quot;</code> instructs the intersections to be sorted by size. Users are flexible to use different color schemes or sort intersections by P value, set, size or degree. The complete control options can be obtained from the help documentation by command <code>help(&quot;plot.msets&quot;)</code>. For example, we can visualize the results in a landscape (matrix) layout as shown in Figure which includes only intersections among 2 to 4 sets by option <code>degree = 2:4</code>:</p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1"></a><span class="kw">plot</span>(res, <span class="dt">Layout=</span><span class="st">&quot;landscape&quot;</span>, <span class="dt">degree=</span><span class="dv">2</span><span class="op">:</span><span class="dv">4</span>, <span class="dt">sort.by=</span><span class="st">&quot;size&quot;</span>, <span class="dt">margin=</span><span class="kw">c</span>(<span class="fl">0.5</span>,<span class="dv">5</span>,<span class="dv">1</span>,<span class="dv">2</span>))</span></code></pre></div>
+<div class="figure">
+<img src="data:image/png;base64,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" alt />
+<p class="caption">A bar chart illustrating all possible intersections among <em>cis</em>-eQTL gene sets in a matrix layout.</p>
+</div>
+<p>The matrix of solid and empty circles at the bottom illustrates the “presence” (solid green) or “absence” (empty) of the gene sets in each intersection. The numbers to the right of the matrix are set sizes. The colored bars on the top of the matrix represent the intersection sizes with the color intensity showing the P value significance.</p>
+<p>The generic <code>summary</code> function can be used to summarize the analysis results in details:</p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1"></a><span class="kw">summary</span>(res)</span></code></pre></div>
+<pre><code>## A msets object with 4 sets: CB FC TC PONS 
+## Background size: 18196 
+## Summary of intersections:
+##            Intersections Degree Observed.Overlap Expected.Overlap           FE
+## 0001                PONS      1              101               NA           NA
+## 0010                  TC      1              137               NA           NA
+## 0011           TC &amp; PONS      2               72     0.7604418554 9.468180e+01
+## 0100                  FC      1              164               NA           NA
+## 0101           FC &amp; PONS      2               74     0.9103099582 8.129099e+01
+## 0110             FC &amp; TC      2              108     1.2347768740 8.746519e+01
+## 0111      FC &amp; TC &amp; PONS      3               68     0.0068538395 9.921446e+03
+## 1000                  CB      1              147               NA           NA
+## 1001           CB &amp; PONS      2               62     0.8159485601 7.598518e+01
+## 1010             CB &amp; TC      2               72     1.1067817103 6.505348e+01
+## 1011      CB &amp; TC &amp; PONS      3               56     0.0061433806 9.115502e+03
+## 1100             CB &amp; FC      2               76     1.3249065729 5.736254e+01
+## 1101      CB &amp; FC &amp; PONS      3               60     0.0073541198 8.158692e+03
+## 1110        CB &amp; FC &amp; TC      3               67     0.0099753902 6.716529e+03
+## 1111 CB &amp; FC &amp; TC &amp; PONS      4               56     0.0000553701 1.011376e+06
+##            P.value                 Elements
+## 0001            NA AATF, ABHD12, ACCS,  ...
+## 0010            NA ABHD12, ACCS, ACP6,  ...
+## 0011 2.102340e-138 ABHD12, ACCS, ACP6,  ...
+## 0100            NA ABHD12, ADAD2, ADAL, ...
+## 0101 3.399208e-136 ABHD12, AMFR, ATPIF1 ...
+## 0110 2.081928e-212 ABHD12, ADAL, AKAP8, ...
+## 0111 2.400407e-273 ABHD12, AMFR, ATPIF1 ...
+## 1000            NA ABHD10, ABHD12, ACO1 ...
+## 1001 6.348584e-109 ABHD12, AMFR, ATPIF1 ...
+## 1010 1.165913e-120 ABHD12, ADAL, AMFR,  ...
+## 1011 1.105986e-218 ABHD12, AMFR, ATPIF1 ...
+## 1100 2.768779e-122 ABHD12, ADAL, AMFR,  ...
+## 1101 6.827755e-232 ABHD12, AMFR, ATPIF1 ...
+## 1110 1.754835e-252 ABHD12, ADAL, AMFR,  ...
+## 1111  0.000000e+00 ABHD12, AMFR, ATPIF1 ...</code></pre>
+<p>The main output from the <code>summary</code> function is a data.frame, with each row representing an intersection and its corresponding test statistics. Details about the <code>summary</code> function output are available from the help documentation:</p>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1"></a>?summary.msets</span></code></pre></div>
+<p>To tabulate the <code>summary</code> result into a file, use command:</p>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1"></a><span class="kw">write.csv</span>(<span class="kw">summary</span>(res)<span class="op">$</span>Table, <span class="dt">file=</span><span class="st">&quot;summary.table.csv&quot;</span>, <span class="dt">row.names=</span><span class="ot">FALSE</span>)</span></code></pre></div>
+</div>
+</div>
+<div id="references" class="section level1">
+<h1>References</h1>
+<p>Gibbs et al. (2010) Abundant Quantitative Trait Loci Exist for DNA Methylation and Gene Expression in Human Brain. PLoS Genetics 6: e1000952.</p>
+<p>Minghui Wang, Yongzhong Zhao, and Bin Zhang (2015) Efficient Test and Visualization of Multi-Set Intersections. Scientific Reports 5: 16923.</p>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
