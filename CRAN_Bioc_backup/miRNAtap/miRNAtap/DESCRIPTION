@@ -1,0 +1,28 @@
+Package: miRNAtap
+Type: Package
+Title: miRNAtap: microRNA Targets - Aggregated Predictions
+Version: 1.36.0
+Date: 2016-10-03
+Author: Maciej Pajak, T. Ian Simpson
+Maintainer: T. Ian Simpson <ian.simpson@ed.ac.uk>
+Description: The package facilitates implementation of workflows
+    requiring miRNA predictions, it allows to integrate ranked
+    miRNA target predictions from multiple sources available online
+    and aggregate them with various methods which improves quality
+    of predictions above any of the single sources. Currently
+    predictions are available for Homo sapiens, Mus musculus and
+    Rattus norvegicus (the last one through homology translation).
+License: GPL-2
+Depends: R (>= 3.3.0), AnnotationDbi
+Imports: DBI, RSQLite, stringr, sqldf, plyr, methods
+Suggests: topGO, org.Hs.eg.db, miRNAtap.db, testthat
+biocViews: Software, Classification, Microarray, Sequencing, miRNA
+Roxygen: list(wrap = FALSE)
+RoxygenNote: 5.0.1
+git_url: https://git.bioconductor.org/packages/miRNAtap
+git_branch: RELEASE_3_18
+git_last_commit: f20aa1f
+git_last_commit_date: 2023-10-24
+Date/Publication: 2023-10-24
+NeedsCompilation: no
+Packaged: 2023-10-24 21:56:47 UTC; biocbuild
