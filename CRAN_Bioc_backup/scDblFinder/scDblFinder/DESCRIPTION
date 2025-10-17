@@ -1,0 +1,40 @@
+Package: scDblFinder
+Type: Package
+Title: scDblFinder
+Version: 1.16.0
+Authors@R: c(
+    person("Pierre-Luc", "Germain", email="pierre-luc.germain@hest.ethz.ch", role=c("cre","aut"), comment=c(ORCID="0000-0003-3418-4218")),
+    person("Aaron", "Lun", email="infinite.monkeys.with.keyboards@gmail.com", role="ctb"))
+URL: https://github.com/plger/scDblFinder,
+        https://plger.github.io/scDblFinder/
+BugReports: https://github.com/plger/scDblFinder/issues
+Description: 
+    The scDblFinder package gathers various methods for the detection and 
+    handling of doublets/multiplets in single-cell sequencing data (i.e. 
+    multiple cells captured within the same droplet or reaction volume). It
+    includes methods formerly found in the scran package, the new fast
+    and comprehensive scDblFinder method, and a reimplementation of the
+    Amulet detection method for single-cell ATAC-seq.
+License: GPL-3 + file LICENSE
+Depends: R (>= 4.0), SingleCellExperiment
+Imports: igraph, Matrix, BiocGenerics, BiocParallel, BiocNeighbors,
+        BiocSingular, S4Vectors, SummarizedExperiment, scran, scater,
+        scuttle, bluster, methods, DelayedArray, xgboost, stats, utils,
+        MASS, IRanges, GenomicRanges, GenomeInfoDb, Rsamtools,
+        rtracklayer
+Suggests: BiocStyle, knitr, rmarkdown, testthat, scRNAseq, circlize,
+        ComplexHeatmap, ggplot2, dplyr, viridisLite, mbkmeans
+VignetteBuilder: knitr
+Encoding: UTF-8
+RoxygenNote: 7.2.3
+biocViews: Preprocessing, SingleCell, RNASeq, ATACSeq
+git_url: https://git.bioconductor.org/packages/scDblFinder
+git_branch: RELEASE_3_18
+git_last_commit: eb6af9b
+git_last_commit_date: 2023-10-24
+Date/Publication: 2023-10-24
+NeedsCompilation: no
+Packaged: 2023-10-24 22:55:45 UTC; biocbuild
+Author: Pierre-Luc Germain [cre, aut] (<https://orcid.org/0000-0003-3418-4218>),
+  Aaron Lun [ctb]
+Maintainer: Pierre-Luc Germain <pierre-luc.germain@hest.ethz.ch>

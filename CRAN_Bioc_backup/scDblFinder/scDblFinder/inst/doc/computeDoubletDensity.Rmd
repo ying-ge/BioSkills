@@ -1,0 +1,147 @@
+---
+title: Scoring potential doublets from simulated densities
+package: scDblFinder
+author: 
+- name: Aaron Lun
+  email: infinite.monkeys.with.keyboards@gmail.com
+date: "`r Sys.Date()`"
+output:
+  BiocStyle::html_document
+vignette: |
+  %\VignetteIndexEntry{4_computeDoubletDensity}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, echo=FALSE, message=FALSE}
+knitr::opts_chunk$set(error=FALSE, message=FALSE, warning=FALSE)
+library(BiocStyle)
+```
+
+# tl;dr
+
+To demonstrate, we'll use one of the mammary gland datasets from the `r Biocpkg("scRNAseq")` package.
+We will subset it down to a random set of 1000 cells for speed.
+
+```{r}
+library(scRNAseq)
+sce <- BachMammaryData(samples="G_1")
+
+set.seed(1001)
+sce <- sce[,sample(ncol(sce), 1000)]
+```
+
+For the purposes of this demonstration, we'll perform an extremely expedited analysis.
+One would usually take more care here and do some quality control,
+create some diagnostic plots, etc., but we don't have the space for that.
+
+```{r}
+library(scuttle)
+sce <- logNormCounts(sce)
+
+library(scran)
+dec <- modelGeneVar(sce)
+hvgs <- getTopHVGs(dec, n=1000)
+
+library(scater)
+set.seed(1002)
+sce <- runPCA(sce, ncomponents=10, subset_row=hvgs)
+sce <- runTSNE(sce, dimred="PCA")
+```
+
+We run `computeDoubletDensity()` to obtain a doublet score for each cell based on the density of simulated doublets around it.
+We log this to get some better dynamic range.
+
+```{r}
+set.seed(1003)
+library(scDblFinder)
+scores <- computeDoubletDensity(sce, subset.row=hvgs)
+plotTSNE(sce, colour_by=I(log1p(scores)))
+```
+
+```{r, echo=FALSE}
+# Sanity check that the plot has one cluster with much higher scores.
+# If this fails, we probably need to pick a more demonstrative example.
+library(bluster)
+clusters <- clusterRows(reducedDim(sce, "PCA"), NNGraphParam())
+by.clust <- split(scores, clusters)
+med.scores <- sort(vapply(by.clust, median, 0), decreasing=TRUE)
+stopifnot(med.scores[1] > med.scores[2] * 4)
+```
+
+# Algorithm overview {#overview}
+
+We use a fairly simple approach in `doubletCells` that involves creating simulated doublets from the original data set:
+
+1. Perform a PCA on the log-normalized expression for all cells in the dataset.
+2. Randomly select two cells and add their count profiles together.
+Compute the log-normalized profile and project it into the PC space.
+3. Repeat **2** to obtain $N_s$ simulated doublet cells.
+4. For each cell, compute the local density of simulated doublets, scaled by the density of the original cells.
+This is used as the doublet score.
+
+# Size factor handling
+
+## Normalization size factors
+
+We allow specification of two sets of size factors for different purposes.
+The first set is the normalization set: division of counts by these size factors yields expression values to be compared across cells.
+This is necessary to compute log-normalized expression values for the PCA.
+
+These size factors are usually computed from some method that assumes most genes are not DE.
+We default to library size normalization though any arbitrary set of size factors can be used.
+The size factor for each doublet is computed as the sum of size factors for the individual cells, based on the additivity of scaling biases.
+
+## RNA content size factors
+
+The second set is the RNA content set: division of counts by these size factors yields expression values that are proportional to absolute abundance across cells.
+This affects the creation of simulated doublets by controlling the scaling of the count profiles for the individual cells.
+These size factors would normally be estimated with spike-ins, but in their absence we default to using unity for all cells.
+
+The use of unity values implies that the library size for each cell is a good proxy for total RNA content.
+This is unlikely to be true: technical biases mean that the library size is an imprecise relative estimate of the content.
+Saturation effects and composition biases also mean that the expected library size for each population is not an accurate estimate of content.
+The imprecision will spread out the simulated doublets while the inaccuracy will result in a systematic shift from the location of true doublets.
+
+Arguably, such problems exist for any doublet estimation method without spike-in information.
+We can only hope that the inaccuracies have only minor effects on the creation of simulated cells.
+Indeed, the first effect does mitigate the second to some extent by ensuring that some simulated doublets will occupy the neighbourhood of the true doublets.
+
+## Interactions between them
+
+These two sets of size factors play different roles so it is possible to specify both of them.
+We use the following algorithm to accommodate non-unity values for the RNA content size factors:
+
+1. The RNA content size factors are used to scale the counts first.
+This ensures that RNA content has the desired effect in step **2** of Section \@ref(overview).
+2. The normalization size factors are also divided by the content size factors.
+This ensures that normalization has the correct effect, see below.
+3. The rest of the algorithm proceeds as if the RNA content size factors were unity.
+Addition of count profiles is done without further scaling, and normalized expression values are computed with the rescaled normalization size factors.
+
+To understand the correctness of the rescaled normalization size factors, consider a non-DE gene with abundance $\lambda_g$.
+The expected count in each cell is $\lambda_g s_i$ for scaling bias $s_i$ (i.e., normalization size factor).
+The rescaled count is $\lambda_g s_i c_i^{-1}$ for some RNA content size factor $c_i$.
+The rescaled normalization size factor is $s_i c_i^{-1}$, such that normalization yields $\lambda_g$ as desired.
+This also holds for doublets where the scaling biases and size factors are additive.
+
+# Doublet score calculations
+
+We assume that the simulation accurately mimics doublet creation - amongst other things, we assume that doublets are equally likely to form between any cell populations and any differences in total RNA between subpopulations are captured or negligible.
+If these assumptions hold, then at any given region in the expression space, the number of doublets among the real cells is proportional to the number of simulated doublets lying in the same region.
+Thus, the probability that a cell is a doublet is proportional to the ratio of the number of neighboring simulated doublets to the number of neighboring real cells. 
+
+A mild additional challenge here is that the number of simulated cells $N_s$ can vary.
+Ideally, we would like the expected output of the function to be the same regardless of the user's choice of $N_s$, i.e., the chosen value should only affect the precision/speed trade-off.
+Many other doublet-based methods take a $k$-nearest neighbours approach to compute densities; but if $N_s$ is too large relative to the number of real cells, all of the $k$ nearest neighbours will be simulated, while if $N_s$ is too small, all of the nearest neighbors will be original cells.
+
+Thus, we use a modified version of the $k$NN approach whereby we identify the distance from each cell to its $k$-th nearest neighbor.
+This defines a hypersphere around that cell in which we count the number of simulated cells.
+We then compute the odds ratio of the number of simulated cells in the hypersphere to $N_s$, divided by the ratio of $k$ to the total number of cells in the dataset.
+This score captures the relative frequency of simulated cells to real cells while being robust to changes to $N_s$.
+
+# Session information {-}
+
+```{r}
+sessionInfo()
+```

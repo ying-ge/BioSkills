@@ -1,0 +1,45 @@
+Changes in version 1.13.14 (2023-06-19)
++ reduced the default minimum number of artificial doublets to improve call robustness in very small datasets.
+
+Changes in version 1.13.10 (2023-03-23)
++ fixed serializing error in multithreading large single samples
++ computed thresholds now reported in metadata
+
+Changes in version 1.13.7 (2023-01-09)
++ added possibility to provide the genes/features to use, updated docs
+
+Changes in version 1.13.4 (2022-11-21)
++ fixed bug in samples reporting in split mode (doesn't affect doublets scores)
+
+Changes in version 1.13.3 (2022-11-20)
++ updated default parameters according to https://arxiv.org/abs/2211.00772
+
+Changes in version 1.13.2 (2022-11-11)
++ added two-pass mode for feature aggregation
+
+Changes in version 1.9.11 (2022-04-16)
++ fixed larger kNN size
+
+Changes in version 1.9.9 (2022-04-9)
++ improved amulet reimplementation
++ added clamulet and scATAC vignette
+
+Changes in version 1.9.1 (2021-11-02)
++ added reimplementation of the amulet method for scATAC-seq
+
+Changes in version 1.7.3 (2021-07-26)
++ scDblFinder now includes both cluster-based and random modes for artificial doublet generation
++ thresholding has been streamlined
++ default parameters have been optimized using benchmark datasets
++ added the `directDblClassification` method
+
+Changes in version 1.5.11 (2021-01-19)
++ scDblFinder now provides doublet enrichment tests
++ doublet generation and default parameters have been further optimized
+
+Changes in version 1.3.25 (2020-10-26)
++ scDblFinder has important improvements on speed, robustness and accuracy
++ in additional to doublet calls, scDblFinder reports the putative origin (combination of clusters) of doublets
+
+Changes in version 1.3.19 (2020-08-06)
++ scDblFinder now hosts the doublet detection methods formerly part of `scran`
