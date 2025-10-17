@@ -1,0 +1,76 @@
+/* Cairo back-end management */
+#include <R.h>
+#include <Rinternals.h>
+
+#include "backend.h"
+
+static const char *types[64];
+
+static struct bed_list_st {
+  Rcairo_backend_def* bed;
+  struct bed_list_st* next;
+} root;
+
+void Rcairo_register_backend(Rcairo_backend_def* def) {
+  struct bed_list_st *l=&root;
+  while (l->bed && l->next) {
+    if (l->bed == def) return; /* nothing to do if we have this be alreay */
+    l = l->next;
+  }
+  if (l->bed) {
+    l->next = (struct bed_list_st*) malloc(sizeof(struct bed_list_st));
+    l = l->next;
+    l->next = 0;
+  }
+  l->bed = def;
+  { /* collect types list */
+    const char **c = types;
+    const char **d = def->types;
+    while (*c) c++;
+    while (*d) {
+      *c=*d; c++; d++;
+      if (c-types > 48) break;
+    }
+  }
+}
+
+int Rcairo_type_supported(const char *type) {
+  const char **c = types;
+  if (!type) return 0;
+  while (*c) {
+    if (!strcmp(type, *c)) return 1;
+    c++;
+  }
+  return 0;
+}
+
+/* for additional capabilities */
+#include "cairogd.h"
+
+SEXP Rcairo_supported_types(void) {
+  const char **c = types;
+  int i = 0;
+  SEXP res;
+  while (*c) { c++; i++; }
+  /* we also add general capabilities: freetype and harfbuzz */
+#if USE_CAIRO_FT
+  i++;
+#ifdef HAVE_HARFBUZZ
+  i++;
+#endif
+#endif
+  PROTECT(res=allocVector(STRSXP, i));
+  i = 0; c = types;
+  while (*c) {
+    SET_STRING_ELT(res, i, mkChar(*c));
+    c++; i++;
+  }
+#if USE_CAIRO_FT
+  SET_STRING_ELT(res, i++, mkChar("freetype"));
+#ifdef HAVE_HARFBUZZ
+  SET_STRING_ELT(res, i++, mkChar("harfbuzz"));
+#endif
+#endif
+  UNPROTECT(1);
+  return res;
+}
