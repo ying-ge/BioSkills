@@ -1,20 +1,62 @@
+# 单细胞分析包
 scanpy
 anndata
-pandas
-numpy
-matplotlib
-seaborn
+scvi-tools
+scvelo
+celltypist
+scrublet
+scdifferential
+
+# 机器学习包
 scikit-learn
-tensorflow
-torch
-biopython
-plotly
-scipy
-dask
-polars
 xgboost
 lightgbm
+catboost
+tensorflow
+torch
+optuna
+
+# 核心包
+numpy
+pandas
+scipy
+matplotlib
+setuptools
+wheel
+
+# 可视化包
+seaborn
+plotly
+bokeh
 networkx
-beautifulsoup4
-requests
-jupyter
+pygraphviz
+circlify
+
+# 基因组学包
+biopython
+pysam
+pybedtools
+pyvcf
+pyensembl
+pyfaidx
+
+# 免疫学包
+cellphonedb
+nichenet
+immunarch
+vdjtools
+scRepertoire
+
+# 深度学习包
+keras
+pytorch-lightning
+fastai
+transformers
+huggingface_hub
+
+# 数据处理包
+dask
+polars
+pyarrow
+openpyxl
+xlrd
