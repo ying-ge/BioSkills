@@ -1,0 +1,30 @@
+Package: scds
+Type: Package
+Title: In-Silico Annotation of Doublets for Single Cell RNA Sequencing
+        Data
+Version: 1.18.0
+Authors@R: c(person("Dennis", "Kostka", role=c("aut", "cre"),
+        email="kostka@pitt.edu"), person("Bais", "Abha",
+        role=c("aut"), email="abhabais@pitt.edu"))
+Description: In single cell RNA sequencing (scRNA-seq) data combinations of cells are sometimes considered a single cell (doublets). The scds package provides methods to annotate doublets in scRNA-seq data computationally.
+License: MIT + file LICENSE
+Encoding: UTF-8
+biocViews: SingleCell, RNASeq, QualityControl, Preprocessing,
+        Transcriptomics, GeneExpression, Sequencing, Software,
+        Classification
+RoxygenNote: 6.1.1
+Depends: R (>= 3.6.0)
+Imports: Matrix, S4Vectors, SingleCellExperiment, SummarizedExperiment,
+        xgboost, methods, stats, dplyr, pROC
+Suggests: BiocStyle, knitr, rsvd, Rtsne, scater, cowplot, rmarkdown
+VignetteBuilder: knitr
+git_url: https://git.bioconductor.org/packages/scds
+git_branch: RELEASE_3_18
+git_last_commit: dff0c08
+git_last_commit_date: 2023-10-24
+Date/Publication: 2023-10-24
+NeedsCompilation: no
+Packaged: 2023-10-24 22:54:38 UTC; biocbuild
+Author: Dennis Kostka [aut, cre],
+  Bais Abha [aut]
+Maintainer: Dennis Kostka <kostka@pitt.edu>
