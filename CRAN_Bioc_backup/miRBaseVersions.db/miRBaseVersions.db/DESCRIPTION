@@ -1,0 +1,18 @@
+Package: miRBaseVersions.db
+Type: Package
+Title: Collection of mature miRNA names of 22 different miRBase release
+        versions
+Version: 1.1.0
+Authors@R: person("Stefan", "Haunsberger", email = "stefan.haunsberger@gmail.com", role = c("aut", "cre"))
+Description: Annotation package containing all available miRNA names from 22 versions (data from http://www.mirbase.org/).
+License: Artistic-2.0
+Imports: AnnotationDbi, DBI, RSQLite, methods, gtools
+biocViews: Preprocessing, miRNA, AnnotationData
+LazyData: TRUE
+Suggests: testthat, knitr, rmarkdown, annotate
+VignetteBuilder: knitr
+RoxygenNote: 6.0.1
+NeedsCompilation: no
+Packaged: 2018-04-09 18:39:09 UTC; biocadmin
+Author: Stefan Haunsberger [aut, cre]
+Maintainer: Stefan Haunsberger <stefan.haunsberger@gmail.com>
