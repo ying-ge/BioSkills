@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="Ben Bolker" />
+<meta name="author" content="Peter Cowan" />
+<meta name="author" content="François Michonneau" />
+
+
+<title>The phylo4 classes and methods</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+
+
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">The phylo4 classes and methods</h1>
+<h4 class="author">Ben Bolker</h4>
+<h4 class="author">Peter Cowan</h4>
+<h4 class="author">François Michonneau</h4>
+
+
+
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(phylobase)</span></code></pre></div>
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>This document describes the new ‘phylo4’ S4 classes and methods,
+which are intended to provide a unifying standard for the representation
+of phylogenetic trees and comparative data in R. The
+<code>phylobase</code> package was developed to help both end users and
+package developers by providing a common suite of tools likely to be
+shared by all packages designed for phylogenetic analysis, facilities
+for data and tree manipulation, and standardization of formats.</p>
+<p>This standardization will benefit <em>end-users</em> by making it
+easier to move data and compare analyses across packages, and to keep
+comparative data synchronized with phylogenetic trees. Users will also
+benefit from a repository of functions for tree manipulation, for
+example tools for including or excluding subtrees (and associated
+phenotypic data) or improved tree and data plotting facilities.
+<code>phylobase</code> will benefit <em>developers</em> by freeing them
+to put their programming effort into developing new methods rather than
+into re-coding base tools. We (the <code>phylobase</code> developers)
+hope <code>phylobase</code> will also facilitate code validation by
+providing a repository for benchmark tests, and more generally that it
+will help catalyze community development of comparative methods in
+R.</p>
+<p>A more abstract motivation for developing <code>phylobase</code> was
+to improve data checking and abstraction of the tree data formats.
+<code>phylobase</code> can check that data and trees are associated in
+the proper fashion, and protects users and developers from accidently
+reordering one, but not the other. It also seeks to abstract the data
+format so that commonly used information (for example, branch length
+information or the ancestor of a particular node) can be accessed
+without knowledge of the underlying data structure (i.e., whether the
+tree is stored as a matrix, or a list, or a parenthesis-based format).
+This is achieved through generic <code>phylobase</code> functions which
+which retrieve the relevant information from the data structures. The
+benefits of such abstraction are multiple: (1) <em>easier access to the
+relevant information</em> via a simple function call (this frees both
+users and developers from learning details of complex data structures),
+(2) <em>freedom to optimize data structures in the future without
+breaking code.</em> Having the generic functions in place to “translate”
+between the data structures and the rest of the program code allows
+program and data structure development to proceed somewhat
+independently. The alternative is code written for specific data
+structures, in which modifications to the data structure requires
+rewriting the entire package code (often exacting too high a price,
+which results in the persistence of less-optimal data structures). (3)
+<em>providing broader access to the range of tools in
+<code>phylobase</code></em>. Developers of specific packages can use
+these new tools based on S4 objects without knowing the details of S4
+programming.</p>
+<p>The base ‘phylo4’ class is modeled on the the <code>phylo</code>
+class in <code>ape</code>. and extend the ‘phylo4’ class to include data
+or multiple trees respectively. In addition to describing the classes
+and methods, this vignette gives examples of how they might be used.</p>
+</div>
+<div id="package-overview" class="section level2">
+<h2>Package overview</h2>
+<p>The phylobase package currently implements the following functions
+and data structures:</p>
+<ul>
+<li><p>Data structures for storing a single tree and multiple trees: and
+?</p></li>
+<li><p>A data structure for storing a tree with associated tip and node
+data:</p></li>
+<li><p>A data structure for storing multiple trees with one set of tip
+data:</p></li>
+<li><p>Functions for reading nexus files into the above data
+structures</p></li>
+<li><p>Functions for converting between the above data structures and
+objects as well as <code>phylog</code> objects (although the latter are
+now deprecated …)</p></li>
+<li><p>Functions for editing trees and data (i.e., subsetting and
+replacing)</p></li>
+<li><p>Functions for plotting trees and trees with data</p></li>
+</ul>
+</div>
+<div id="using-the-s4-help-system" class="section level2">
+<h2>Using the S4 help system</h2>
+<p>The help system works similarly to the help system with some small
+differences relating to how methods are written. The function is a good
+example. When we type we are provided the help for the default plotting
+function which expects <code>x</code> and <code>y</code>. <code>R</code>
+also provides a way to smartly dispatch the right type of plotting
+function. In the case of an object (a class object) <code>R</code>
+evaluates the class of the object and finds the correct functions, so
+the following works correctly.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ape)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1</span>)  <span class="do">## set random-number seed</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>rand_tree <span class="ot">&lt;-</span> <span class="fu">rcoal</span>(<span class="dv">10</span>) <span class="do">## Make a random tree with 10 tips</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(rand_tree)</span></code></pre></div>
+<p>However, typing still takes us to the default <code>plot</code> help.
+We have to type to find what we are looking for. This is because
+generics are simply functions with a dot and the class name added.</p>
+<p>The generic system is too complicated to describe here, but doesn’t
+include the same dot notation. As a result doesn’t work, <code>R</code>
+still finds the right plotting function.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(phylobase)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co"># convert rand_tree to a phylo4 object</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>rand_p4_tree <span class="ot">&lt;-</span> <span class="fu">as</span>(rand_tree, <span class="st">&quot;phylo4&quot;</span>)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(rand_p4_tree)</span></code></pre></div>
+<p>All fine and good, but how to we find out about all the great
+features of the <code>phylobase</code> plotting function? <code>R</code>
+has two nifty ways to find it, the first is to simply put a question
+mark in front of the whole call:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="st">`</span><span class="at">?</span><span class="st">`</span>(<span class="fu">plot</span>(rand_p4_tree))</span></code></pre></div>
+<p><code>R</code> looks at the class of the object and takes us to the
+correct help file (note: this only works with objects). The second ways
+is handy if you already know the class of your object, or want to
+compare to generics for different classes:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="st">`</span><span class="at">?</span><span class="st">`</span>(method, <span class="fu">plot</span>(<span class="st">&quot;phylo4&quot;</span>))</span></code></pre></div>
+<p>More information about how documentation works can be found in the
+methods package, by running the following command.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">help</span>(<span class="st">&#39;Documentation&#39;</span>, <span class="at">package=</span><span class="st">&quot;methods&quot;</span>)</span></code></pre></div>
+</div>
+<div id="trees-without-data" class="section level2">
+<h2>Trees without data</h2>
+<p>You can start with a tree — an object of class <code>phylo</code>
+from the <code>ape</code> package (e.g., read in using the
+<code>read.tree()</code> or <code>read.nexus()</code> functions), and
+convert it to a <code>phylo4</code> object.</p>
+<p>For example, load the raw <em>Geospiza</em> data:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(phylobase)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(geospiza_raw) <span class="co"># what does it contain?</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(geospiza_raw)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;tree&quot; &quot;data&quot;</span></span></code></pre></div>
+<p>Convert the <code>S3</code> tree to a <code>S4 phylo4</code> object
+using the <code>as()</code> function:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>(g1 <span class="ot">&lt;-</span> <span class="fu">as</span>(geospiza_raw<span class="sc">$</span>tree, <span class="st">&quot;phylo4&quot;</span>))</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;           label node ancestor edge.length node.type</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1    fuliginosa    1       24     0.05500       tip</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2        fortis    2       24     0.05500       tip</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3  magnirostris    3       23     0.11000       tip</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4   conirostris    4       22     0.18333       tip</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5      scandens    5       21     0.19250       tip</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6    difficilis    6       20     0.22800       tip</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 7       pallida    7       25     0.08667       tip</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 8      parvulus    8       27     0.02000       tip</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 9    psittacula    9       27     0.02000       tip</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 10       pauper   10       26     0.03500       tip</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 11   Platyspiza   11       18     0.46550       tip</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 12        fusca   12       17     0.53409       tip</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 13 Pinaroloxias   13       16     0.58333       tip</span></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 14     olivacea   14       15     0.88077       tip</span></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 15         &lt;NA&gt;   15        0          NA      root</span></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 16         &lt;NA&gt;   16       15     0.29744  internal</span></span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 17         &lt;NA&gt;   17       16     0.04924  internal</span></span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 18         &lt;NA&gt;   18       17     0.06859  internal</span></span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 19         &lt;NA&gt;   19       18     0.13404  internal</span></span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 20         &lt;NA&gt;   20       19     0.10346  internal</span></span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [ reached &#39;max&#39; / getOption(&quot;max.print&quot;) -- omitted 7 rows ]</span></span></code></pre></div>
+<p>The (internal) nodes appear with labels because they are not
+defined:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nodeLabels</span>(g1)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 15 16 17 18 19 20 21 22 23 24 25 26 27 </span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; NA NA NA NA NA NA NA NA NA NA NA NA NA</span></span></code></pre></div>
+<p>You can also retrieve the node labels with .</p>
+<p>A simple way to assign the node numbers as labels (useful for various
+checks) is</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nodeLabels</span>(g1) <span class="ot">&lt;-</span> <span class="fu">paste</span>(<span class="st">&quot;N&quot;</span>, <span class="fu">nodeId</span>(g1, <span class="st">&quot;internal&quot;</span>), <span class="at">sep=</span><span class="st">&quot;&quot;</span>)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(g1, <span class="dv">5</span>)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;          label node ancestor edge.length node.type</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1   fuliginosa    1       24     0.05500       tip</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2       fortis    2       24     0.05500       tip</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 magnirostris    3       23     0.11000       tip</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4  conirostris    4       22     0.18333       tip</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5     scandens    5       21     0.19250       tip</span></span></code></pre></div>
+<p>The method gives a little extra information, including information on
+the distribution of branch lengths:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(g1)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  Phylogenetic tree : g1 </span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  Number of tips    : 14 </span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  Number of nodes   : 13 </span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  Branch lengths:</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;         mean         : 0.1764008 </span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;         variance     : 0.04624379 </span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;         distribution :</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 0.00917 0.04985 0.08000 0.17640 0.21912 0.88077</span></span></code></pre></div>
+<p>Print tip labels:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tipLabels</span>(g1)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;              1              2              3              4              5              6 </span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   &quot;fuliginosa&quot;       &quot;fortis&quot; &quot;magnirostris&quot;  &quot;conirostris&quot;     &quot;scandens&quot;   &quot;difficilis&quot; </span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;              7              8              9             10             11             12 </span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      &quot;pallida&quot;     &quot;parvulus&quot;   &quot;psittacula&quot;       &quot;pauper&quot;   &quot;Platyspiza&quot;        &quot;fusca&quot; </span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;             13             14 </span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; &quot;Pinaroloxias&quot;     &quot;olivacea&quot;</span></span></code></pre></div>
+<p>(<code>labels(g1,&quot;tip&quot;)</code> would also work.)</p>
+<p>You can modify labels and other aspects of the tree — for example, to
+convert all the labels to lower case:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tipLabels</span>(g1) <span class="ot">&lt;-</span> <span class="fu">tolower</span>(<span class="fu">tipLabels</span>(g1))</span></code></pre></div>
+<p>You could also modify selected labels, e.g. to modify the labels in
+positions 11 and 13 (which happen to be the only labels with uppercase
+letters):</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tipLabels</span>(g1)[<span class="fu">c</span>(<span class="dv">11</span>, <span class="dv">13</span>)] <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;platyspiza&quot;</span>, <span class="st">&quot;pinaroloxias&quot;</span>)</span></code></pre></div>
+<p>Note that for a given tree, <code>phylobase</code> always return the
+<code>tipLabels</code> in the same order.</p>
+<p>Print node numbers (in edge matrix order):</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nodeId</span>(g1, <span class="at">type=</span><span class="st">&#39;all&#39;</span>)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [1]  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27</span></span></code></pre></div>
+<p>Does it have information on branch lengths?</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hasEdgeLength</span>(g1)</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
+<p>It does! What do they look like?</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">edgeLength</span>(g1)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   15-16   16-17   17-18   18-19   19-20   20-21   21-22   22-23   23-24    24-1    24-2 </span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 0.29744 0.04924 0.06859 0.13404 0.10346 0.03550 0.00917 0.07333 0.05500 0.05500 0.05500 </span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    23-3    22-4    21-5    0-15    20-6   19-25    25-7   25-26   26-27    27-8    27-9 </span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 0.11000 0.18333 0.19250      NA 0.22800 0.24479 0.08667 0.05167 0.01500 0.02000 0.02000 </span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   26-10   18-11   17-12   16-13   15-14 </span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 0.03500 0.46550 0.53409 0.58333 0.88077</span></span></code></pre></div>
+<p>Note that the root has <code>&lt;NA&gt;</code> as its length.</p>
+<p>Print edge labels (also empty in this case — therefore all
+<code>NA</code>):</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">edgeLabels</span>(g1)</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 15-16 16-17 17-18 18-19 19-20 20-21 21-22 22-23 23-24  24-1  24-2  23-3  22-4  21-5  0-15 </span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA </span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  20-6 19-25  25-7 25-26 26-27  27-8  27-9 26-10 18-11 17-12 16-13 15-14 </span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA</span></span></code></pre></div>
+<p>You can also use this function to label specific edges:</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">edgeLabels</span>(g1)[<span class="st">&quot;23-24&quot;</span>] <span class="ot">&lt;-</span> <span class="st">&quot;an edge&quot;</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="fu">edgeLabels</span>(g1)</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     15-16     16-17     17-18     18-19     19-20     20-21     21-22     22-23     23-24 </span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        NA        NA        NA        NA        NA        NA        NA        NA &quot;an edge&quot; </span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      24-1      24-2      23-3      22-4      21-5      0-15      20-6     19-25      25-7 </span></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        NA        NA        NA        NA        NA        NA        NA        NA        NA </span></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     25-26     26-27      27-8      27-9     26-10     18-11     17-12     16-13     15-14 </span></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        NA        NA        NA        NA        NA        NA        NA        NA        NA</span></span></code></pre></div>
+<p>The edge labels are named according to the nodes they connect
+(ancestor-descendant). You can get the edge(s) associated with a
+particular node:</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">getEdge</span>(g1, <span class="dv">24</span>) <span class="co"># default uses descendant node</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      24 </span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; &quot;23-24&quot;</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="fu">getEdge</span>(g1, <span class="dv">24</span>, <span class="at">type=</span><span class="st">&quot;ancestor&quot;</span>) <span class="co"># edges using ancestor node</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     24     24 </span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; &quot;24-1&quot; &quot;24-2&quot;</span></span></code></pre></div>
+<p>These results can in turn be passed to the function to retrieve the
+length of a given set of edges:</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">edgeLength</span>(g1)[<span class="fu">getEdge</span>(g1, <span class="dv">24</span>)]</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 23-24 </span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 0.055</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="fu">edgeLength</span>(g1)[<span class="fu">getEdge</span>(g1, <span class="dv">24</span>, <span class="st">&quot;ancestor&quot;</span>)]</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  24-1  24-2 </span></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 0.055 0.055</span></span></code></pre></div>
+<p>Is it rooted?</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">isRooted</span>(g1)</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
+<p>Which node is the root?</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">rootNode</span>(g1)</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; N15 </span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  15</span></span></code></pre></div>
+<p>Does it contain any polytomies?</p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hasPoly</span>(g1)</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] FALSE</span></span></code></pre></div>
+<p>Is the tree ultrametric?</p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">isUltrametric</span>(g1)</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
+<p>You can also get the depth (distance from the root) of any given node
+or the tips:</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nodeDepth</span>(g1, <span class="dv">23</span>)</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Warning: &#39;nodeDepth&#39; is deprecated.</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Use &#39;nodeHeight&#39; instead.</span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; See help(&quot;Deprecated&quot;)</span></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     N23 </span></span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 0.77077</span></span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a><span class="fu">depthTips</span>(g1)</span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Warning: &#39;depthTips&#39; is deprecated.</span></span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Use &#39;nodeHeight&#39; instead.</span></span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; See help(&quot;Deprecated&quot;)</span></span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Warning: &#39;nodeDepth&#39; is deprecated.</span></span>
+<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Use &#39;nodeHeight&#39; instead.</span></span>
+<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; See help(&quot;Deprecated&quot;)</span></span>
+<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   fuliginosa       fortis magnirostris  conirostris     scandens   difficilis </span></span>
+<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      0.88077      0.88077      0.88077      0.88077      0.88077      0.88077 </span></span>
+<span id="cb26-17"><a href="#cb26-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      pallida     parvulus   psittacula       pauper   platyspiza        fusca </span></span>
+<span id="cb26-18"><a href="#cb26-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      0.88077      0.88077      0.88077      0.88077      0.88077      0.88077 </span></span>
+<span id="cb26-19"><a href="#cb26-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; pinaroloxias     olivacea </span></span>
+<span id="cb26-20"><a href="#cb26-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      0.88077      0.88077</span></span></code></pre></div>
+</div>
+<div id="trees-with-data" class="section level2">
+<h2>Trees with data</h2>
+<p>The <code>phylo4d</code> class matches trees with data, or combines
+them with a data frame to make a <code>phylo4d</code> (tree-with-data)
+object.</p>
+<p>Now we’ll take the <em>Geospiza</em> data from
+<code>geospiza_raw$data</code> and merge it with the tree. First, let’s
+prepare the data:</p>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>g1 <span class="ot">&lt;-</span> <span class="fu">as</span>(geospiza_raw<span class="sc">$</span>tree, <span class="st">&quot;phylo4&quot;</span>)</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>geodata <span class="ot">&lt;-</span> geospiza_raw<span class="sc">$</span>data</span></code></pre></div>
+<p>However, since <em>G. olivacea</em> is included in the tree but not
+in the data set, we will initially run into some trouble:</p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>g2 <span class="ot">&lt;-</span> <span class="fu">phylo4d</span>(g1, geodata)</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Error in formatData(phy = x, dt = tip.data, type = &quot;tip&quot;, ...): The following nodes are not found in the dataset:  olivacea</span></span></code></pre></div>
+<p>To deal with <em>G. olivacea</em> missing from the data, we have a
+few choices. The easiest is to use to allow to create the new object
+with a warning (you can also use to proceed without warnings):</p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>g2 <span class="ot">&lt;-</span> <span class="fu">phylo4d</span>(g1, geodata, <span class="at">missing.data=</span><span class="st">&quot;warn&quot;</span>)</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Warning in formatData(phy = x, dt = tip.data, type = &quot;tip&quot;, ...): The following nodes are</span></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; not found in the dataset: olivacea</span></span></code></pre></div>
+<p>Another way to deal with this would be to use <code>prune()</code> to
+drop the offending tip from the tree first:</p>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>g1sub <span class="ot">&lt;-</span> <span class="fu">prune</span>(g1, <span class="st">&quot;olivacea&quot;</span>)</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>g1B <span class="ot">&lt;-</span> <span class="fu">phylo4d</span>(g1sub, geodata)</span></code></pre></div>
+<p>The difference between the two objects is that the species <em>G.
+olivacea</em> is still present in the tree but has no data (i.e.,
+<code>NA</code>) associated with it. In the other case, <em>G.
+olivacea</em> is not included in the tree anymore. The approach you
+choose depends on the goal of your analysis.</p>
+<p>You can summarize the new object with the function
+<code>summary</code>. It breaks down the statistics about the traits
+based on whether it is associated with the tips for the internal nodes:
+&lt;&lt;geomergesum&gt;&gt;= summary(g2) @</p>
+<p>Or use <code>tdata()</code> to extract the data (i.e.,
+<code>tdata(g2)</code>). By default, <code>tdata()</code> will retrieve
+tip data, but you can also get internal node data only () or — if the
+tip and node data have the same format — all the data combined ().</p>
+<p>If you want to plot the data (e.g. for checking the input),
+<code>plot(tdata(g2))</code> will create the default plot for the data —
+in this case, since it is a data frame, this will be a
+<code>pairs</code> plot of the data.</p>
+</div>
+<div id="subsetting" class="section level2">
+<h2>Subsetting</h2>
+<p>The <code>subset</code> command offers a variety of ways of
+extracting portions of a <code>phylo4</code> or <code>phylo4d</code>
+tree, keeping any tip/node data consistent.</p>
+<dl>
+<dt>tips.include</dt>
+<dd>
+<p>give a vector of tips (names or numbers) to retain</p>
+</dd>
+<dt>tips.exclude</dt>
+<dd>
+<p>give a vector of tips (names or numbers) to drop</p>
+</dd>
+<dt>mrca</dt>
+<dd>
+<p>give a vector of node or tip names or numbers; extract the clade
+containing these taxa</p>
+</dd>
+<dt>node.subtree</dt>
+<dd>
+<p>give a node (name or number); extract the subtree starting from this
+node</p>
+</dd>
+</dl>
+<p>Different ways to extract the <em>fuliginosa</em>-<em>scandens</em>
+clade:</p>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">subset</span>(g2, <span class="at">tips.include=</span><span class="fu">c</span>(<span class="st">&quot;fuliginosa&quot;</span>, <span class="st">&quot;fortis&quot;</span>, <span class="st">&quot;magnirostris&quot;</span>,</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;conirostris&quot;</span>, <span class="st">&quot;scandens&quot;</span>))</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="fu">subset</span>(g2, <span class="at">node.subtree=</span><span class="dv">21</span>)</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a><span class="fu">subset</span>(g2, <span class="at">mrca=</span><span class="fu">c</span>(<span class="st">&quot;scandens&quot;</span>, <span class="st">&quot;fortis&quot;</span>))</span></code></pre></div>
+<p>One could drop the clade by doing</p>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">subset</span>(g2, <span class="at">tips.exclude=</span><span class="fu">c</span>(<span class="st">&quot;fuliginosa&quot;</span>, <span class="st">&quot;fortis&quot;</span>, <span class="st">&quot;magnirostris&quot;</span>,</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;conirostris&quot;</span>, <span class="st">&quot;scandens&quot;</span>))</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a><span class="fu">subset</span>(g2, <span class="at">tips.exclude=</span><span class="fu">names</span>(<span class="fu">descendants</span>(g2, <span class="fu">MRCA</span>(g2, <span class="fu">c</span>(<span class="st">&quot;difficilis&quot;</span>,</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;fortis&quot;</span>)))))</span></code></pre></div>
+</div>
+<div id="tree-walking" class="section level2">
+<h2>Tree-walking</h2>
+<p><code>phylobase</code> provides many functions that allows users to
+explore relationships between nodes on a tree (tree-walking and tree
+traversal). Most functions work by specifying the <code>phylo4</code>
+(or <code>phylo4d</code>) object as the first argument, the node
+numbers/labels as the second argument (followed by some additional
+arguments).</p>
+<p><code>getNode</code> allows you to find a node based on its node
+number or its label. It returns a vector with node numbers as values and
+labels as names:</p>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(geospiza)</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="fu">getNode</span>(geospiza, <span class="dv">10</span>)</span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; pauper </span></span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     10</span></span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a><span class="fu">getNode</span>(geospiza, <span class="st">&quot;pauper&quot;</span>)</span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; pauper </span></span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     10</span></span></code></pre></div>
+<p>If no node is specified, they are all returned, and if a node can’t
+be found it’s returned as a <code>NA</code>. It is possible to control
+what happens when a node can’t be found:</p>
+<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">getNode</span>(geospiza)</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   fuliginosa       fortis magnirostris  conirostris     scandens   difficilis </span></span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;            1            2            3            4            5            6 </span></span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      pallida     parvulus   psittacula       pauper   Platyspiza        fusca </span></span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;            7            8            9           10           11           12 </span></span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Pinaroloxias     olivacea          N15          N16          N17          N18 </span></span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;           13           14           15           16           17           18 </span></span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;          N19          N20          N21          N22          N23          N24 </span></span>
+<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;           19           20           21           22           23           24 </span></span>
+<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;          N25          N26          N27 </span></span>
+<span id="cb34-11"><a href="#cb34-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;           25           26           27</span></span>
+<span id="cb34-12"><a href="#cb34-12" aria-hidden="true" tabindex="-1"></a><span class="fu">getNode</span>(geospiza, <span class="dv">10</span><span class="sc">:</span><span class="dv">14</span>)</span>
+<span id="cb34-13"><a href="#cb34-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;       pauper   Platyspiza        fusca Pinaroloxias     olivacea </span></span>
+<span id="cb34-14"><a href="#cb34-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;           10           11           12           13           14</span></span>
+<span id="cb34-15"><a href="#cb34-15" aria-hidden="true" tabindex="-1"></a><span class="fu">getNode</span>(geospiza, <span class="st">&quot;melanogaster&quot;</span>, <span class="at">missing=</span><span class="st">&quot;OK&quot;</span>) <span class="co"># no warning</span></span>
+<span id="cb34-16"><a href="#cb34-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; &lt;NA&gt; </span></span>
+<span id="cb34-17"><a href="#cb34-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   NA</span></span>
+<span id="cb34-18"><a href="#cb34-18" aria-hidden="true" tabindex="-1"></a><span class="fu">getNode</span>(geospiza, <span class="st">&quot;melanogaster&quot;</span>, <span class="at">missing=</span><span class="st">&quot;warn&quot;</span>) <span class="co"># warning!</span></span>
+<span id="cb34-19"><a href="#cb34-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Warning in getNode(geospiza, &quot;melanogaster&quot;, missing = &quot;warn&quot;): Some nodes not found</span></span>
+<span id="cb34-20"><a href="#cb34-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; among all nodes in tree: melanogaster</span></span>
+<span id="cb34-21"><a href="#cb34-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; &lt;NA&gt; </span></span>
+<span id="cb34-22"><a href="#cb34-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   NA</span></span></code></pre></div>
+<p><code>children</code> and <code>ancestor</code> give the immediate
+neighboring nodes:</p>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">children</span>(geospiza, <span class="dv">16</span>)</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;          N17 Pinaroloxias </span></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;           17           13</span></span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ancestor</span>(geospiza, <span class="dv">16</span>)</span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; N15 </span></span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  15</span></span></code></pre></div>
+<p>while <code>descendants</code> and <code>ancestors</code> can
+traverse the tree up to the tips or root respectively:</p>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">descendants</span>(geospiza, <span class="dv">16</span>) <span class="co"># by default returns only the tips</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Pinaroloxias        fusca   Platyspiza   difficilis     scandens  conirostris </span></span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;           13           12           11            6            5            4 </span></span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; magnirostris   fuliginosa       fortis      pallida       pauper     parvulus </span></span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;            3            1            2            7           10            8 </span></span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   psittacula </span></span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;            9</span></span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a><span class="fu">descendants</span>(geospiza, <span class="st">&quot;all&quot;</span>) <span class="co"># also include the internal nodes</span></span>
+<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Warning in getNode(phy, node, missing = &quot;warn&quot;): Some nodes not found among all nodes in</span></span>
+<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; tree: all</span></span>
+<span id="cb36-11"><a href="#cb36-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; named list()</span></span>
+<span id="cb36-12"><a href="#cb36-12" aria-hidden="true" tabindex="-1"></a><span class="fu">ancestors</span>(geospiza, <span class="dv">20</span>)</span>
+<span id="cb36-13"><a href="#cb36-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; N19 N18 N17 N16 N15 </span></span>
+<span id="cb36-14"><a href="#cb36-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  19  18  17  16  15</span></span>
+<span id="cb36-15"><a href="#cb36-15" aria-hidden="true" tabindex="-1"></a><span class="fu">ancestors</span>(geospiza, <span class="dv">20</span>, <span class="st">&quot;ALL&quot;</span>) <span class="co"># uppercase ALL includes self</span></span>
+<span id="cb36-16"><a href="#cb36-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; N20 N19 N18 N17 N16 N15 </span></span>
+<span id="cb36-17"><a href="#cb36-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  20  19  18  17  16  15</span></span></code></pre></div>
+<p><code>siblings</code> returns the other node(s) associated with the
+same ancestor:</p>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">siblings</span>(geospiza, <span class="dv">20</span>)</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; N25 </span></span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  25</span></span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a><span class="fu">siblings</span>(geospiza, <span class="dv">20</span>, <span class="at">include.self=</span><span class="cn">TRUE</span>)</span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; N20 N25 </span></span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  20  25</span></span></code></pre></div>
+<p><code>MRCA</code> returns the most common recent ancestor for a set
+of tips, and shortest path returns the nodes connecting 2 nodes:</p>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">MRCA</span>(geospiza, <span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>)</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; N20 </span></span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  20</span></span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a><span class="fu">shortestPath</span>(geospiza, <span class="dv">4</span>, <span class="st">&quot;pauper&quot;</span>)</span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; N19 N20 N21 N22 N25 N26 </span></span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  19  20  21  22  25  26</span></span></code></pre></div>
+</div>
+<div id="multiphylo4-classes" class="section level2">
+<h2>multiPhylo4 classes</h2>
+<p><code>multiPhylo4</code> classes are not yet implemented but will be
+coming soon.</p>
+</div>
+<div id="examples" class="section level2">
+<h2>Examples</h2>
+<div id="constructing-a-brownian-motion-trait-simulator" class="section level3">
+<h3>Constructing a Brownian motion trait simulator</h3>
+<p>This section will describe a way of constructing a simulator that
+generates trait values for extant species (tips) given a tree with
+branch lengths, assuming a model of Brownian motion.</p>
+<p>We can use to coerce the tree into a variance-covariance matrix form,
+and then use <code>mvrnorm</code> from the <code>MASS</code> package to
+generate a set of multivariate normally distributed values for the tips.
+(A benefit of this approach is that we can very quickly generate a very
+large number of replicates.) This example illustrates a common feature
+of working with <code>phylobase</code> — combining tools from several
+different packages to operate on phylogenetic trees with data.</p>
+<p>We start with a randomly generated tree using <code>rcoal()</code>
+from <code>ape</code> to generate the tree topology and branch
+lengths:</p>
+<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1001</span>)</span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>tree <span class="ot">&lt;-</span> <span class="fu">as</span>(<span class="fu">rcoal</span>(<span class="dv">12</span>), <span class="st">&quot;phylo4&quot;</span>)</span></code></pre></div>
+<p>Next we generate the phylogenetic variance-covariance matrix (by
+coercing the tree to a <code>phylo4vcov</code> object) and pick a single
+set of normally distributed traits (using to pick a multivariate normal
+deviate with a variance-covariance matrix that matches the structure of
+the tree).</p>
+<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>vmat <span class="ot">&lt;-</span> <span class="fu">as</span>(tree, <span class="st">&quot;phylo4vcov&quot;</span>)</span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>vmat <span class="ot">&lt;-</span> <span class="fu">cov2cor</span>(vmat)</span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(MASS)</span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>trvec <span class="ot">&lt;-</span> <span class="fu">mvrnorm</span>(<span class="dv">1</span>, <span class="at">mu=</span><span class="fu">rep</span>(<span class="dv">0</span>, <span class="dv">12</span>), <span class="at">Sigma=</span>vmat)</span></code></pre></div>
+<p>The last step (easy) is to convert the <code>phylo4vcov</code> object
+back to a <code>phylo4d</code> object:</p>
+<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>treed <span class="ot">&lt;-</span> <span class="fu">phylo4d</span>(tree, <span class="at">tip.data=</span><span class="fu">as.data.frame</span>(trvec))</span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(treed)</span></code></pre></div>
+<div class="figure">
+<img src="data:image/png;base64,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" alt />
+<p class="caption">plot of chunk plotvcvphylo</p>
+</div>
+</div>
+</div>
+<div id="definitionsslots" class="section level2">
+<h2>Definitions/slots</h2>
+<p>This section details the internal structure of the
+<code>phylo4</code>, <code>multiphylo4</code> (coming soon!),
+<code>phylo4d</code>, and <code>multiphylo4d</code> (coming soon!)
+classes. The basic building blocks of these classes are the
+<code>phylo4</code> object and a dataframe. The <code>phylo4</code> tree
+format is largely similar to the one used by <code>phylo</code> class in
+the package <code>ape</code><a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a>.</p>
+<p>We use “edge” for ancestor-descendant relationships in the phylogeny
+(sometimes called “branches”) and “edge lengths” for their lengths
+(“branch lengths”). Most generally, “nodes” are all species in the tree;
+species with descendants are “internal nodes” (we often refer to these
+just as “nodes”, meaning clear from context); “tips” are species with no
+descendants. The “root node” is the node with no ancestor (if one
+exists).</p>
+<div id="phylo4" class="section level3">
+<h3>phylo4</h3>
+<p>Like <code>phylo</code>, the main components of the
+<code>phylo4</code> class are:</p>
+<dl>
+<dt>edge</dt>
+<dd>
+<p>a 2-column matrix of integers, with <span class="math inline">\(N\)</span> rows for a rooted tree or <span class="math inline">\(N-1\)</span> rows for an unrooted tree and column
+names <code>ancestor</code> and <code>descendant</code>. Each row
+contains information on one edge in the tree. See below for further
+constraints on the edge matrix.</p>
+</dd>
+<dt>edge.length</dt>
+<dd>
+<p>numeric list of edge lengths (length <span class="math inline">\(N\)</span> (rooted) or <span class="math inline">\(N-1\)</span> (unrooted) or empty (length 0))</p>
+</dd>
+<dt>tip.label</dt>
+<dd>
+<p>character vector of tip labels (required), with length=# of tips. Tip
+labels need not be unique, but data-tree matching with non-unique labels
+will cause an error</p>
+</dd>
+<dt>node.label</dt>
+<dd>
+<p>character vector of node labels, length=# of internal nodes or 0 (if
+empty). Node labels need not be unique, but data-tree matching with
+non-unique labels will cause an error</p>
+</dd>
+<dt>order</dt>
+<dd>
+<p>character: “preorder”, “postorder”, or “unknown” (default),
+describing the order of rows in the edge matrix. , “pruningwise” and
+“cladewise” are accepted for compatibility with <code>ape</code></p>
+</dd>
+</dl>
+<p>The edge matrix must not contain <code>NA</code>s, with the exception
+of the root node, which has an <code>NA</code> for
+<code>ancestor</code>. <code>phylobase</code> does not enforce an order
+on the rows of the edge matrix, but it stores information on the current
+ordering in the slot — current allowable values are “unknown” (the
+default), “preorder” (equivalent to “cladewise” in <code>ape</code>) or
+“postorder” <a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a>.</p>
+<p>The basic criteria for the edge matrix are similar to those of
+<code>ape</code>, as documented it’s tree specification<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a>. This is a modified
+version of those rules, for a tree with <span class="math inline">\(n\)</span> tips and <span class="math inline">\(m\)</span> internal nodes:</p>
+<ul>
+<li><p>Tips (no descendants) are coded <span class="math inline">\(1,\ldots, n\)</span>, and internal nodes (<span class="math inline">\(\ge 1\)</span> descendant) are coded <span class="math inline">\(n + 1, \ldots , n + m\)</span> (<span class="math inline">\(n + 1\)</span> is the root). Both series are
+numbered with no gaps.</p></li>
+<li><p>The first (ancestor) column has only values <span class="math inline">\(&gt; n\)</span> (internal nodes): thus, values
+<span class="math inline">\(\le n\)</span> (tips) appear only in the
+second (descendant) column</p></li>
+<li><p>all internal nodes (not including the root) must appear in the
+first (ancestor) column at least once [unlike <code>ape</code>, which
+nominally requires each internal node to have at least two descendants
+(although it doesn’t absolutely prohibit them and has a function to get
+rid of them), <code>phylobase</code> does allow these “singleton nodes”
+and has a method <code>hasSingle</code> for detecting them]. Singleton
+nodes can be useful as a way of representing changes along a lineage;
+they are used this way in the <code>ouch</code> package.</p></li>
+<li><p>the number of occurrences of a node in the first column is
+related to the nature of the node: once if it is a singleton, twice if
+it is dichotomous (i.e., of degree 3 [counting ancestor as well as
+descendants]), three times if it is trichotomous (degree 4), and so
+on.</p></li>
+</ul>
+<p><code>phylobase</code> does not technically prohibit reticulations
+(nodes or tips that appear more than once in the descendant column), but
+they will probably break most of the methods. Disconnected trees,
+cycles, and other exotica are not tested for, but will certainly break
+the methods.</p>
+<p>We have defined basic methods for
+<code>phylo4</code>:<code>show</code>, <code>print</code>, and a variety
+of accessor functions (see help files). <code>summary</code> does not
+seem to be terribly useful in the context of a “raw” tree, because there
+is not much to compute.</p>
+</div>
+<div id="phylo4d" class="section level3">
+<h3>phylo4d</h3>
+<p>The <code>phylo4d</code> class extends <code>phylo4</code> with data.
+Tip data, and (internal) node data are stored separately, but can be
+retrieved together or separately with <code>tdata(x,&quot;tip&quot;)</code>,
+<code>tdata(x,&quot;internal&quot;)</code> or <code>tdata(x,&quot;all&quot;)</code>. There
+is no separate slot for edge data, but these can be stored as node data
+associated with the descendant node.</p>
+</div>
+</div>
+<div class="footnotes footnotes-end-of-document">
+<hr />
+<ol>
+<li id="fn1"><p><a href="https://emmanuelparadis.github.io/ape_development.html" class="uri">https://emmanuelparadis.github.io/ape_development.html</a><a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+<li id="fn2"><p>see <a href="https://en.wikipedia.org/wiki/Tree_traversal" class="uri">https://en.wikipedia.org/wiki/Tree_traversal</a> for more
+information on orderings. (<code>ape</code>’s “pruningwise” is
+“bottom-up” ordering).<a href="#fnref2" class="footnote-back">↩︎</a></p></li>
+<li id="fn3"><p><a href="https://emmanuelparadis.github.io/misc/FormatTreeR.pdf" class="uri">https://emmanuelparadis.github.io/misc/FormatTreeR.pdf</a><a href="#fnref3" class="footnote-back">↩︎</a></p></li>
+</ol>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
