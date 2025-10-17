@@ -1,0 +1,7 @@
+Package: mixOmics
+Version: 6.26.0
+Source: Bioconductor BioCsoft
+URL: https://bioconductor.org/packages/3.18/bioc/src/contrib/mixOmics_6.26.0.tar.gz
+Size: 18.03 MB
+Download Date: 2025-10-17
+
