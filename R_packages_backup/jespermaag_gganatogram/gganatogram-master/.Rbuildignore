@@ -1,0 +1,12 @@
+^R/gg2\.R$
+^\.travis\.yml$
+^appveyor\.yml$
+^.*\.Rproj$
+^\.Rproj\.user$
+^README\.Rmd$
+^cran\-comments\.md$
+^figure$
+^data-raw$
+^shiny$
+^cell$
+
