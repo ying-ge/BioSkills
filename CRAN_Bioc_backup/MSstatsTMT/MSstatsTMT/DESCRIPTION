@@ -1,0 +1,37 @@
+Package: MSstatsTMT
+Title: Protein Significance Analysis in shotgun mass spectrometry-based
+        proteomic experiments with tandem mass tag (TMT) labeling
+Version: 2.10.0
+Date: 2023-02-18
+Description: The package provides statistical tools for detecting differentially abundant proteins in shotgun mass spectrometry-based proteomic experiments with tandem mass tag (TMT) labeling. It provides multiple functionalities, including aata visualization, protein quantification and normalization, and statistical modeling and inference. Furthermore, it is inter-operable with other data processing tools, such as Proteome Discoverer, MaxQuant, OpenMS and SpectroMine.
+Authors@R: c(person("Ting", "Huang", email = "thuang0703@gmail.com", role=c("aut","cre")),
+	person("Meena", "Choi", email = "mnchoi67@gmail.com", role="aut"),
+	person("Mateusz", "Staniak", email = "mtst@mstaniak.pl", role = "aut"),
+	person("Sicheng", "Hao", email = "hao.sic@husky.neu.edu", role = "aut"),
+	person("Olga", "Vitek", email = "o.vitek@northeastern.edu", role = "aut"))
+License: Artistic-2.0
+Depends: R (>= 4.2)
+Imports: limma, lme4, lmerTest, methods, data.table, stats, utils,
+        ggplot2, grDevices, graphics, MSstats, MSstatsConvert,
+        checkmate
+Suggests: BiocStyle, knitr, rmarkdown, testthat
+VignetteBuilder: knitr
+biocViews: ImmunoOncology, MassSpectrometry, Proteomics, Software
+Encoding: UTF-8
+LazyData: true
+URL: http://msstats.org/msstatstmt/
+BugReports: https://groups.google.com/forum/#!forum/msstats
+RoxygenNote: 7.2.3
+git_url: https://git.bioconductor.org/packages/MSstatsTMT
+git_branch: RELEASE_3_18
+git_last_commit: 0d6344a
+git_last_commit_date: 2023-10-24
+Date/Publication: 2023-10-24
+NeedsCompilation: no
+Packaged: 2023-10-24 22:04:42 UTC; biocbuild
+Author: Ting Huang [aut, cre],
+  Meena Choi [aut],
+  Mateusz Staniak [aut],
+  Sicheng Hao [aut],
+  Olga Vitek [aut]
+Maintainer: Ting Huang <thuang0703@gmail.com>
