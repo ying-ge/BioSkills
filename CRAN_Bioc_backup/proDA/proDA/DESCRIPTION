@@ -1,0 +1,38 @@
+Package: proDA
+Type: Package
+Title: Differential Abundance Analysis of Label-Free Mass Spectrometry
+        Data
+Version: 1.16.0
+Authors@R: c(person("Constantin", "Ahlmann-Eltze", email = "artjom31415@googlemail.com", 
+             role = c("aut", "cre"), comment = c(ORCID = "0000-0002-3762-068X")),
+             person("Simon", "Anders", email="s.anders@zmbh.uni-heidelberg.de", 
+             role="ths", comment = c(ORCID = "0000-0003-4868-1805")))
+Description: Account for missing values in label-free mass spectrometry data 
+    without imputation. The package implements a probabilistic dropout model that
+    ensures that the information from observed and missing values are properly 
+    combined. It adds empirical Bayesian priors to increase power to detect
+    differentially abundant proteins.
+License: GPL-3
+Encoding: UTF-8
+RoxygenNote: 7.1.0
+Suggests: testthat (>= 2.1.0), MSnbase, dplyr, stringr, readr, tidyr,
+        tibble, limma, DEP, numDeriv, pheatmap, knitr, rmarkdown,
+        BiocStyle
+Imports: stats, utils, methods, BiocGenerics, SummarizedExperiment,
+        S4Vectors, extraDistr
+URL: https://github.com/const-ae/proDA
+BugReports: https://github.com/const-ae/proDA/issues
+biocViews: Proteomics, MassSpectrometry, DifferentialExpression,
+        Bayesian, Regression, Software, Normalization, QualityControl
+VignetteBuilder: knitr
+git_url: https://git.bioconductor.org/packages/proDA
+git_branch: RELEASE_3_18
+git_last_commit: 1b39f4f
+git_last_commit_date: 2023-10-24
+Date/Publication: 2023-10-24
+NeedsCompilation: no
+Packaged: 2023-10-24 22:32:01 UTC; biocbuild
+Author: Constantin Ahlmann-Eltze [aut, cre]
+    (<https://orcid.org/0000-0002-3762-068X>),
+  Simon Anders [ths] (<https://orcid.org/0000-0003-4868-1805>)
+Maintainer: Constantin Ahlmann-Eltze <artjom31415@googlemail.com>
