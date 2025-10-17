@@ -1,0 +1,18 @@
+Package: DNAcopy
+Title: DNA Copy Number Data Analysis
+Version: 1.76.0
+Author: Venkatraman E. Seshan, Adam Olshen
+Description: Implements the circular binary segmentation (CBS) 
+        algorithm to segment DNA copy number data and identify
+        genomic regions with abnormal copy number.
+Maintainer: Venkatraman E. Seshan <seshanv@mskcc.org>
+LazyData: yes
+License: GPL (>= 2)
+biocViews: Microarray, CopyNumberVariation
+NeedsCompilation: yes
+git_url: https://git.bioconductor.org/packages/DNAcopy
+git_branch: RELEASE_3_18
+git_last_commit: de0b0ad
+git_last_commit_date: 2023-10-24
+Date/Publication: 2023-10-24
+Packaged: 2023-10-24 21:02:05 UTC; biocbuild
