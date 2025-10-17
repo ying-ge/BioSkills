@@ -1,0 +1,1525 @@
+#' @include ggproto.R
+NULL
+
+#' Facets
+#'
+#' @description
+#' All `facet_*()` functions returns a `Facet` object or an object of a
+#' `Facet` subclass. This object describes how to assign data to different
+#' panels, how to apply positional scales and how to lay out the panels, once
+#' rendered.
+#'
+#' @details
+#' Extending facets can range from the simple modifications of current facets,
+#' to very laborious rewrites with a lot of [`gtable()`][gtable::gtable()]
+#' manipulation.For some examples of both, please see the extension vignette.
+#' The object and its parameters are chaperoned by the [Layout] class.
+#'
+#' `Facet` subclasses, like other extendible ggproto classes, have a range
+#' of methods that can be modified. Some of these are required for all new
+#' subclasses, while other only need to be modified if need arises.
+#'
+#' The required methods are:
+#' * `compute_layout`
+#' * `map_data()`
+#' * `draw_panels()` or its subsidiaries:
+#'     * `init_gtable()`
+#'     * `attach_axes()`
+#'     * `attach_strips()`
+#'
+#' In addition to the methods above, it can be useful to override the default
+#' behaviour of one or more of the following methods:
+#'
+#' * `setup_params()`
+#' * `init_scales()`
+#' * `train_scale()`
+#' * `finish_data()`
+#' * `draw_back()`, `draw_front()` or `draw_labels()`
+#'
+#' All extension methods receive the content of the params field as the params
+#' argument, so the constructor function will generally put all relevant
+#' information into this field.
+#'
+#' @section Conventions:
+#'
+#' The object name that a new class is assigned to is typically the same as the
+#' class name. Facet class names are in UpperCamelCase and start with the
+#' `Facet*` prefix, like `FacetNew`.
+#'
+#' A constructor function is usually paired with a Facet class. The constructor
+#' copies the facet class and populates the `params` field. The constructor
+#' function name should take the Facet class name and be formatted with
+#' snake_case, so that `FacetNew` becomes `facet_new()`.
+#'
+#' @export
+#' @format NULL
+#' @usage NULL
+#' @family Layout components
+#' @keywords internal
+#' @seealso The the `r link_book("new facets section", "extensions#new-facets")`
+#' @seealso Run `vignette("extending-ggplot2")`, in particular the "Creating a
+#' new faceting" section.
+#'
+#' @examples
+#' # Please see extension vignette
+#' NULL
+Facet <- ggproto("Facet", NULL,
+
+  # Fields ------------------------------------------------------------------
+
+  #' @field shink A scalar boolean which when `TRUE`, will shrink scales to
+  #' fit output statistics rather than raw data. If `FALSE`, will only include
+  #' raw data before statistical summary. By exception this is not part of the
+  #' `params` field.
+  # TODO: should just put `shrink` in the params?
+  shrink = FALSE,
+
+  #' @field params A named list of parameters populated by the constructor
+  #' function.
+  params = list(),
+
+  # Methods -----------------------------------------------------------------
+
+  ## Layout$setup() ---------------------------------------------------------
+
+  #' @field setup_params
+  #' **Description**
+  #'
+  #' A function method for modifying or checking the parameters based on the
+  #' data. The default method includes a `.possible_columns` variable giving
+  #' column names.
+  #'
+  #' **Usage**
+  #' ```r
+  #' Facet$setup_params(data, params)
+  #' ```
+  #' **Arguments**
+  #' \describe{
+  #'   \item{`data`}{A list of data frames. The first item is the global data,
+  #'   which is followed by layer data in subsequent items.}
+  #'   \item{`params`}{A list of current parameters.}
+  #' }
+  #'
+  #' **Value**
+  #'
+  #' A list of parameters
+  setup_params = function(data, params) {
+    params$.possible_columns <- unique0(unlist(lapply(data, names)))
+    params
+  },
+
+  #' @field setup_data
+  #' **Description**
+  #'
+  #' A function method for modifying or checking the data prior to adding
+  #' defaults. The default method returns data unaltered.
+  #'
+  #' **Usage**
+  #' ```r
+  #' Facet$setup_data(data, params)
+  #' ```
+  #' **Arguments**
+  #' \describe{
+  #'   \item{`data`}{A list of data frames. The first item is the global data,
+  #'   which is followed by layer data in subsequent items.}
+  #'   \item{`params`}{A list of parameters coming from the `setup_params()`
+  #'   method.}
+  #' }
+  #'
+  #' **Value**
+  #'
+  #' A list of data frames of the same length as the `data` argument
+  setup_data = function(data, params) {
+    data
+  },
+
+  #' @field compute_layout
+  #' **Description**
+  #'
+  #' A function method for creating the correspondence between faceting
+  #' variable levels, panels and position scales. It places panels like cells
+  #' in a matrix.
+  #'
+  #' **Usage**
+  #' ```r
+  #' Facet$compute_layout(data, params)
+  #' ```
+  #' **Arguments**
+  #' \describe{
+  #'   \item{`data`}{A list of data frames. The first item is the global data,
+  #'   which is followed by layer data in subsequent items.}
+  #'   \item{`params`}{A list of parameters coming from the `setup_params()`
+  #'   method.}
+  #' }
+  #'
+  #' **Value**
+  #'
+  #' A data frame with 1 row per panel, containing at least integer columns
+  #' `ROW`, `COL`, `PANEL`, `SCALE_X` and `SCALE_Y`. Can contain additional
+  #' information in terms of columns, typically faceting variables.
+  compute_layout = function(data, params) {
+    cli::cli_abort("Not implemented.")
+  },
+
+  #' @field map_data
+  #' **Description**
+  #'
+  #' A function method for to create the `PANEL` variable in layer data. The
+  #' `PANEL` variable is a special variable that tracks the relationship between
+  #' rows in the layer data and the panels described in the `layout` input.
+  #'
+  #' In addition, #' this function may copy or discard rows as needed, for
+  #' example when adding margins in FacetGrid.
+  #'
+  #' **Usage**
+  #' ```r
+  #' Facet$map_data(data, layout, params)
+  #' ```
+  #' **Arguments**
+  #' \describe{
+  #'   \item{`data`}{A list of data frames containing layer data.}
+  #'   \item{`layout`}{A data frame computed by the `compute_layout()` method.
+  #'   Typically contains the faceting variables, `ROW`, `COL`, `PANEL`,
+  #'   `SCALE_X` and `SCALE_Y` variables.}
+  #'   \item{`params`}{A list of parameters coming from the `setup_params()`
+  #'   method.}
+  #' }
+  #'
+  #' **Value**
+  #'
+  #' A list of data frames containing layer data including a `PANEL` variable.
+  map_data = function(data, layout, params) {
+    cli::cli_abort("Not implemented.")
+  },
+
+  ## Layout$train_position() -----------------------------------------------
+
+  #' @field init_scales
+  #' **Description**
+  #'
+  #' A function method for initialising position scales. Given a prototype scale
+  #' for `x` and `y`, creates layout specific scales to accommodate
+  #' the relationships between panels and scales. By default, the prototype
+  #' scales are cloned for each `SCALE_X` and `SCALE_Y` level. The function is
+  #' called separately; once for `x` and once for `y`.
+  #'
+  #' **Usage**
+  #' ```r
+  #' Facet$init_scales(layout, x_scale, y_scale, params)
+  #' ```
+  #' **Arguments**
+  #' \describe{
+  #'   \item{`layout`}{A data frame computed by the `compute_layout()` method.
+  #'   Typically contains the faceting variables, `ROW`, `COL`, `PANEL`,
+  #'   `SCALE_X` and `SCALE_Y` variables.}
+  #'   \item{`x_scale`,`y_scale`}{A position scale for the `x` and `y`
+  #'   aesthetics respectively.}
+  #'   \item{`params`}{A list of parameters coming from the `setup_params()`
+  #'   method.}
+  #' }
+  #'
+  #' **Value**
+  #'
+  #' A named list with `x` and `y` elements containing a list of panel scales
+  #' for each `SCALE_X` and/or `SCALE_Y` level respectively.
+  init_scales = function(layout, x_scale = NULL, y_scale = NULL, params) {
+    scales <- list()
+    if (!is.null(x_scale)) {
+      scales$x <- lapply(seq_len(max(layout$SCALE_X)), function(i) x_scale$clone())
+    }
+    if (!is.null(y_scale)) {
+      scales$y <- lapply(seq_len(max(layout$SCALE_Y)), function(i) y_scale$clone())
+    }
+    scales
+  },
+
+  #' @field train_scales
+  #' **Description**
+  #'
+  #' A function method for training position scales. The default trains each
+  #' scale on the data related to its panels.
+  #'
+  #' **Usage**
+  #' ```r
+  #' Facet$train_scales(x_scales, y_scales, layout, data, params)
+  #' ```
+  #' **Arguments**
+  #' \describe{
+  #'   \item{`x_scales`,`y_scales`}{A list of panel scales for each `SCALE_X`
+  #'   and `SCALE_Y` level respectively.}
+  #'   \item{`layout`}{A data frame computed by the `compute_layout()` method.
+  #'   Typically contains the faceting variables, `ROW`, `COL`, `PANEL`,
+  #'   `SCALE_X` and `SCALE_Y` variables.}
+  #'   \item{`data`}{A list of data frames containing layer data.}
+  #'   \item{`params`}{A list of parameters coming from the `setup_params()`
+  #'   method.}
+  #' }
+  #'
+  #' **Value**
+  #'
+  #' Nothing, this method is called for its side-effect of training the scales.
+  train_scales = function(x_scales, y_scales, layout, data, params) {
+    # loop over each layer, training x and y scales in turn
+    for (layer_data in data) {
+      match_id <- NULL
+
+      if (!is.null(x_scales)) {
+        x_vars <- intersect(x_scales[[1]]$aesthetics, names(layer_data))
+        if (length(x_vars) > 0) {
+          match_id <- match(layer_data$PANEL, layout$PANEL)
+          SCALE_X <- layout$SCALE_X[match_id]
+          scale_apply(layer_data, x_vars, "train", SCALE_X, x_scales)
+        }
+      }
+
+      if (!is.null(y_scales)) {
+        y_vars <- intersect(y_scales[[1]]$aesthetics, names(layer_data))
+        if (length(y_vars) > 0) {
+          if (is.null(match_id)) {
+            match_id <- match(layer_data$PANEL, layout$PANEL)
+          }
+          SCALE_Y <- layout$SCALE_Y[match_id]
+
+          scale_apply(layer_data, y_vars, "train", SCALE_Y, y_scales)
+        }
+      }
+    }
+  },
+
+  ## Layout$setup_panel_params() --------------------------------------------
+
+  #' @field setup_panel_params
+  #' **Description**
+  #'
+  #' A function method as a hook to give facets input over panel parameters. By
+  #' default, returns panel parameters unaltered.
+  #'
+  #' **Usage**
+  #' ```r
+  #' Facet$setup_panel_params(panel_params, coord, ...)
+  #' ```
+  #' **Arguments**
+  #' \describe{
+  #'   \item{`panel_params`}{A named list of view scales, ranges and other
+  #'   optional parameters from `Coord$setup_panel_params()`.}
+  #'   \item{`coord`}{A `<Coord>` ggproto object.}
+  #'   \item{`...`}{Currently not in use. For future expansion.}
+  #' }
+  #'
+  #' **Value**
+  #'
+  #' A list of panel parameters.
+  setup_panel_params = function(self, panel_params, coord, ...) {
+    panel_params
+  },
+
+  ## Layout$finish_data() --------------------------------------------------
+
+  #' @field finish_data
+  #' **Description**
+  #'
+  #' A function method as a hook for making last-minute modifications to layer
+  #' data before it is rendered by Geoms. The default is to not modify the data.
+  #'
+  #' **Usage**
+  #' ```r
+  #' Facet$finish_data(data, layout, x_scales, y_scales, params)
+  #' ```
+  #' **Arguments**
+  #' \describe{
+  #'   \item{`data`}{A data frame containing layer data of a single layer.}
+  #'   \item{`layout`}{A data frame computed by the `compute_layout()` method.
+  #'   Typically contains the faceting variables, `ROW`, `COL`, `PANEL`,
+  #'   `SCALE_X` and `SCALE_Y` variables.}
+  #'   \item{`x_scales`,`y_scales`}{A list of panel scales for each `SCALE_X`
+  #'   and `SCALE_Y` level respectively.}
+  #'   \item{`params`}{A list of parameters coming from the `setup_params()`
+  #'   method.}
+  #' }
+  #'
+  #' **Value**
+  #'
+  #' A data frame containing layer data.
+  finish_data = function(data, layout, x_scales, y_scales, params) {
+    data
+  },
+
+  ## Layout$render() -------------------------------------------------------
+
+  #' @field draw_panel_content
+  #' **Description**
+  #'
+  #' A function method to assemble the panel contents. It delegates the
+  #' `draw_back()` and `draw_front()` methods, as well as `Coord$draw_panel()`.
+  #'
+  #' **Usage**
+  #' ```r
+  #' Facet$draw_panel_content(
+  #'   panels,
+  #'   layout,
+  #'   x_scales,
+  #'   y_scales,
+  #'   ranges,
+  #'   coord,
+  #'   theme,
+  #'   params,
+  #'   ...
+  #' )
+  #' ```
+  #' **Arguments**
+  #' \describe{
+  #'   \item{`panels`}{A list parallel to layers. Each element is another list
+  #'   with grobs for each panel, generated by `Layer$draw_geom()`.}
+  #'   \item{`layout`}{A data frame computed by the `compute_layout()` method.
+  #'   Typically contains the faceting variables, `ROW`, `COL`, `PANEL`,
+  #'   `SCALE_X` and `SCALE_Y` variables.}
+  #'   \item{`x_scales`,`y_scales`}{A list of panel scales for each `SCALE_X`
+  #'   and `SCALE_Y` level respectively.}
+  #'   \item{`ranges`}{A list of panel parameters from the
+  #'   `setup_panel_params()` augmented with position guides.}
+  #'   \item{`coord`}{A `<Coord>` ggproto object.}
+  #'   \item{`data`}{A list of data frames containing layer data.}
+  #'   \item{`theme`}{A [complete theme][complete_theme()] object.}
+  #'   \item{`params`}{A list of parameters coming from the `setup_params()`
+  #'   method.}
+  #'   \item{`...`}{Currently not in use.}
+  #' }
+  #'
+  #' **Value**
+  #'
+  #' A list of grobs, one for each level of the `PANEL` layout variable. Grob
+  #' can be `zeroGrob()` to draw nothing.
+  draw_panel_content = function(self, panels, layout, x_scales, y_scales,
+                                ranges, coord, data, theme, params, ...) {
+    facet_bg <- self$draw_back(
+      data,
+      layout,
+      x_scales,
+      y_scales,
+      theme,
+      params
+    )
+    facet_fg <- self$draw_front(
+      data,
+      layout,
+      x_scales,
+      y_scales,
+      theme,
+      params
+    )
+
+    # Draw individual panels, then call `$draw_panels()` method to
+    # assemble into gtable
+    lapply(seq_along(panels[[1]]), function(i) {
+      panel <- lapply(panels, `[[`, i)
+      panel <- c(facet_bg[i], panel, facet_fg[i])
+      panel <- coord$draw_panel(panel, ranges[[i]], theme)
+      ggname(paste("panel", i, sep = "-"), panel)
+    })
+  },
+
+  #' @field draw_back,draw_front
+  #' **Description**
+  #'
+  #' A function method draw facet background (back) and foreground (front) for
+  #' panels. The front and back will sandwich the grobs created by layers. The
+  #' default methods draw nothing.
+  #'
+  #' **Usage**
+  #' ```r
+  #' Facet$draw_back(data, layout, x_scales, y_scales, theme, params)
+  #' Facet$draw_front(data, layout, x_scales, y_scales, theme, params)
+  #' ```
+  #' **Arguments**
+  #' \describe{
+  #'   \item{`data`}{A list of data frames containing layer data.}
+  #'   \item{`layout`}{A data frame computed by the `compute_layout()` method.
+  #'   Typically contains the faceting variables, `ROW`, `COL`, `PANEL`,
+  #'   `SCALE_X` and `SCALE_Y` variables.}
+  #'   \item{`x_scales`,`y_scales`}{A list of panel scales for each `SCALE_X`
+  #'   and `SCALE_Y` level respectively.}
+  #'   \item{`theme`}{A [complete theme][complete_theme()] object.}
+  #'   \item{`params`}{A list of parameters coming from the `setup_params()`
+  #'   method.}
+  #' }
+  #'
+  #' **Value**
+  #'
+  #' A list of grobs, one for each level of the `PANEL` layout variable. Grob
+  #' can be `zeroGrob()` to draw nothing.
+  draw_back = function(data, layout, x_scales, y_scales, theme, params) {
+    rep(list(zeroGrob()), vec_unique_count(layout$PANEL))
+  },
+
+  draw_front = function(data, layout, x_scales, y_scales, theme, params) {
+    rep(list(zeroGrob()), vec_unique_count(layout$PANEL))
+  },
+
+  #' @field draw_panels
+  #' **Description**
+  #'
+  #' A function method that orchestrates the majority of facet drawing. It is
+  #' responsible for assembling a gtable with panel content decorated with axes
+  #' and strips. The resulting gtable is the basis for the plot in its entirety.
+  #' It delegates these tasks to the `init_gtable()`, `attach_axes()` and
+  #' `attach_strips()` methods.
+  #'
+  #' **Usage**
+  #' ```r
+  #' Facet$draw_panels(
+  #'   panels,
+  #'   layout,
+  #'   x_scales,
+  #'   y_scales,
+  #'   ranges,
+  #'   coord,
+  #'   data,
+  #'   theme,
+  #'   params
+  #' )
+  #' ```
+  #' **Arguments**
+  #' \describe{
+  #'   \item{`panels`}{A list of grobs, one per panel.}
+  #'   \item{`layout`}{A data frame computed by the `compute_layout()` method.
+  #'   Typically contains the faceting variables, `ROW`, `COL`, `PANEL`,
+  #'   `SCALE_X` and `SCALE_Y` variables.}
+  #'   \item{`x_scales`,`y_scales`}{A list of panel scales for each `SCALE_X`
+  #'   and `SCALE_Y` level respectively.}
+  #'   \item{`ranges`}{A list of panel parameters from the
+  #'   `setup_panel_params()` augmented with position guides.}
+  #'   \item{`coord`}{A `<Coord>` ggproto object.}
+  #'   \item{`data`}{A list of data frames containing layer data.}
+  #'   \item{`theme`}{A [complete theme][complete_theme()] object.}
+  #'   \item{`params`}{A list of parameters coming from the `setup_params()`
+  #'   method.}
+  #' }
+  #'
+  #' **Value**
+  #'
+  #' A [`gtable`][gtable::gtable()] object.
+  draw_panels = function(self, panels, layout, x_scales = NULL, y_scales = NULL,
+                         ranges, coord, data = NULL, theme, params) {
+
+    free  <- params$free       %||% list(x = FALSE, y = FALSE)
+    space <- params$space_free %||% list(x = FALSE, y = FALSE)
+
+    aspect_ratio <- theme$aspect.ratio
+    if (!is.null(aspect_ratio) && (space$x || space$y)) {
+      cli::cli_abort("Free scales cannot be mixed with a fixed aspect ratio.")
+    }
+
+    if (!coord$is_free()) {
+      if (space$x && space$y) {
+        aspect_ratio <- aspect_ratio %||% coord$ratio
+      } else if (free$x || free$y) {
+        msg <- paste0("{.fn {snake_class(self)}} can't use free scales with ",
+                      "{.fn {snake_class(coord)}}")
+        if (!is.null(coord$ratio)) {
+          msg <- paste0(msg, " with a fixed {.arg ratio} argument")
+        }
+        cli::cli_abort(paste0(msg, "."))
+      }
+    }
+
+    table <- self$init_gtable(
+      panels, layout, theme, ranges, params,
+      aspect_ratio = aspect_ratio %||% coord$aspect(ranges[[1]])
+    )
+
+    table <- self$attach_axes(table, layout, ranges, coord, theme, params)
+    self$attach_strips(table, layout, params, theme)
+  },
+
+  #' @field init_gtable
+  #' **Description**
+  #'
+  #' A function method that initiates a gtable object containing panels set
+  #' at the appropriate `ROW` and `COL` cells from the layout. The panels are
+  #' separated by the `panel.spacing.{x/y}` spacing.
+  #'
+  #' **Usage**
+  #' ```r
+  #' Facet$init_gtable(panels, layout, theme, ranges, params, aspect_ratio)
+  #' ```
+  #' **Arguments**
+  #' \describe{
+  #'   \item{`panels`}{A list of grobs, one per panel.}
+  #'   \item{`layout`}{A data frame computed by the `compute_layout()` method.
+  #'   Typically contains the faceting variables, `ROW`, `COL`, `PANEL`,
+  #'   `SCALE_X` and `SCALE_Y` variables.}
+  #'   \item{`theme`}{A [complete theme][complete_theme()] object.}
+  #'   \item{`ranges`}{A list of panel parameters from the
+  #'   `setup_panel_params()` augmented with position guides.}
+  #'   \item{`aspect_ratio`}{A scalar numeric for the panel aspect ratio or
+  #'   `NULL` for no aspect ratio.}
+  #' }
+  #'
+  #' **Value**
+  #'
+  #' A [`gtable`][gtable::gtable()] object containing panel grobs prefixed with
+  #' `"panel"`.
+  init_gtable = function(panels, layout, theme, ranges, params,
+                         aspect_ratio = NULL) {
+
+    # Initialise matrix of panels
+    dim   <- c(max(layout$ROW), max(layout$COL))
+    table <- matrix(list(zeroGrob()), dim[1], dim[2])
+    table[cbind(layout$ROW, layout$COL)] <- panels
+
+    # Set initial sizes
+    widths  <- unit(rep(1, dim[2]), "null")
+    heights <- unit(rep(1 * abs(aspect_ratio %||% 1), dim[1]), "null")
+
+    # When space are free, let panel parameter limits determine size of panel
+    space <- params$space_free %||% list(x = FALSE, y = FALSE)
+    if (space$x) {
+      idx    <- layout$PANEL[layout$ROW == 1]
+      widths <- vapply(idx, function(i) diff(ranges[[i]]$x.range), numeric(1))
+      widths <- unit(widths, "null")
+    }
+
+    if (space$y) {
+      idx <- layout$PANEL[layout$COL == 1]
+      heights <- vapply(idx, function(i) diff(ranges[[i]]$y.range), numeric(1))
+      heights <- unit(heights * abs(aspect_ratio %||% 1), "null")
+    }
+
+    # Build gtable
+    table <- gtable_matrix(
+      "layout", table,
+      widths = widths, heights = heights,
+      respect = !is.null(aspect_ratio),
+      clip = "off", z = matrix(1, dim[1], dim[2])
+    )
+
+    # Set panel names
+    table$layout$name <- paste(
+      "panel",
+      rep(seq_len(dim[2]), each = dim[1]),
+      rep(seq_len(dim[1]), dim[2]),
+      sep = "-"
+    )
+
+    # Add spacing between panels
+    spacing <- lapply(
+      c(x = "panel.spacing.x", y = "panel.spacing.y"),
+      calc_element, theme = theme
+    )
+
+    table <- gtable_add_col_space(table, spacing$x)
+    table <- gtable_add_row_space(table, spacing$y)
+    table
+  },
+
+  #' @field attach_axes
+  #' **Description**
+  #'
+  #' A function method that renders position guides (axes) and attaches these
+  #' to the gtable with panels. The default method returns the gtable unaltered.
+  #'
+  #' **Usage**
+  #' ```r
+  #' Facet$attach_axes(table, layout, ranges, coord, theme, params)
+  #' ```
+  #' **Arguments**
+  #' \describe{
+  #'   \item{`table`}{A [`gtable`][gtable::gtable()] object populated with panels from the
+  #'   `init_gtable()` method.}
+  #'   \item{`layout`}{A data frame computed by the `compute_layout()` method.
+  #'   Typically contains the faceting variables, `ROW`, `COL`, `PANEL`,
+  #'   `SCALE_X` and `SCALE_Y` variables.}
+  #'   \item{`ranges`}{A list of panel parameters from the
+  #'   `setup_panel_params()` augmented with position guides.}
+  #'   \item{`coord`}{A `<Coord>` ggproto object.}
+  #'   \item{`theme`}{A [complete theme][complete_theme()] object.}
+  #'   \item{`params`}{A list of parameters coming from the `setup_params()`
+  #'   method.}
+  #' }
+  #'
+  #' **Value**
+  #'
+  #' A [`gtable`][gtable::gtable()] object.
+  attach_axes = function(table, layout, ranges, coord, theme, params) {
+    table
+  },
+
+  #' @field attach_strips
+  #' **Description**
+  #'
+  #' A function method that renders strips and attaches these to the gtable
+  #' with panels and axes. The `format_strip_labels()` method is used to format
+  #' the strip text. The default method returns the gtable unaltered.
+  #'
+  #' **Usage**
+  #' ```r
+  #' Facet$attach_strips(table, layout, ranges, coord, theme, params)
+  #' ```
+  #' **Arguments**
+  #' \describe{
+  #'   \item{`table`}{A [`gtable`][gtable::gtable()] object from the `attach_axes()`
+  #'   method.}
+  #'   \item{`layout`}{A data frame computed by the `compute_layout()` method.
+  #'   Typically contains the faceting variables, `ROW`, `COL`, `PANEL`,
+  #'   `SCALE_X` and `SCALE_Y` variables.}
+  #'   \item{`params`}{A list of parameters coming from the `setup_params()`
+  #'   method.}
+  #'   \item{`theme`}{A [complete theme][complete_theme()] object.}
+  #' }
+  #'
+  #' **Value**
+  #'
+  #' A [`gtable`][gtable::gtable()] object.
+  attach_strips = function(table, layout, params, theme) {
+    table
+  },
+
+  #' @field format_strip_labels
+  #' **Description**
+  #'
+  #' A function method that formats the text for strips. It is used in the
+  #' `attach_strips` methods, but also the `get_strip_labels()` function.
+  #' The default method returns `NULL`.
+  #'
+  #' **Usage**
+  #' ```r
+  #' Facet$format_strip_labels(layout, params)
+  #' ```
+  #' **Arguments**
+  #' \describe{
+  #'   \item{`layout`}{A data frame computed by the `compute_layout()` method.
+  #'   Typically contains the faceting variables, `ROW`, `COL`, `PANEL`,
+  #'   `SCALE_X` and `SCALE_Y` variables.}
+  #'   \item{`params`}{A list of parameters coming from the `setup_params()`
+  #'   method.}
+  #' }
+  #'
+  #' **Value**
+  #'
+  #' A list containing a data frame with strip labels.
+  format_strip_labels = function(layout, params) {
+    return()
+  },
+
+  #' @field set_panel_size
+  #' **Description**
+  #'
+  #' A function method that enforces the `panel.widths` and `panel.heights`
+  #' theme settings.
+  #'
+  #' **Usage**
+  #' ```r
+  #' Facet$set_panel_size(table, theme)
+  #' ```
+  #' **Arguments**
+  #' \describe{
+  #'   \item{`table`}{A [`gtable`][gtable::gtable()] object populated by the
+  #'   `draw_panels()` method.}
+  #'   \item{`theme`}{A [complete theme][complete_theme()] object.}
+  #' }
+  #'
+  #' **Value**
+  #'
+  #' The `table` object, optionally with different `widths` and `heights`
+  #' properties.
+  set_panel_size = function(table, theme) {
+
+    new_widths  <- calc_element("panel.widths",  theme)
+    new_heights <- calc_element("panel.heights", theme)
+
+    if (is.null(new_widths) && is.null(new_heights)) {
+      return(table)
+    }
+
+    if (isTRUE(table$respect)) {
+      args <- !c(is.null(new_widths), is.null(new_heights))
+      args <- c("panel.widths", "panel.heights")[args]
+      cli::cli_warn(
+        "Aspect ratios are overruled by {.arg {args}} theme element{?s}."
+      )
+      table$respect <- FALSE
+    }
+
+    rows <- panel_rows(table)
+    cols <- panel_cols(table)
+
+    if (length(new_widths) == 1L && nrow(cols) > 1L) {
+      # Get total size of non-panel widths in between panels
+      extra <- setdiff(seq(min(cols$l), max(cols$r)), union(cols$l, cols$r))
+      extra <- unit(sum(width_cm(table$widths[extra])), "cm")
+      # Distribute width proportionally
+      relative   <- as.numeric(table$widths[cols$l]) # assumed to be simple units
+      new_widths <- (new_widths - extra) * (relative / sum(relative))
+    }
+    if (!is.null(new_widths)) {
+      table$widths[cols$l] <- rep(new_widths, length.out = nrow(cols))
+    }
+
+    if (length(new_heights) == 1L && nrow(rows) > 1L) {
+      # Get total size of non-panel heights in between panels
+      extra <- setdiff(seq(min(rows$t), max(rows$t)), union(rows$t, rows$b))
+      extra <- unit(sum(height_cm(table$heights[extra])), "cm")
+      # Distribute height proportionally
+      relative    <- as.numeric(table$heights[rows$t]) # assumed to be simple units
+      new_heights <- (new_heights - extra) * (relative / sum(relative))
+    }
+    if (!is.null(new_heights)) {
+      table$heights[rows$t] <- rep(new_heights, length.out = nrow(rows))
+    }
+
+    table
+  },
+
+  #' @field attach_axes
+  #' **Description**
+  #'
+  #' A function method that renders axis titles and adds them to the gtable.
+  #' The default is to add one title at each side depending on the position
+  #' and presence of axes.
+  #'
+  #' **Usage**
+  #' ```r
+  #' Facet$draw_labels(
+  #'   panels,
+  #'   layout,
+  #'   x_scales,
+  #'   y_scales,
+  #'   ranges,
+  #'   coord,
+  #'   data,
+  #'   theme,
+  #'   labels,
+  #'   params
+  #' )
+  #' ```
+  #' **Arguments**
+  #' \describe{
+  #'   \item{`panels`}{A [`gtable`][gtable::gtable()] object initiated by the
+  #'   `draw_panels()` method.}
+  #'   \item{`layout`}{A data frame computed by the `compute_layout()` method.
+  #'   Typically contains the faceting variables, `ROW`, `COL`, `PANEL`,
+  #'   `SCALE_X` and `SCALE_Y` variables.}
+  #'   \item{`x_scales`,`y_scales`}{A list of panel scales for each `SCALE_X`
+  #'   and `SCALE_Y` level respectively.}
+  #'   \item{`ranges`}{A list of panel parameters from the
+  #'   `setup_panel_params()` augmented with position guides.}
+  #'   \item{`coord`}{A `<Coord>` ggproto object.}
+  #'   \item{`data`}{A list of data frames containing layer data.}
+  #'   \item{`theme`}{A [complete theme][complete_theme()] object.}
+  #'   \item{`labels`}{A named list containing an `x` list and `y` list. The
+  #'   `x` and `y` lists have `primary` and `secondary` labels.}
+  #'   \item{`params`}{A list of parameters coming from the `setup_params()`
+  #'   method.}
+  #' }
+  #'
+  #' **Value**
+  #'
+  #' A [`gtable`][gtable::gtable()] object.
+  draw_labels = function(panels, layout, x_scales, y_scales, ranges, coord, data, theme, labels, params) {
+    panel_dim <-  find_panel(panels)
+
+    xlab_height_top <- grobHeight(labels$x[[1]])
+    panels <- gtable_add_rows(panels, xlab_height_top, pos = 0)
+    panels <- gtable_add_grob(panels, labels$x[[1]], name = "xlab-t",
+      l = panel_dim$l, r = panel_dim$r, t = 1, clip = "off")
+
+    xlab_height_bottom <- grobHeight(labels$x[[2]])
+    panels <- gtable_add_rows(panels, xlab_height_bottom, pos = -1)
+    panels <- gtable_add_grob(panels, labels$x[[2]], name = "xlab-b",
+      l = panel_dim$l, r = panel_dim$r, t = -1, clip = "off")
+
+    panel_dim <-  find_panel(panels)
+
+    ylab_width_left <- grobWidth(labels$y[[1]])
+    panels <- gtable_add_cols(panels, ylab_width_left, pos = 0)
+    panels <- gtable_add_grob(panels, labels$y[[1]], name = "ylab-l",
+      l = 1, b = panel_dim$b, t = panel_dim$t, clip = "off")
+
+    ylab_width_right <- grobWidth(labels$y[[2]])
+    panels <- gtable_add_cols(panels, ylab_width_right, pos = -1)
+    panels <- gtable_add_grob(panels, labels$y[[2]], name = "ylab-r",
+      l = -1, b = panel_dim$b, t = panel_dim$t, clip = "off")
+
+    panels
+  },
+
+  ## Utilities -------------------------------------------------------------
+
+  #' @field vars
+  #' **Description**
+  #'
+  #' A function method that returns the names of faceting variables. The
+  #' default method returns an character vector with 0 length.
+  #'
+  #' **Usage**
+  #' ```r
+  #' Facet$vars()
+  #' ```
+  #'
+  #' **Value**
+  #'
+  #' A character vector
+  vars = function() {
+    character(0)
+  }
+)
+
+# Helpers -----------------------------------------------------------------
+
+#' Quote faceting variables
+#'
+#' @description
+#' Just like [aes()], `vars()` is a [quoting function][rlang::quotation]
+#' that takes inputs to be evaluated in the context of a dataset.
+#' These inputs can be:
+#'
+#' * variable names
+#' * complex expressions
+#'
+#' In both cases, the results (the vectors that the variable
+#' represents or the results of the expressions) are used to form
+#' faceting groups.
+#'
+#' @param ... <[`data-masking`][rlang::topic-data-mask]> Variables or
+#'   expressions automatically quoted. These are evaluated in the context of the
+#'   data to form faceting groups. Can be named (the names are passed to a
+#'   [labeller][labellers]).
+#'
+#' @seealso [aes()], [facet_wrap()], [facet_grid()]
+#' @export
+#' @examples
+#' p <- ggplot(mtcars, aes(wt, disp)) + geom_point()
+#' p + facet_wrap(vars(vs, am))
+#'
+#' # vars() makes it easy to pass variables from wrapper functions:
+#' wrap_by <- function(...) {
+#'   facet_wrap(vars(...), labeller = label_both)
+#' }
+#' p + wrap_by(vs)
+#' p + wrap_by(vs, am)
+#'
+#' # You can also supply expressions to vars(). In this case it's often a
+#' # good idea to supply a name as well:
+#' p + wrap_by(drat = cut_number(drat, 3))
+#'
+#' # Let's create another function for cutting and wrapping a
+#' # variable. This time it will take a named argument instead of dots,
+#' # so we'll have to use the "enquote and unquote" pattern:
+#' wrap_cut <- function(var, n = 3) {
+#'   # Let's enquote the named argument `var` to make it auto-quoting:
+#'   var <- enquo(var)
+#'
+#'   # `as_label()` will create a nice default name:
+#'   nm <- as_label(var)
+#'
+#'   # Now let's unquote everything at the right place. Note that we also
+#'   # unquote `n` just in case the data frame has a column named
+#'   # `n`. The latter would have precedence over our local variable
+#'   # because the data is always masking the environment.
+#'   wrap_by(!!nm := cut_number(!!var, !!n))
+#' }
+#'
+#' # Thanks to tidy eval idioms we now have another useful wrapper:
+#' p + wrap_cut(drat)
+vars <- function(...) {
+  quos(...)
+}
+
+#' @export
+#' @rdname is_tests
+is_facet <- function(x) inherits(x, "Facet")
+
+#' @export
+#' @rdname is_tests
+#' @usage is.facet(x) # Deprecated
+is.facet <- function(x) {
+  deprecate_soft0("3.5.2", "is.facet()", "is_facet()")
+  is_facet(x)
+}
+
+#' Accessing a plot's facet strip labels
+#'
+#' This functions retrieves labels from facet strips with the labeller applied.
+#'
+#' @param plot A ggplot or build ggplot object.
+#'
+#' @return `NULL` if there are no labels, otherwise a list of data.frames
+#'   containing the labels.
+#' @export
+#' @keywords internal
+#'
+#' @examples
+#' # Basic plot
+#' p <- ggplot(mpg, aes(displ, hwy)) +
+#'   geom_point()
+#'
+#' get_strip_labels(p) # empty facets
+#' get_strip_labels(p + facet_wrap(year ~ cyl))
+#' get_strip_labels(p + facet_grid(year ~ cyl))
+get_strip_labels <- function(plot = get_last_plot()) {
+  plot   <- ggplot_build(plot)
+  layout <- plot@layout$layout
+  params <- plot@layout$facet_params
+  plot@plot@facet$format_strip_labels(layout, params)
+}
+
+# A "special" value, currently not used but could be used to determine
+# if faceting is active
+NO_PANEL <- -1L
+
+unique_combs <- function(df) {
+  if (length(df) == 0) return()
+
+  unique_values <- lapply(df, ulevels)
+  rev(expand.grid(rev(unique_values), stringsAsFactors = FALSE,
+    KEEP.OUT.ATTRS = TRUE))
+}
+
+df.grid <- function(a, b) {
+  if (is.null(a) || nrow(a) == 0) return(b)
+  if (is.null(b) || nrow(b) == 0) return(a)
+
+  indexes <- expand.grid(
+    i_a = seq_len(nrow(a)),
+    i_b = seq_len(nrow(b))
+  )
+  vec_cbind(
+    unrowname(a[indexes$i_a, , drop = FALSE]),
+    unrowname(b[indexes$i_b, , drop = FALSE])
+  )
+}
+
+# A facets spec is a list of facets. A grid facetting needs two facets
+# while a wrap facetting flattens all dimensions and thus accepts any
+# number of facets.
+#
+# A facets is a list of grouping variables. They are typically
+# supplied as variable names but can be expressions.
+#
+# as_facets() is complex due to historical baggage but its main
+# purpose is to create a facets spec from a formula: a + b ~ c + d
+# creates a facets list with two components, each of which bundles two
+# facetting variables.
+
+as_facets_list <- function(x) {
+  check_vars(x)
+  if (is_quosures(x)) {
+    x <- quos_auto_name(x)
+    return(list(x))
+  }
+
+  # This needs to happen early because we might get a formula.
+  # facet_grid() directly converted strings to a formula while
+  # facet_wrap() called as.quoted(). Hence this is a little more
+  # complicated for backward compatibility.
+  if (is_string(x)) {
+    x <- parse_expr(x)
+  }
+
+  # At this level formulas are coerced to lists of lists for backward
+  # compatibility with facet_grid(). The LHS and RHS are treated as
+  # distinct facet dimensions and `+` defines multiple facet variables
+  # inside each dimension.
+  if (is_formula(x)) {
+    if (length(x) == 2) {
+      rows <- f_as_facets(NULL)
+      cols <- f_as_facets(x)
+    } else {
+      rows <- f_as_facets(x[-3])
+      cols <- f_as_facets(x[-2])
+    }
+    return(list(rows, cols))
+  }
+
+  # For backward-compatibility with facet_wrap()
+  if (!is_bare_list(x)) {
+    x <- as_quoted(x)
+  }
+
+  # If we have a list there are two possibilities. We may already have
+  # a proper facet spec structure. Otherwise we coerce each element
+  # with as_quoted() for backward compatibility with facet_grid().
+  if (is.list(x)) {
+    x <- lapply(x, as_facets)
+  }
+
+  x
+}
+
+check_vars <- function(x) {
+  if (is_mapping(x)) {
+    cli::cli_abort("Please use {.fn vars} to supply facet variables.")
+  }
+  # Native pipe have higher precedence than + so any type of gg object can be
+  # expected here, not just ggplot
+  if (S7::S7_inherits(x, class_gg)) {
+    cli::cli_abort(c(
+      "Please use {.fn vars} to supply facet variables.",
+      "i" = "Did you use {.code %>%} or {.code |>} instead of {.code +}?"
+    ))
+  }
+  invisible()
+}
+
+# Flatten a list of quosures objects to a quosures object, and compact it
+compact_facets <- function(x) {
+  x <- as_facets_list(x)
+  proxy   <- vec_proxy(x)
+  is_list <- vapply(proxy, vec_is_list, logical(1))
+  proxy[is_list]  <- lapply(proxy[is_list],  unclass)
+  proxy[!is_list] <- lapply(proxy[!is_list], list)
+  new <- list_unchop(proxy, ptype = list(), name_spec = "{outer}_{inner}")
+  x <- vec_restore(new, x)
+
+  null_or_missing <- vapply(x, function(x) quo_is_null(x) || quo_is_missing(x), logical(1))
+  new_quosures(x[!null_or_missing])
+}
+
+# Compatibility with plyr::as.quoted()
+as_quoted <- function(x) {
+  if (is.character(x)) {
+    if (length(x) > 1) {
+      x <- paste(x, collapse = "; ")
+    }
+    return(parse_exprs(x))
+  }
+  if (is.null(x)) {
+    return(list())
+  }
+  if (is_formula(x)) {
+    return(simplify(x))
+  }
+  list(x)
+}
+# From plyr:::as.quoted.formula
+simplify <- function(x) {
+  if (length(x) == 2 && is_symbol(x[[1]], "~")) {
+    return(simplify(x[[2]]))
+  }
+  if (length(x) < 3) {
+    return(list(x))
+  }
+  op <- x[[1]]; a <- x[[2]]; b <- x[[3]]
+
+  if (is_symbol(op, c("+", "*", "~"))) {
+    c(simplify(a), simplify(b))
+  } else if (is_symbol(op, "-")) {
+    c(simplify(a), expr(-!!simplify(b)))
+  } else {
+    list(x)
+  }
+}
+
+as_facets <- function(x) {
+  is_facets <- is.list(x) && length(x) > 0 &&
+    all(vapply(x, is_quosure, logical(1)))
+  if (is_facets) {
+    return(x)
+  }
+
+  if (is_formula(x)) {
+    # Use different formula method because plyr's does not handle the
+    # environment correctly.
+    f_as_facets(x)
+  } else {
+    vars <- as_quoted(x)
+    as_quosures(vars, globalenv(), named = TRUE)
+  }
+}
+f_as_facets <- function(f) {
+  if (is.null(f)) {
+    return(as_quosures(list()))
+  }
+
+  env <- f_env(f) %||% globalenv()
+
+  # as.quoted() handles `+` specifications
+  vars <- simplify(f)
+
+  # `.` in formulas is discarded
+  vars <- vars[!vapply(vars, identical, logical(1), as.name("."))]
+
+  as_quosures(vars, env, named = TRUE)
+}
+
+# When evaluating variables in a facet specification, we evaluate bare
+# variables and expressions slightly differently. Bare variables should
+# always succeed, even if the variable doesn't exist in the data frame:
+# that makes it possible to repeat data across multiple factors. But
+# when evaluating an expression, you want to see any errors. That does
+# mean you can't have background data when faceting by an expression,
+# but that seems like a reasonable tradeoff.
+eval_facets <- function(facets, data, possible_columns = NULL) {
+  vars <- compact(lapply(facets, eval_facet, data, possible_columns = possible_columns))
+  data_frame0(!!!vars)
+}
+eval_facet <- function(facet, data, possible_columns = NULL) {
+  # Treat the case when `facet` is a quosure of a symbol specifically
+  # to issue a friendlier warning
+  if (quo_is_symbol(facet)) {
+    facet <- as.character(quo_get_expr(facet))
+
+    if (facet %in% names(data)) {
+      out <- data[[facet]]
+    } else {
+      out <- NULL
+    }
+    return(out)
+  }
+
+  # Key idea: use active bindings so that column names missing in this layer
+  # but present in others raise a custom error
+  env <- new_environment(data)
+  missing_columns <- setdiff(possible_columns, names(data))
+  undefined_error <- function(e) cli::cli_abort("", class = "ggplot2_missing_facet_var")
+  bindings <- rep_named(missing_columns, list(undefined_error))
+  env_bind_active(env, !!!bindings)
+
+  # Create a data mask and install a data pronoun manually (see ?new_data_mask)
+  mask <- new_data_mask(env)
+  mask$.data <- as_data_pronoun(mask)
+
+  try_fetch(
+    eval_tidy(facet, mask),
+    ggplot2_missing_facet_var = function(e) NULL
+  )
+}
+
+layout_null <- function() {
+  # PANEL needs to be a factor to be consistent with other facet types
+  data_frame0(
+    PANEL = factor(1),
+    ROW = 1,
+    COL = 1,
+    SCALE_X = 1,
+    SCALE_Y = 1,
+    .size = 1L
+  )
+}
+
+check_layout <- function(x) {
+  if (all(c("PANEL", "SCALE_X", "SCALE_Y") %in% names(x))) {
+    return()
+  }
+
+  cli::cli_abort("Facet layout has a bad format. It must contain columns {.col PANEL}, {.col SCALE_X}, and {.col SCALE_Y}.")
+}
+
+check_facet_vars <- function(..., name) {
+  vars_names <- c(...)
+  reserved_names <- c("PANEL", "ROW", "COL", "SCALE_X", "SCALE_Y")
+  problems <- intersect(vars_names, reserved_names)
+  if (length(problems) != 0) {
+    cli::cli_abort(c(
+      "{.val {problems}} {?is/are} not {?an/} allowed name{?/s} for faceting variables.",
+      "i" = "Change the name of your data columns to not be {.or {.str {reserved_names}}}."
+    ), call = call2(name))
+  }
+}
+
+#' Get the maximal width/length of a list of grobs
+#'
+#' @param grobs A list of grobs
+#' @param value_only Should the return value be a simple numeric vector giving
+#' the maximum in cm
+#'
+#' @return The largest value. measured in cm as a unit object or a numeric
+#' vector depending on `value_only`
+#'
+#' @keywords internal
+#' @export
+max_height <- function(grobs, value_only = FALSE) {
+  height <- max(unlist(lapply(grobs, height_cm)))
+  if (!value_only) height <- unit(height, "cm")
+  height
+}
+#' @rdname max_height
+#' @export
+max_width <- function(grobs, value_only = FALSE) {
+  width <- max(unlist(lapply(grobs, width_cm)))
+  if (!value_only) width <- unit(width, "cm")
+  width
+}
+#' Find panels in a gtable
+#'
+#' These functions help detect the placement of panels in a gtable, if they are
+#' named with "panel" in the beginning. `find_panel()` returns the extend of
+#' the panel area, while `panel_cols()` and `panel_rows()` returns the
+#' columns and rows that contains panels respectively.
+#'
+#' @param table A gtable
+#'
+#' @return A data.frame with some or all of the columns t(op), r(ight),
+#' b(ottom), and l(eft)
+#'
+#' @keywords internal
+#' @export
+find_panel <- function(table) {
+  layout <- table$layout
+  panels <- layout[grepl("^panel", layout$name), , drop = FALSE]
+
+  data_frame0(
+    t = min(.subset2(panels, "t")),
+    r = max(.subset2(panels, "r")),
+    b = max(.subset2(panels, "b")),
+    l = min(.subset2(panels, "l")),
+    .size = 1
+  )
+}
+#' @rdname find_panel
+#' @export
+panel_cols <- function(table) {
+  panels <- table$layout[grepl("^panel", table$layout$name), , drop = FALSE]
+  unique0(panels[, c('l', 'r')])
+}
+#' @rdname find_panel
+#' @export
+panel_rows <- function(table) {
+  panels <- table$layout[grepl("^panel", table$layout$name), , drop = FALSE]
+  unique0(panels[, c('t', 'b')])
+}
+#' Take input data and define a mapping between faceting variables and ROW,
+#' COL and PANEL keys
+#'
+#' @param data A list of data.frames, the first being the plot data and the
+#' subsequent individual layer data
+#' @param env The environment the vars should be evaluated in
+#' @param vars A list of quoted symbols matching columns in data
+#' @param drop should missing combinations/levels be dropped
+#'
+#' @return A data.frame with columns for PANEL, ROW, COL, and faceting vars
+#'
+#' @keywords internal
+#' @export
+combine_vars <- function(data, env = emptyenv(), vars = NULL, drop = TRUE) {
+  possible_columns <- unique0(unlist(lapply(data, names)))
+  if (length(vars) == 0) return(data_frame0())
+
+  # For each layer, compute the facet values
+  values <- compact(lapply(data, eval_facets, facets = vars, possible_columns = possible_columns))
+
+  # Form the base data.frame which contains all combinations of faceting
+  # variables that appear in the data
+  has_all <- unlist(lapply(values, length)) == length(vars)
+  if (!any(has_all)) {
+    missing <- lapply(values, function(x) setdiff(names(vars), names(x)))
+    missing_vars <- paste0(
+      c("Plot", paste0("Layer ", seq_len(length(data) - 1))),
+      " is missing {.var ", missing[seq_along(data)], "}"
+    )
+    names(missing_vars) <- rep("x", length(data))
+
+    cli::cli_abort(c(
+      "At least one layer must contain all faceting variables: {.var {names(vars)}}",
+      missing_vars
+    ))
+  }
+
+  base <- unique0(vec_rbind0(!!!values[has_all]))
+  if (!drop) {
+    base <- unique_combs(base)
+  }
+
+  # Systematically add on missing combinations
+  for (value in values[!has_all]) {
+    if (empty(value)) next;
+
+    old <- base[setdiff(names(base), names(value))]
+    new <- unique0(value[intersect(names(base), names(value))])
+    if (drop) {
+      new <- unique_combs(new)
+    }
+    base <- unique0(vec_rbind0(base, df.grid(old, new)))
+  }
+
+  if (empty(base)) {
+    cli::cli_abort("Faceting variables must have at least one value.")
+  }
+
+  base
+}
+#' Render panel axes
+#'
+#' These helpers facilitates generating theme compliant axes when
+#' building up the plot.
+#'
+#' @param x,y A list of ranges as available to the draw_panel method in
+#' `Facet` subclasses.
+#' @param coord A `Coord` object
+#' @param theme A `theme` object
+#' @param transpose Should the output be transposed?
+#'
+#' @return A list with the element "x" and "y" each containing axis
+#' specifications for the ranges passed in. Each axis specification is a list
+#' with a "top" and "bottom" element for x-axes and "left" and "right" element
+#' for y-axis, holding the respective axis grobs. Depending on the content of x
+#' and y some of the grobs might be zeroGrobs. If `transpose=TRUE` the
+#' content of the x and y elements will be transposed so e.g. all left-axes are
+#' collected in a left element as a list of grobs.
+#'
+#' @keywords internal
+#' @export
+#'
+render_axes <- function(x = NULL, y = NULL, coord, theme, transpose = FALSE) {
+  axes <- list()
+  if (!is.null(x)) {
+    axes$x <- lapply(x, coord$render_axis_h, theme)
+  }
+  if (!is.null(y)) {
+    axes$y <- lapply(y, coord$render_axis_v, theme)
+  }
+  if (transpose) {
+    axes <- list(
+      x = list(
+        top = lapply(axes$x, `[[`, "top"),
+        bottom = lapply(axes$x, `[[`, "bottom")
+      ),
+      y = list(
+        left = lapply(axes$y, `[[`, "left"),
+        right = lapply(axes$y, `[[`, "right")
+      )
+    )
+  }
+  axes
+}
+#' Render panel strips
+#'
+#' All positions are rendered and it is up to the facet to decide which to use
+#'
+#' @param x,y A data.frame with a column for each variable and a row for each
+#' combination to draw
+#' @param labeller A labeller function
+#' @param theme a `theme` object
+#'
+#' @return A list with an "x" and a "y" element, each containing a "top" and
+#' "bottom" or "left" and "right" element respectively. These contains a list of
+#' rendered strips as gtables.
+#'
+#' @keywords internal
+#' @export
+render_strips <- function(x = NULL, y = NULL, labeller = identity, theme) {
+  list(
+    x = build_strip(x, labeller, theme, TRUE),
+    y = build_strip(y, labeller, theme, FALSE)
+  )
+}
+
+
+censor_labels <- function(ranges, layout, labels) {
+  if (labels$x && labels$y) {
+    return(ranges)
+  }
+  draw <- matrix(
+    TRUE, length(ranges), 4,
+    dimnames = list(NULL, c("top", "bottom", "left", "right"))
+  )
+
+  if (!labels$x) {
+    xmax <- stats::ave(layout$ROW, layout$COL, FUN = max)
+    xmin <- stats::ave(layout$ROW, layout$COL, FUN = min)
+    draw[which(layout$ROW != xmax), "bottom"] <- FALSE
+    draw[which(layout$ROW != xmin), "top"] <- FALSE
+  }
+  if (!labels$y) {
+    ymax <- stats::ave(layout$COL, layout$ROW, FUN = max)
+    ymin <- stats::ave(layout$COL, layout$ROW, FUN = min)
+    draw[which(layout$COL != ymax), "right"] <- FALSE
+    draw[which(layout$COL != ymin), "left"] <- FALSE
+  }
+  for (i in seq_along(ranges)) {
+    ranges[[i]]$draw_labels <- as.list(draw[i, ])
+  }
+  ranges
+}
+
+map_facet_data <- function(data, layout, params) {
+
+  if (empty(data)) {
+    return(vec_cbind(data %|W|% NULL, PANEL = integer(0)))
+  }
+
+  vars <- params$facets %||% c(params$rows, params$cols)
+
+  if (length(vars) == 0) {
+    data$PANEL <- layout$PANEL
+    return(data)
+  }
+
+  grid_layout <- all(c("rows", "cols") %in% names(params))
+  layer_layout <- attr(data, "layout")
+  if (identical(layer_layout, "fixed")) {
+    n <- vec_size(data)
+    data <- vec_rep(data, vec_size(layout))
+    data$PANEL <- vec_rep_each(layout$PANEL, n)
+    return(data)
+  }
+
+  # Compute faceting values
+  facet_vals <- eval_facets(vars, data, params$.possible_columns)
+
+  include_margins <- !isFALSE(params$margins %||% FALSE) &&
+    nrow(facet_vals) == nrow(data) && grid_layout
+  if (include_margins) {
+    # Margins are computed on evaluated faceting values (#1864).
+    facet_vals <- reshape_add_margins(
+      vec_cbind(facet_vals, .index = seq_len(nrow(facet_vals))),
+      list(intersect(names(params$rows), names(facet_vals)),
+           intersect(names(params$cols), names(facet_vals))),
+      params$margins %||% FALSE
+    )
+    # Apply recycling on original data to fit margins
+    # We're using base subsetting here because `data` might have a superclass
+    # that isn't handled well by vctrs::vec_slice
+    data <- data[facet_vals$.index, , drop = FALSE]
+    facet_vals$.index <- NULL
+  }
+
+  # If we need to fix rows or columns, we make the corresponding faceting
+  # variables missing on purpose
+  if (grid_layout) {
+    if (identical(layer_layout, "fixed_rows")) {
+      facet_vals <- facet_vals[setdiff(names(facet_vals), names(params$cols))]
+    }
+    if (identical(layer_layout, "fixed_cols")) {
+      facet_vals <- facet_vals[setdiff(names(facet_vals), names(params$rows))]
+    }
+  }
+
+  # If any faceting variables are missing, add them in by
+  # duplicating the data
+  missing_facets <- setdiff(names(vars), names(facet_vals))
+  if (length(missing_facets) > 0) {
+
+    to_add <- unique0(layout[missing_facets])
+
+    data_rep  <- rep.int(seq_len(nrow(data)), nrow(to_add))
+    facet_rep <- rep(seq_len(nrow(to_add)), each = nrow(data))
+
+    data <- unrowname(data[data_rep, , drop = FALSE])
+    facet_vals <- unrowname(vec_cbind(
+      unrowname(facet_vals[data_rep, , drop = FALSE]),
+      unrowname(to_add[facet_rep, , drop = FALSE])
+    ))
+  }
+
+  if (nrow(facet_vals) < 1) {
+    # Add PANEL variable
+    data$PANEL <- NO_PANEL
+    return(data)
+  }
+
+  facet_vals[] <- lapply(facet_vals, as_unordered_factor)
+  facet_vals[] <- lapply(facet_vals, addNA, ifany = TRUE)
+  layout[] <- lapply(layout, as_unordered_factor)
+
+  # Add PANEL variable
+  keys <- join_keys(facet_vals, layout, by = names(vars))
+  data$PANEL <- layout$PANEL[match(keys$x, keys$y)]
+
+  # Filter panels when layer_layout is an integer
+  if (is_integerish(layer_layout)) {
+    data <- vec_slice(data, data$PANEL %in% layer_layout)
+  }
+
+  data
+}
