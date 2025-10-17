@@ -1,0 +1,45 @@
+Package: GOSemSim
+Type: Package
+Title: GO-terms Semantic Similarity Measures
+Version: 2.28.1
+Authors@R: c( person(given = "Guangchuang", family = "Yu",             email = "guangchuangyu@gmail.com", role  = c("aut", "cre")),
+              person(given = "Alexey",      family = "Stukalov",       email = "astukalov@gmail.com",     role  = "ctb"),
+              person(given= "Pingfan",      family = "Guo",            email = "1178431277@qq.com",       role  = "ctb"),
+              person(given = "Chuanle",     family = "Xiao",           email = "xiaochuanle@126.com",     role  = "ctb"),
+              person(given = "Lluís",       family = "Revilla Sancho", email = "lluis.revilla@gmail.com", role  = "ctb")
+             )
+Maintainer: Guangchuang Yu <guangchuangyu@gmail.com>
+Description: The semantic comparisons of Gene Ontology (GO) annotations provide
+    quantitative ways to compute similarities between genes and gene groups,
+    and have became important basis for many bioinformatics analysis approaches.
+    GOSemSim is an R package for semantic similarity computation among GO terms,
+    sets of GO terms, gene products and gene clusters. GOSemSim implemented five
+    methods proposed by Resnik, Schlicker, Jiang, Lin and Wang respectively.
+Depends: R (>= 3.5.0)
+LinkingTo: Rcpp
+Imports: AnnotationDbi, GO.db, methods, rlang, stats, utils,
+        yulab.utils
+Suggests: AnnotationHub, BiocManager, clusterProfiler, DOSE, knitr,
+        readr, rmarkdown, org.Hs.eg.db, prettydoc, testthat, tidyr,
+        tidyselect, ROCR
+VignetteBuilder: knitr
+ByteCompile: true
+License: Artistic-2.0
+Encoding: UTF-8
+URL: https://yulab-smu.top/biomedical-knowledge-mining-book/
+BugReports: https://github.com/YuLab-SMU/GOSemSim/issues
+Packaged: 2024-01-17 22:19:09 UTC; biocbuild
+biocViews: Annotation, GO, Clustering, Pathways, Network, Software
+RoxygenNote: 7.2.3
+git_url: https://git.bioconductor.org/packages/GOSemSim
+git_branch: RELEASE_3_18
+git_last_commit: 84618af
+git_last_commit_date: 2024-01-16
+Repository: Bioconductor 3.18
+Date/Publication: 2024-01-17
+NeedsCompilation: yes
+Author: Guangchuang Yu [aut, cre],
+  Alexey Stukalov [ctb],
+  Pingfan Guo [ctb],
+  Chuanle Xiao [ctb],
+  Lluís Revilla Sancho [ctb]
