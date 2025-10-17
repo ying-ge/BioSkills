@@ -1,0 +1,42 @@
+Package: survcomp
+Type: Package
+Title: Performance Assessment and Comparison for Survival Analysis
+Version: 1.52.0
+Date: 2021-12-14
+Description: Assessment and Comparison for Performance of Risk Prediction (Survival) Models.
+biocViews: GeneExpression, DifferentialExpression, Visualization
+Authors@R: c(
+    person("Benjamin", "Haibe-Kains", email="benjamin.haibe.kains@utoronto.ca",
+        role=c("aut", "cre")), 
+    person("Markus" , "Schroeder", email="markus.schroeder@ucdconnect.ie",
+        role=c("aut")), 
+    person("Catharina", "Olsen", email="colsen@ulb.ac.be", 
+        role=c("aut")),
+    person("Christos", "Sotiriou", role=c("aut")),
+    person("Gianluca", "Bontempi", role=c("aut")),
+    person("John", "Quackenbush", role=c("aut")),
+    person("Samuel", "Branders", role=c("aut")),
+    person("Zhaleh", "Safikhani", role=c("aut"))
+    )
+Depends: survival, prodlim, R (>= 3.4)
+Suggests: Hmisc, clinfun, xtable, Biobase, BiocManager
+Imports: ipred, SuppDists, KernSmooth, survivalROC, bootstrap, grid,
+        rmeta, stats, graphics
+License: Artistic-2.0
+URL: http://www.pmgenomics.ca/bhklab/
+git_url: https://git.bioconductor.org/packages/survcomp
+git_branch: RELEASE_3_18
+git_last_commit: 6e3bbe2
+git_last_commit_date: 2023-10-24
+Date/Publication: 2023-10-24
+NeedsCompilation: yes
+Packaged: 2023-10-24 23:17:06 UTC; biocbuild
+Author: Benjamin Haibe-Kains [aut, cre],
+  Markus Schroeder [aut],
+  Catharina Olsen [aut],
+  Christos Sotiriou [aut],
+  Gianluca Bontempi [aut],
+  John Quackenbush [aut],
+  Samuel Branders [aut],
+  Zhaleh Safikhani [aut]
+Maintainer: Benjamin Haibe-Kains <benjamin.haibe.kains@utoronto.ca>
