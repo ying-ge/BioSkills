@@ -1,0 +1,10 @@
+options("rgdal_show_exportToProj4_warnings"="none")
+library(sp)
+g = SpatialGrid(GridTopology(c(5,5), c(10,10), c(3,3)))
+p = as(g, "SpatialPolygons")
+p$z = c(1,0,1,0,1,0,1,0,1)
+cc = coordinates(g)
+pts = cbind(c(9,21,21,9,9),c(9,9,21,21,9))
+sq = SpatialPolygons(list(Polygons(list(Polygon(pts)), "ID")))
+rnd2 = function(x) round(x, 2)
+
