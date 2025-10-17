@@ -1,0 +1,38 @@
+Package: circRNAprofiler
+Type: Package
+Title: circRNAprofiler: An R-Based Computational Framework for the
+        Downstream Analysis of Circular RNAs
+Version: 1.16.0
+Author: Simona Aufiero
+Maintainer: Simona Aufiero <simo.aufiero@gmail.com>
+Description: R-based computational framework for a comprehensive in silico 
+    analysis of circRNAs. This computational framework allows to combine and 
+    analyze circRNAs previously detected by multiple publicly available 
+    annotation-based circRNA detection tools. It covers different aspects of 
+    circRNAs analysis from differential expression analysis, evolutionary 
+    conservation, biogenesis to functional analysis.
+License: GPL-3
+Encoding: UTF-8
+biocViews: Annotation, StructuralPrediction, FunctionalPrediction,
+        GenePrediction, GenomeAssembly, DifferentialExpression
+Depends: R(>= 4.3.0)
+RoxygenNote: 7.2.3
+Suggests: testthat, knitr, roxygen2, rmarkdown, devtools, gridExtra,
+        ggpubr, VennDiagram, BSgenome.Mmusculus.UCSC.mm9,
+        BSgenome.Hsapiens.UCSC.hg38, BSgenome.Mmusculus.UCSC.mm10,
+        BiocManager,
+Imports: dplyr, magrittr, readr, rtracklayer, stringr, stringi, DESeq2,
+        edgeR, GenomicRanges, IRanges, seqinr, R.utils, reshape2,
+        ggplot2, utils, rlang, S4Vectors, stats, GenomeInfoDb,
+        universalmotif, AnnotationHub, BSgenome.Hsapiens.UCSC.hg19,
+        Biostrings, gwascat, BSgenome,
+VignetteBuilder: knitr
+URL: https://github.com/Aufiero/circRNAprofiler
+BugReports: https://github.com/Aufiero/circRNAprofiler/issues
+git_url: https://git.bioconductor.org/packages/circRNAprofiler
+git_branch: RELEASE_3_18
+git_last_commit: 39fe35b
+git_last_commit_date: 2023-10-24
+Date/Publication: 2023-10-24
+NeedsCompilation: no
+Packaged: 2023-10-24 20:42:19 UTC; biocbuild
