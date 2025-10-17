@@ -1,0 +1,47 @@
+Package: motifbreakR
+Title: A Package For Predicting The Disruptiveness Of Single Nucleotide
+        Polymorphisms On Transcription Factor Binding Sites
+Version: 2.16.0
+Authors@R: c(person(given="Simon Gert", family="Coetzee",
+        email="simon.coetzee@cshs.org", role = c("aut", "cre")),
+        person(given="Dennis J.", family="Hazelett",
+        email="dennis.hazelett@cshs.org", role = c("aut")))
+Description: We introduce motifbreakR, which allows the biologist to
+        judge in the first place whether the sequence surrounding the
+        polymorphism is a good match, and in the second place how much
+        information is gained or lost in one allele of the polymorphism
+        relative to another. MotifbreakR is both flexible and
+        extensible over previous offerings; giving a choice of
+        algorithms for interrogation of genomes with motifs from public
+        sources that users can choose from; these are 1) a weighted-sum
+        probability matrix, 2) log-probabilities, and 3) weighted by
+        relative entropy. MotifbreakR can predict effects for novel or
+        previously described variants in public databases, making it
+        suitable for tasks beyond the scope of its original design.
+        Lastly, it can be used to interrogate any genome curated within
+        Bioconductor (currently there are 32 species, a total of 109 
+        versions).
+Depends: R (>= 4.3.0), grid, MotifDb
+Imports: methods, grDevices, stringr, parallel, BiocGenerics, S4Vectors
+        (>= 0.9.25), IRanges, GenomeInfoDb, GenomicRanges, Biostrings,
+        BSgenome, rtracklayer, VariantAnnotation, BiocParallel,
+        motifStack, Gviz, matrixStats, TFMPvalue, SummarizedExperiment
+Suggests: BSgenome.Hsapiens.UCSC.hg19,
+        SNPlocs.Hsapiens.dbSNP155.GRCh37, knitr, rmarkdown,
+        BSgenome.Drerio.UCSC.danRer7, BiocStyle
+VignetteBuilder: knitr
+Encoding: UTF-8
+License: GPL-2
+BugReports: https://github.com/Simon-Coetzee/motifbreakR/issues
+biocViews: ChIPSeq, Visualization, MotifAnnotation, Transcription
+NeedsCompilation: no
+RoxygenNote: 7.2.3
+git_url: https://git.bioconductor.org/packages/motifbreakR
+git_branch: RELEASE_3_18
+git_last_commit: 741df7f
+git_last_commit_date: 2023-10-24
+Date/Publication: 2023-10-24
+Packaged: 2023-10-24 22:05:40 UTC; biocbuild
+Author: Simon Gert Coetzee [aut, cre],
+  Dennis J. Hazelett [aut]
+Maintainer: Simon Gert Coetzee <simon.coetzee@cshs.org>
