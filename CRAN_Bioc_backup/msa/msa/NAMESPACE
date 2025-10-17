@@ -1,0 +1,18 @@
+useDynLib(msa)
+
+import(methods)
+import(Rcpp)
+import(BiocGenerics)
+import(Biostrings)
+import(S4Vectors)
+import(IRanges)
+importFrom(tools, texi2dvi)
+importFrom(utils, capture.output)
+
+export(msa, msaMuscle, msaClustalW, msaClustalOmega, msaPrettyPrint,
+       msaConvert, msaCheckNames)
+
+exportClasses(MsaDNAMultipleAlignment, MsaRNAMultipleAlignment,
+              MsaAAMultipleAlignment, MsaMetaData)
+exportMethods(params, version, show, print, msaConservationScore,
+              msaConsensusSequence)

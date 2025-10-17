@@ -1,0 +1,28 @@
+##345678901234567890123456789012345678901234567890123456789012345678901234567890
+citHeader("To cite package 'msa' in publications use:")
+
+citEntry(entry="Article",
+         title = "msa: an R package for multiple sequence alignment",
+         author = personList(as.person("Ulrich Bodenhofer"),
+                             as.person("Enrico Bonatesta"),
+                             as.person("Christoph Horejs-Kainrath"),
+                             as.person("Sepp Hochreiter")),
+         journal="Bioinformatics",
+         volume="31",
+         number="24",
+         pages="3997--3999",
+         year="2015",
+         doi="10.1093/bioinformatics/btv494",
+         textVersion =
+             paste("U. Bodenhofer, E. Bonatesta, C. Horejs-Kainrath, and S. Hochreiter (2015)",
+                   "msa: an R package for multiple sequence alignment.",
+                   "Bioinformatics 31(24):3997-9999.",
+                   "DOI: 10.1093/bioinformatics/btv176.")
+)
+
+citFooter(
+"If you use one of the three alignment algorithms, ",
+"please cite the corresponding original paper.\n\n",
+"To obtain the reference in BibTex format, enter",
+"'toBibtex(citation(\"msa\"))'"
+)
