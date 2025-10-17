@@ -1,0 +1,157 @@
+Changes in version 2025.6.24
+
+- geom_dl: change method to dl.method to support stat="smooth".
+
+Changes in version 2025.5.20
+
+- Authors@R in DESCRIPTION.
+
+Changes in version 2024.4.16
+
+- fix make.tiebreaker issue with constant data, was Warning: number of rows of result is not a multiple of vector length (arg 1).
+
+Changes in version 2024.1.21
+
+- fix legends2hide issue with ggplot2 3.5.0.
+
+Changes in version 2023.8.25
+
+- CRAN NOTE doc fixes.
+- use Suggests conditionally in examples/tests.
+
+Changes in version 2021.2.24
+
+- rgb to grayscale formula corrected in polygon.method().
+
+Changes in version 2021.1.13
+
+- Remove bitmapType cairo in examples vignette.
+
+Changes in version 2020.12.29
+
+- fix for single ggplot with two geom_dl with same method. previously this would create two grobs with the same name in a single gTree, which is not allowed (as documented in ?gTree) and resulted in only the first geom_dl being drawn. Now we append a unique integer id to each name so that grid draws both geom_dl.
+- fix for lattice: Get lattice transformation functions working again + tests. (Error: data must have a column named label for qqmath examples)
+- dldoc no longer uses type="cairo" at request of CRAN.
+
+Changes in version 2020.6.30
+
+- custom.colors argument for polygon.method, default choice of white or black depending on how dark the color would be if rendered as grayscale.
+
+Changes in version 2020.6.17
+
+- grid grobs have names.
+- vignette example / LOPART100 data for black/blue pos swapped for t=100. (bug fix in make.tiebreaker, use rule=2 in approx for no NA)
+- using top.qp with one point gave an error: need at least two non-NA values to interpolate. (bug fix in make.tiebreaker, only run approx if there are at least two values)
+- legends2hide inside tryCatch to fix error with parsing legends in ggplots with custom themes, https://github.com/tdhock/directlabels/issues/6
+- fix test failures that showed up with new code.
+- examples vignette for geom_dl with same aes(label), but different aes(label.group, color).
+- draw.polygons/polygon.method support top/bottom as well as first/last/left/right. New *.polygons methods.
+
+Changes in version 2020.6.7
+
+- initial code for:
+- polygons below the point.
+- aes(label) which may have the same value for two different aes(group) values, e.g. two algorithms/groups which both compute the same thing, optimal changepoint tau^*, but we want to compute and show a label for each of them.
+- using stringDescent to compute height of boxes. maybe consider grobDescent or descentDetails?
+
+Changes in version 2020.1.31
+
+- remove Suggest ElemStatLearn.
+- remove prostate dl.combine example.
+
+Changes in version 2019.12.5
+
+- update for new testing software.
+
+Changes in version 2018.10.5
+
+- Non-syntactic variable names supported, e.g. aes(color=`car class`)
+
+Changes in version 2018.5.22
+
+- Update Suggest dplyr to pass CRAN checks.
+
+Changes in version 2017.03.31
+
+- test case and bugfix for lasso.labels with a constant line.
+
+Changes in version 2017.03.24
+
+- test case and bugfix for using directlabels when ggplot2 is not attached to the global namespace. this happens if directlabels is used in a ggplot in a package that imports ggplot2 but does not attach it, e.g. https://github.com/tdhock/penaltyLearning/blob/master/R/IntervalRegression.R
+
+Changes in version 2017.01.03
+
+- Test and bugfix for angled.boxes -- there was some problem with the colour column (one of the columns to.restore after applying far.from.others.borders) being treated as a factor.
+
+Changes in version 2016.10.25
+
+- delete browser() in qp.labels
+
+Changes in version 2015.12.16
+
+- importFrom non-base packages.
+
+Changes in version 2015.12.15
+
+- ggplot2 does not need to be installed for package checks to pass.
+
+Changes in version 2015.12.14
+
+- suggest ggplot2 >= 2.0.
+
+Changes in version 2015.11.28
+
+- Works with new ggplot2 >= 1.0.1.9003 internals. (and no longer works with older ggplot2 internals!)
+
+Changes in version 2015.6.17
+
+- Namespaces fixes to ensure that R CMD check runs cleanly,  and that you can use `geom_dl()`  without attaching directlabels to the search path.
+
+Changes in version 2014.6.13
+
+- geom_dl(show_guide=FALSE) is default.
+
+Changes in version 2014.5.12
+
+- custom colors for dotplots in lattice, see etc/lattice-custom-colors.R
+
+Changes in version 2014.4.25
+
+- BUGFIX: bumpup works when there is only 1 group.
+
+Changes in version 2014.1.31
+
+- use fill if no colour in ggplots.
+- guides(others_with_colour="none")
+
+Changes in version 2014.1.27
+
+- polygon.methods for lineplots.
+
+Changes in version 2013.11.21
+
+- projectionSeconds data set and angled.boxes Positioning Method, inspired by Mark Schmidt's prettyPlot. http://www.di.ens.fr/~mschmidt/Software/prettyPlot.html
+- draw.rects draws a rotated box when rot is specified.
+
+Changes in version 2013.9.17
+
+- label.endpoints can handle the case (common for scatterplots) where there are several endpoints with the same x value.
+
+Changes in version 2013.8.2
+
+- geom_dl aes inherits from the colored geom aes.
+
+Changes in version 2013.7.24
+
+- Doc updates: drawDetails.dlgrob documents interpretation of columns, apply.method uses itemize list, \code{\link{fun}} hyperlinks.
+
+Changes in version 2013.6.15
+
+- Documentation updates.
+
+Changes in version 2013.6.14
+
+- Depend on quadprog.
+- Bugfix for reduce.cex.lr: decrease the text size based on previous cex, rather than assuming the previous cex is 1.
+- Remove follow.points, perpendicular.(lines|grid).
+- Change with/within/transform/subset to alternatives that do not generate NOTEs during package check.
