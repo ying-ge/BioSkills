@@ -1,0 +1,32 @@
+StatMedianIQRText <- ggplot2::ggproto("StatMedianIQRText", ggplot2::Stat,
+
+  required_aes = c("x", "y"),
+
+  setup_params = function(data, params) {
+    if(!is.null(params$y.pos))
+      return(params)
+
+    range.y <- range(data$y, na.rm = TRUE)
+    pos <- range.y[2] + diff(range.y) * params$y.expand.factor
+    params$y.pos <- pos
+    params
+  },
+
+  compute_panel = function(data, scales, y.pos, y.expand.factor, digits, digit.type, nsmall, family) {
+
+    Median.orig <- as.vector(by(data$y, data$x, median, na.rm = TRUE))
+    IQR.orig <- as.vector(by(data$y, data$x, iqr, na.rm = TRUE))
+
+    Median <- do.call(digit.type, list(x = Median.orig, digits = digits))
+    IQR    <- do.call(digit.type, list(x = IQR.orig,    digits = digits))
+
+
+    dum.mat <- format(rbind(Median, IQR), nsmall = nsmall)
+    lab <- paste0("Median=", dum.mat[1, ],
+        ifelse(family == "mono", "\nIQR   =", "\nIQR    ="),
+        dum.mat[2, ])
+
+    data.frame(x = as.vector(by(data$x, data$x, function(x)x[1])), y = y.pos, label = lab)
+  }
+
+)
