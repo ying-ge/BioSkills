@@ -1,0 +1,75 @@
+---
+title: "Making use of curatedMetagenomicData"
+author: "Levi Waldron"
+date: "1/11/2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, eval = FALSE)
+```
+
+# Fetch from `curatedMetagenomicData`
+
+Download the data as an `ExpressionSet` list:
+
+```{r, cache=FALSE}
+library(curatedMetagenomicData)
+esetlist <- list(taxa = ZellerG_2014.metaphlan_bugs_list.stool()[, 1:10],
+                 pathways = ZellerG_2014.pathabundance_relab.stool())
+## species and strain-level taxa only:
+esetlist$taxa <- esetlist$taxa[grep("s__", rownames(esetlist$taxa)), ]
+## eliminate taxa-specific pathway contributions (only total pathway abundances):
+esetlist$pathways <- esetlist$pathways[grep("g__", 
+                                  rownames(esetlist$pathways), invert=TRUE), ]
+```
+
+Create the `MultiAssayExperiment`:
+
+```{r}
+library(MultiAssayExperiment)
+cmd <- MultiAssayExperiment(experiments=esetlist, 
+    colData=colData(as(esetlist[[2]], "SummarizedExperiment")))
+cmd
+rownames(cmd)
+```
+
+## CCA with omicade4
+
+```{r}
+library(omicade4)
+cmdsub <- cmd[, cmd$disease %in% c("adenoma", "CRC", "healthy"), ]
+##Get rid of rows that are all zero:
+cmdsub <- cmdsub[lapply(assays(cmdsub), function(exper) rowSums(exper) > 0), ]
+
+mcoin <- mcia(assay(cmdsub))
+plot(mcoin, phenovec=cmdsub$disease, sample.lab=FALSE)
+```
+
+## iClusterPlus
+
+Error, "system is computationally singular"
+```{r, eval=FALSE}
+library(iClusterPlus)
+datasets = assay(cmdsub)
+datasets = lapply(datasets, t)
+iclus = iCluster(datasets=datasets, k=5, lambda=c(0.2, 0.2))
+plotiCluster(fit=iclus, label=cmdsub$disease)
+```
+
+## sparse CCA
+
+```{r}
+library(PMA)
+cmd2 <- mergeReplicates(intersectColumns(cmd))
+## ERROR: some columns have SD = 0
+mycca <- PMA::CCA(x=t(assay(cmd2, 1)), z=t(assay(cmd2, 2)))
+mycca
+```
+
+# Others to try
+```{r, eval=FALSE}
+library(made4)
+library(MCIA)
+# library(Rtopper)  # gene set analysis
+```
