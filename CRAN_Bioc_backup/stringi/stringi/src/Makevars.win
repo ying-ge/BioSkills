@@ -1,0 +1,58 @@
+# kate: hl Makefile
+## `stringi` Makevars.win
+## Copyright (c) 2013-2025, Marek Gagolewski <https://www.gagolewski.com/>
+
+PKG_CPPFLAGS=-I. -Iicu74/ -Iicu74/unicode -Iicu74/common -Iicu74/i18n \
+-DUCONFIG_USE_LOCAL \
+-DU_STATIC_IMPLEMENTATION -DU_COMMON_IMPLEMENTATION \
+-DU_I18N_IMPLEMENTATION -DU_TOOLUTIL_IMPLEMENTATION \
+-UDEBUG -DNDEBUG -DWINVER=0x0601 -D_WIN32_WINNT=0x0601 \
+-DU_USE_STRTOD_L=0
+# 0x0600 == Windows Vista/Server 2008
+# 0x0601 == Windows 7
+# 0x0602 == Windows 8
+# 0x0603 == Windows 8.1
+# 0x0A00 == Windows 10
+# ICU 69 uses LOCALE_ALLOW_NEUTRAL_NAMES which is Windows 7 and later
+
+
+
+SOURCES_CPP=$(wildcard stri_*.cpp)
+OBJECTS=$(SOURCES_CPP:.cpp=.o)
+
+ICU_STUBDATA_SOURCES_CPP=$(wildcard icu74/stubdata/*.cpp)
+ICU_STUBDATA_OBJECTS=$(ICU_STUBDATA_SOURCES_CPP:.cpp=.o)
+
+ICU_COMMON_SOURCES_CPP=$(wildcard icu74/common/*.cpp)
+ICU_COMMON_OBJECTS=$(ICU_COMMON_SOURCES_CPP:.cpp=.o)
+
+ICU_I18N_SOURCES_CPP=$(wildcard icu74/i18n/*.cpp)
+ICU_I18N_OBJECTS=$(ICU_I18N_SOURCES_CPP:.cpp=.o)
+
+
+
+## OBJECTS=$(OBJECTS) $(ICU_COMMON_OBJECTS) $(ICU_I18N_OBJECTS) $(ICU_STUBDATA_OBJECTS)
+## There was a Cygwin bug which reported "mem alloc error" while linking
+## too many .o files at once. At other times, we can get a "make: execvp: sh:
+## Argument list too long" error. Thus, below we split the build process into
+## a few parts using static libs.
+
+.PHONY: all
+
+all: $(SHLIB)
+
+$(SHLIB): $(OBJECTS) libicu_common.a libicu_i18n.a libicu_stubdata.a
+
+PKG_LIBS=-L. -licu_i18n -licu_common -licu_stubdata
+
+libicu_common.a: $(ICU_COMMON_OBJECTS)
+
+libicu_i18n.a: $(ICU_I18N_OBJECTS)
+
+libicu_stubdata.a: $(ICU_STUBDATA_OBJECTS)
+
+clean:
+	rm -f $(OBJECTS) $(ICU_COMMON_OBJECTS) $(ICU_I18N_OBJECTS) \
+		$(ICU_STUBDATA_OBJECTS) libicu_common.a libicu_i18n.a \
+		libicu_stubdata.a
+
