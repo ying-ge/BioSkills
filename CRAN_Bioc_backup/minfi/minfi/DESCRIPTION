@@ -1,0 +1,65 @@
+Package: minfi
+Version: 1.48.0
+Title: Analyze Illumina Infinium DNA methylation arrays
+Description: Tools to analyze & visualize Illumina Infinium methylation arrays.
+Authors@R: c(person(c("Kasper", "Daniel"), "Hansen", role = c("cre", "aut"),
+                    email = "kasperdanielhansen@gmail.com"),
+             person("Martin", "Aryee", role = "aut"),
+             person(c("Rafael", "A."), "Irizarry", role = "aut"),
+             person(c("Andrew", "E."), "Jaffe", role = "ctb"),
+             person("Jovana", "Maksimovic", role = "ctb"),
+             person(c("E.", "Andres"), "Houseman", role = "ctb"),
+             person("Jean-Philippe", "Fortin", role = "ctb"),
+             person("Tim", "Triche", role = "ctb"),
+             person(c("Shan", "V."), "Andrews", role = "ctb"),
+             person(c("Peter", "F."), "Hickey", role = "ctb"))
+Depends: methods, BiocGenerics (>= 0.15.3), GenomicRanges,
+        SummarizedExperiment (>= 1.1.6), Biostrings, bumphunter (>=
+        1.1.9)
+Suggests: IlluminaHumanMethylation450kmanifest (>= 0.2.0),
+        IlluminaHumanMethylation450kanno.ilmn12.hg19 (>= 0.2.1),
+        minfiData (>= 0.18.0), minfiDataEPIC, FlowSorted.Blood.450k (>=
+        1.0.1), RUnit, digest, BiocStyle, knitr, rmarkdown, tools
+Imports: S4Vectors, GenomeInfoDb, Biobase (>= 2.33.2), IRanges,
+        beanplot, RColorBrewer, lattice, nor1mix, siggenes, limma,
+        preprocessCore, illuminaio (>= 0.23.2), DelayedMatrixStats (>=
+        1.3.4), mclust, genefilter, nlme, reshape, MASS, quadprog,
+        data.table, GEOquery, stats, grDevices, graphics, utils,
+        DelayedArray (>= 0.15.16), HDF5Array, BiocParallel
+Collate: AllGenerics.R MethylSet-class.R RatioSet-class.R
+        RGChannelSet-class.R RGChannelSetExtended-class.R
+        GenomicMethylSet-class.R GenomicRatioSet-class.R eSet_methods.R
+        utils.R IlluminaMethylationManifest-class.R
+        IlluminaMethylationAnnotation-class.R minfiQC.R getSex.R
+        dmpFinder.R blocks.R plot.R plotBetasByType.R preprocessRaw.R
+        preprocessIllumina.R detectionP.R preprocessSwan.R
+        preprocessQuantile.R preprocessNoob.R preprocessFunnorm.R qc.R
+        read.450k.R read.meth.R read.meth2.R read.geo.R read.manifest.R
+        bumphunter.R estimateCellCounts.R gaphunter.R compartments.R
+        combineArrays.R DelayedArray_utils.R
+VignetteBuilder: knitr
+License: Artistic-2.0
+URL: https://github.com/hansenlab/minfi
+BugReports: https://github.com/hansenlab/minfi/issues
+biocViews: ImmunoOncology, DNAMethylation, DifferentialMethylation,
+        Epigenetics, Microarray, MethylationArray, MultiChannel,
+        TwoChannel, DataImport, Normalization, Preprocessing,
+        QualityControl
+git_url: https://git.bioconductor.org/packages/minfi
+git_branch: RELEASE_3_18
+git_last_commit: aef0cde
+git_last_commit_date: 2023-10-24
+Date/Publication: 2023-10-24
+NeedsCompilation: no
+Packaged: 2023-10-24 21:56:31 UTC; biocbuild
+Author: Kasper Daniel Hansen [cre, aut],
+  Martin Aryee [aut],
+  Rafael A. Irizarry [aut],
+  Andrew E. Jaffe [ctb],
+  Jovana Maksimovic [ctb],
+  E. Andres Houseman [ctb],
+  Jean-Philippe Fortin [ctb],
+  Tim Triche [ctb],
+  Shan V. Andrews [ctb],
+  Peter F. Hickey [ctb]
+Maintainer: Kasper Daniel Hansen <kasperdanielhansen@gmail.com>
