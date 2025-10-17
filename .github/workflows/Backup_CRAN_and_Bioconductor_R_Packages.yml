@@ -42,12 +42,7 @@ jobs:
     - name: Check and prepare package list
       run: |
         echo "🔍 检查R包列表文件..."
-        
-        # 检查可能的文件位置
-        if [ -f ".github/docs/library_list.txt" ]; then
-          echo "✅ 找到文件: .github/docs/library_list.txt"
-          cp .github/docs/library_list.txt package_list.txt
-        fi
+        cp .github/docs/lib_FigureYa_plus.txt package_list.txt
         
         # 显示包列表信息
         echo "📄 R包列表内容:"
