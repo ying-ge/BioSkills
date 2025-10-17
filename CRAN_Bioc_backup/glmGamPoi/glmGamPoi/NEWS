@@ -1,0 +1,96 @@
+Version 1.13 (2023-07-03)
++ Implement a likelihood ratio test based on the Chi-squared distribution, if
+`test_de` is called after setting `overdispersion_shrinkage = FALSE`. Note that
+this test is less reliable than than the quasi-likelihood F test that is run
+for `overdispersion_shrinkage = TRUE`.
+
+Version 1.11 (2023-01-03)
++ Breaking change: rename 'pseudobulk_sce' to 'pseudobulk'
++ Add a new vignette explaining how and why pseudobulking is
+a powerful concept for single cell data analysis
++ Depcreate 'pseudobulk_by' argument in 'test_de'. Use the 'pseudobulk' function
+instead.
++ Add a new argument 'max_lfc' to to 'test_de' to avoid impractically large
+log fold changes for lowly expressed genes.
++ Support rlang quosures for the contrast argument in 'test_de'
++ Add a helper function called 'fact' that simplifies specification
+of contrast for complex experimental designs
++ Add 'use_assay' argument to 'glm_gp'
++ Add `vctrs` as dependency. The package is necessary to replicate the
+`group_by` behavior from `dplyr`.
++ Add 'size_factors = "ratio"' to emulate the behavior of DESeq2's size
+factor calculation
++ Make sure that the 'ignore_degeneracy' argument is propagated to 'test_de'
+
+Version 1.9
++ Breaking change to the way that non-standard evaluation parameters are handled.
+Variables in arguments such as 'pseudobulk_by' or 'subset_to' which evaluate
+to a single string are no longer interpreted as referring to a column.
+This change makes the handling of NSE more consistent.
++ Add new function 'pseudobulk_sce' to easily form pseudobulk samples
+
+Version 1.5
++ Choose a more reasonable scale for global overdispersion estimate
++ Make code more robust accidental internal NA's
++ Add fallback mechanism in case the Fisher scoring fails to converge.
+Instead of returing NA, try again using the BFGS algorithm.
++ Better error message if the design contains NA's
+
+
+Version 1.4 (2021-05-19)
++ Ridge regularization framework. glmGamPoi now supports regularizing
+the coefficient estimates using a quadratic penalty function.
+Furthmore, more advanced regularization schemes, such as regularizing
+towards a specific value and full Tikhonov regularization are implemented.
++ New predict() function. Also supports estimating the standard error
+of the mean estimate.
++ Make sure that Fisher scoring does not converge to unrealistically
+large values of mu
++ Fix minor bug in test_de() concerning the calculation of the degree
+of freedom
++ Fix minor bug in calculation of working and Pearson residuals, which
+used to return NaN if mu was 0. Now, they are 0.
++ Improve vignette/Readme: add section on differential expression
+analysis with Kang et al. (2018) as example data
++ `glm_gp` returns the Offset matrix and bug fix for test_de() if a
+offset was specified
++ Add CITATION file
++ Make sure that residuals are pristine (when the input was a DelayedArray)
++ Set dimnames of residuals
++ Improve error message if input is a sparse matrix
+
+
+Version 1.2 (2020-11-09)
++ Remove dual likelihood functions for overdispersion estimation.
+Instead merge functionality into conventional_***. This should
+cause no user facing changes, however should make it easier to
+maintain the package
++ Make conventional_score_function_fast() more robust to extreme
+inputs. Avoid numerically imprecise subtractions and employ
+bounds based on series expansions for very small input
++ If dispersion estimate quits because there is no maximum or
+all y are 0, return iterations = 0
++ Add limits (1e-16 / 1e16) for nlminb estimates of the
+dispersion. This protects against errors due to NA's in
+the conventional_likelihood_fast
++ Automatically set 'size_factors = FALSE' for input with
+0 or 1 row. This will change the estimated beta, but not the
+mu's
++ Rename gampoi_overdispersion_mle() -> overdispersion_mle()
++ Store data in the object returned by glm_gp()
++ Remove Y from the interface of residuals.glmGamPoi, because
+I can just get it directly from fit$data
++ Add function test_de() that does a quasi-likelihood ratio
+test to detect differentially expressed genes
++ Add functionality to make a pseudobulk test directly
+from test_de() by aggregating the data around one column
++ In group-wise beta estimation, fall back to optimize()
+if the Newton method fails
++ Change the default size factor estimation method from
+"poscounts" to "normed_sum" and provide an easy way to
+call scran::calculateSumFactors()
++ New "global" mode for dispersion estimation
+
+
+Changes in version 0.0.99 (2020-03-23)
++ Submitted to Bioconductor
