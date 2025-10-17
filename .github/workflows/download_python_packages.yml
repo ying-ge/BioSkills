@@ -2,6 +2,15 @@ name: Download Python Packages
 
 on:
   workflow_dispatch:
+    inputs:
+      python_version:
+        description: 'Python version to use'
+        required: false
+        default: '3.12' # 推荐使用一个当前支持的版本，如 3.12
+      package_file:
+        description: 'Path to package list file'
+        required: false
+        default: '.github/docs/lib_python.txt'
   schedule:
     # 每月9号自动更新
     - cron: '0 0 9 * *'
@@ -17,24 +26,21 @@ permissions:
 jobs:
   download-packages:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ${{ github.event.inputs.python_version || '3.14.0' }}
-
+    
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
       
-    - name: Set up Python ${{ matrix.python-version }}
+    - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: ${{ matrix.python-version }}
+        python-version: ${{ github.event.inputs.python_version || '3.12' }}
         
     - name: Cache pip packages
       uses: actions/cache@v3
       with:
         path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('.github/docs/lib_python.txt') }}
+        key: ${{ runner.os }}-pip-${{ hashFiles(github.event.inputs.package_file || '.github/docs/lib_python.txt') }}
         restore-keys: |
           ${{ runner.os }}-pip-
           
@@ -52,7 +58,7 @@ jobs:
         
     - name: Parse package list
       env:
-        PYTHON_VERSION: ${{ matrix.python-version }}
+        PYTHON_VERSION: ${{ github.event.inputs.python_version || '3.12' }}
       run: |
         python .github/scripts/parse_packages.py \
           "${{ github.event.inputs.package_file || '.github/docs/lib_python.txt' }}" \
@@ -68,7 +74,7 @@ jobs:
           
     - name: Create metadata and reports
       env:
-        PYTHON_VERSION: ${{ matrix.python-version }}
+        PYTHON_VERSION: ${{ github.event.inputs.python_version || '3.12' }}
         GITHUB_EVENT_NAME: ${{ github.event_name }}
         GITHUB_RUN_ID: ${{ github.run_id }}
         GITHUB_REPOSITORY: ${{ github.repository }}
