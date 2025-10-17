@@ -1,0 +1,7 @@
+Package: nucleoSim
+Version: 1.30.0
+Source: Bioconductor BioCsoft
+URL: https://bioconductor.org/packages/3.18/bioc/src/contrib/nucleoSim_1.30.0.tar.gz
+Size: 0.42 MB
+Download Date: 2025-10-17
+
