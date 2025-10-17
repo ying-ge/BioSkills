@@ -1,4 +1,31 @@
-# 生物医学R包完整分类指南
+[![zread](https://img.shields.io/badge/Ask_Zread-_.svg?style=flat&color=00b0aa&labelColor=000000&logo=data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHZpZXdCb3g9IjAgMCAxNiAxNiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTQuOTYxNTYgMS42MDAxSDIuMjQxNTZDMS44ODgxIDEuNjAwMSAxLjYwMTU2IDEuODg2NjQgMS42MDE1NiAyLjI0MDFWNC45NjAxQzEuNjAxNTYgNS4zMTM1NiAxLjg4ODEgNS42MDAxIDIuMjQxNTYgNS42MDAxSDQuOTYxNTZDNS4zMTUwMiA1LjYwMDEgNS42MDE1NiA1LjMxMzU2IDUuNjAxNTYgNC45NjAxVjIuMjQwMUM1LjYwMTU2IDEuODg2NjQgNS4zMTUwMiAxLjYwMDEgNC45NjE1NiAxLjYwMDFaIiBmaWxsPSIjZmZmIi8%2BCjxwYXRoIGQ9Ik00Ljk2MTU2IDEwLjM5OTlIMi4yNDE1NkMxLjg4ODEgMTAuMzk5OSAxLjYwMTU2IDEwLjY4NjQgMS42MDE1NiAxMS4wMzk5VjEzLjc1OTlDMS42MDE1NiAxNC4xMTM0IDEuODg4MSAxNC4zOTk5IDIuMjQxNTYgMTQuMzk5OUg0Ljk2MTU2QzUuMzE1MDIgMTQuMzk5OSA1LjYwMTU2IDE0LjExMzQgNS42MDE1NiAxMy43NTk5VjExLjAzOTlDNS42MDE1NiAxMC42ODY0IDUuMzE1MDIgMTAuMzk5OSA0Ljk2MTU2IDEwLjM5OTlaIiBmaWxsPSIjZmZmIi8%2BCjxwYXRoIGQ9Ik0xMy43NTg0IDEuNjAwMUgxMS4wMzg0QzEwLjY4NSAxLjYwMDEgMTAuMzk4NCAxLjg4NjY0IDEwLjM5ODQgMi4yNDAxVjQuOTYwMUMxMC4zOTg0IDUuMzEzNTYgMTAuNjg1IDUuNjAwMSAxMS4wMzg0IDUuNjAwMUgxMy43NTg0QzE0LjExMTkgNS42MDAxIDE0LjM5ODQgNS4zMTM1NiAxNC4zOTg0IDQuOTYwMVYyLjI0MDFDMTQuMzk4NCAxLjg4NjY0IDE0LjExMTkgMS42MDAxIDEzLjc1ODQgMS42MDAxWiIgZmlsbD0iI2ZmZiIvPgo8cGF0aCBkPSJNNCAxMkwxMiA0TDQgMTJaIiBmaWxsPSIjZmZmIi8%2BCjxwYXRoIGQ9Ik00IDEyTDEyIDQiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSIxLjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgo8L3N2Zz4K&logoColor=ffffff)](https://zread.ai/ying-ge/FigureYa-package)
+
+## 🚀 **核心价值：从论文到代码的终极桥梁**
+
+> **你还在为复现论文method而苦恼吗？**  
+> 看到复杂的实验设计和分析流程，却不知道该用哪些R包？  
+> 搜索半天找到的工具，组合起来却各种报错？
+
+**这个仓库就是你的解决方案！**
+
+✨ **复制粘贴论文method，即刻获得完整R包实施方案**
+
+- **精准匹配**：400+个生物信息学R包，按领域精准分类，每个包都有明确的功能定位
+- **完整工作流**：从数据预处理到最终发表图表，为你设计端到端的分析链条  
+- **实战导向**：不再是"可能用这个包"，而是"就这些包，按这个顺序"
+- **避免踩坑**：专业的包组合策略，避免工具冲突和版本问题
+
+📊 **适用场景**
+- 📄 **论文复现**：快速将Nature、Cell等高分论文的分析方法转化为可执行的R代码
+- 🔬 **项目设计**：为你的生物信息学项目选择最优的工具组合
+- 🎓 **学习指导**：系统了解各个分析方向的流行工具和最佳实践
+- ⚡ **效率提升**：告别搜索试错，专注于科学问题本身
+
+**示例**：
+> 输入："单细胞RNA-seq差异表达 + 细胞通讯分析"  
+> 输出："Seurat + DESeq2 + CellChat + ggplot2完整流程，含关键参数和可视化方案"
+
+🎯 **这不是一个普通的包列表，这是你的生物信息学私人顾问！**
 
 ## 🧬 **基因组学与转录组学 | Genomics & Transcriptomics**
 
