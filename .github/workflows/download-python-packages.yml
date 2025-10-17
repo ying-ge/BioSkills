@@ -24,7 +24,11 @@ on:
     paths:
       - '.github/docs/lib_python.txt'
       - '.github/scripts/*.py'
-
+      
+permissions:
+  contents: write
+  actions: read
+  
 jobs:
   download-packages:
     runs-on: ubuntu-latest
