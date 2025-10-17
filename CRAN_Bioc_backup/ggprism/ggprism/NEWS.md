@@ -1,0 +1,54 @@
+# ggprism 1.0.7
+
+* Incorporate compatability fixes for ggplot2 v4.0.0 (#38). Includes:
+    * Ensure parent of theme_prism() is itself a theme
+    * Fix a fragile test
+    * Update some deprecated function calls
+
+# ggprism 1.0.6
+
+* Fixes some tests broken by scales package v.1.4.0.
+* No changes to package functionality.
+
+# ggprism 1.0.5
+
+* Update annotation_ticks() with `linewidth` aesthetic.
+* Various fixes to enable compatability with ggplot2 v3.5.0.
+
+# ggprism 1.0.4
+
+* Update wings vignette with `linewidth` aesthetic from ggplot2 v3.4.0
+* Stop relying on unexported ggplot2 functions to maintain compatibility
+with ggplot2 v3.4.0 (#20)
+* Fix bug in `StatBracket` (#18)
+* Add `parse` argument to `add_pvalue()` which allows the use of plotmath
+expressions for the text labels (#10).
+
+# ggprism 1.0.3
+
+* Fix one of the figures in p-values vignette
+* Replace some `annotation_ticks()` tests to ensure compatibility with
+the upcoming ggplot2 v3.4.0
+
+# ggprism 1.0.2
+
+* Make `add_pvalue()` more flexible to different input columns
+* Fix errors in p-values vignette so it works again
+* Increase test coverage
+* Re-write some tests so they pass for R 3.6.3
+* Update README (fix some incorrect links and update citation info)
+
+# ggprism 1.0.1
+
+* First CRAN submission
+* Remove separate LICENSE file
+* Reword package description in DESCRIPTION.
+* Fix various typos in vignettes and function documentation.
+* Move the two example vignettes to be online only, i.e. not included
+in the installed package.
+
+# ggprism 1.0.0
+
+* Initial GitHub release. Provide functions for changing ggplot2 themes, 
+axis guides, colours, and fills, and adding p-value brackets. Also include
+small data set with fly wing data.
