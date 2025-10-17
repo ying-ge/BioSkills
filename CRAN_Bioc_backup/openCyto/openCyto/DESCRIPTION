@@ -1,0 +1,31 @@
+Package: openCyto
+Type: Package
+Title: Hierarchical Gating Pipeline for flow cytometry data
+Version: 2.14.0
+Date: 2012-06-11
+Author: Mike Jiang, John Ramey, Greg Finak, Raphael Gottardo
+Maintainer: Mike Jiang <mike@ozette.com>
+Description: This package is designed to facilitate the automated gating
+    methods in sequential way to mimic the manual gating strategy.
+License: AGPL-3.0-only
+LazyLoad: yes
+Imports: methods,Biobase,BiocGenerics,flowCore(>=
+        1.99.17),flowViz,ncdfFlow(>= 2.11.34),flowWorkspace(>=
+        3.99.1),flowClust(>= 3.11.4),RBGL,graph,data.table,RColorBrewer
+Suggests: flowWorkspaceData, knitr, rmarkdown, markdown, testthat,
+        utils, tools, parallel, ggcyto, CytoML, flowStats(>= 4.5.2),
+        MASS
+biocViews: ImmunoOncology, FlowCytometry, DataImport, Preprocessing,
+        DataRepresentation
+Encoding: UTF-8
+VignetteBuilder: knitr
+LinkingTo: cpp11, BH
+RoxygenNote: 7.2.1
+git_url: https://git.bioconductor.org/packages/openCyto
+git_branch: RELEASE_3_18
+git_last_commit: 4b6c714
+git_last_commit_date: 2023-10-24
+Date/Publication: 2023-10-24
+NeedsCompilation: yes
+Packaged: 2023-10-24 22:15:33 UTC; biocbuild
+Depends: R (>= 3.5.0)

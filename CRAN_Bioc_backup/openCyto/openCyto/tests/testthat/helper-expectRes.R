@@ -1,0 +1,12 @@
+library(data.table)
+library(utils)
+library(tools)
+library(flowCore)
+library(ncdfFlow)
+gtFile <- system.file("extdata/gating_template/tcell.csv", package = "openCyto")
+expectResults <- readRDS("expectResults.rds")
+dataDir <- system.file("extdata",package="flowWorkspaceData")
+gs_dir <- list.files(dataDir, pattern = "gs_manual",full = TRUE)
+gs <- load_gs(gs_dir)
+data("GvHD")
+
