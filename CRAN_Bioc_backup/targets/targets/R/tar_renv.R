@@ -1,0 +1,131 @@
+#' @title Set up package dependencies for compatibility with `renv`
+#' @export
+#' @family scripts
+#' @seealso <https://rstudio.github.io/renv/articles/renv.html>
+#' @description Write package dependencies to a script file
+#'   (by default, named `_targets_packages.R` in the root project directory).
+#'   Each package is written to a separate line
+#'   as a standard [library()] call (e.g. `library(package)`) so
+#'   `renv` can identify them automatically.
+#'   The following packages are included:
+#'
+#'     * Packages listed in the `packages` argument of [tar_target()]
+#'       or [tar_option_set()].
+#'     * Packages required by the `format` set in [tar_target()]
+#'       or [tar_option_set()].
+#'     * Packages directly listed in the `extras` argument of [tar_renv()].
+#'
+#' @details This function gets called for its side-effect, which writes
+#'   package dependencies to a script for compatibility with `renv`.
+#'   The generated file should __not__ be edited by hand and will be
+#'   overwritten each time `tar_renv()` is called.
+#'
+#'   The behavior of `renv` is to create and manage a project-local `R` library
+#'   and keep a record of project dependencies in a file called `renv.lock`.
+#'   To identify dependencies, `renv` crawls through code to find packages
+#'   explicitly mentioned using `library()`, `require()`, or `::`.
+#'   However, `targets` pipelines introduce extra package dependencies
+#'   through the `packages` and `format` arguments of
+#'   [tar_option_set()] and [tar_target()].
+#'   [tar_renv()] writes a special R script which allows these extra packages
+#'   (along with packages listed in `extras`) to be detected by `renv`.
+#'
+#'   With the script written by `tar_renv()`, `renv` is able to crawl the
+#'   file to identify package dependencies (with `renv::dependencies()`).
+#'   `tar_renv()` only serves to make your `targets` project compatible with
+#'   `renv`, it is still the users responsibility to call `renv::init()` and
+#'   `renv::snapshot()` directly to initialize and manage a
+#'   project-local `R` library. This allows your `targets` pipeline to have
+#'   its own self-contained `R` library separate from your standard `R`
+#'   library. See <https://rstudio.github.io/renv/index.html> for
+#'   more information.
+#' @section Performance:
+#'   If you use `renv`, then overhead from project initialization
+#'   could slow down [tar_make()] and friends.
+#'   If you experience slowness, please make sure your `renv` library
+#'   is on a fast file system.
+#'   (For example, slow network drives can severely reduce performance.)
+#'   In addition, you can disable the slowest `renv` initialization checks.
+#'   After confirming at
+#'   <https://rstudio.github.io/renv/reference/config.html>
+#'   that you can safely disable these checks,
+#'   you can write lines
+#'   `RENV_CONFIG_SANDBOX_ENABLED=false`
+#'   and `RENV_CONFIG_SYNCHRONIZED_CHECK=false`
+#'   in your user-level `.Renviron` file. If you disable the synchronization
+#'   check, remember to call `renv::status()` periodically
+#'   to check the health of your `renv` project library.
+#' @return Nothing, invisibly.
+#' @inheritParams tar_validate
+#' @param extras Character vector of additional packages to declare as
+#'   project dependencies.
+#' @param path Character of length 1, path to the script file to
+#'   populate with `library()` calls.
+#' @examples
+#' tar_dir({ # tar_dir() runs code from a temp dir for CRAN.
+#'   tar_script({
+#'     library(targets)
+#'     library(tarchetypes)
+#'     tar_option_set(packages = c("tibble", "qs"))
+#'     list()
+#'   }, ask = FALSE)
+#'   tar_renv()
+#'   writeLines(readLines("_targets_packages.R"))
+#' })
+#' tar_option_reset()
+tar_renv <- function(
+  extras = c(
+    "bslib",
+    "crew",
+    "gt",
+    "markdown",
+    "rstudioapi",
+    "shiny",
+    "shinybusy",
+    "shinyWidgets",
+    "visNetwork"
+  ),
+  path = "_targets_packages.R",
+  callr_function = callr::r,
+  callr_arguments = targets::tar_callr_args_default(callr_function),
+  envir = parent.frame(),
+  script = targets::tar_config_get("script")
+) {
+  force(envir)
+  tar_assert_chr(extras)
+  tar_assert_chr(path)
+  tar_assert_scalar(path)
+  tar_assert_callr_function(callr_function)
+  tar_assert_list(callr_arguments)
+  callr_outer(
+    targets_function = tar_renv_inner,
+    targets_arguments = list(extras = extras, path = path),
+    callr_function = callr_function,
+    callr_arguments = callr_arguments,
+    envir = envir,
+    script = script,
+    store = tar_config_get("store"),
+    fun = "tar_renv"
+  )
+  invisible()
+}
+
+tar_renv_inner <- function(pipeline, extras, path) {
+  option_pkgs <- tar_option_get("packages")
+  targets_pkgs <- pipeline_get_packages(pipeline)
+  option_format <- store_get_packages(store_init(tar_option_get("format")))
+  all_pkgs <- unique(
+    c(
+      option_pkgs,
+      targets_pkgs,
+      option_format,
+      extras
+    )
+  )
+  all_pkgs <- sort_chr(all_pkgs)
+  lines <- c(
+    "# Generated by targets::tar_renv(): do not edit by hand",
+    paste0("library(", all_pkgs, ")")
+  )
+  writeLines(lines, con = path)
+}
