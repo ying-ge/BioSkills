@@ -1,0 +1,193 @@
+useDynLib(TFBSTools, .registration = TRUE)
+
+
+### -----------------------------------------------------------------
+### Import S4 classes defined in other packages
+###
+importClassesFrom(S4Vectors, Annotated, Vector, SimpleList, List, DataFrame)
+importClassesFrom(Biostrings, DNAStringSet, PairwiseAlignments, XStringViews)
+importClassesFrom(GenomicRanges, GRanges, GRangesList)
+importClassesFrom(methods, ANY, character, integer, missing)
+importClassesFrom(CNEr, Axt)
+import(BiocGenerics)
+
+
+### -----------------------------------------------------------------
+### Import S4 methods defined in other packages
+###
+importMethodsFrom(Biostrings, reverseComplement, matchPWM, maxScore, minScore, 
+                  consensusMatrix, PairwiseAlignments, pattern, consensusMatrix)
+importMethodsFrom(DBI, dbGetQuery)
+importMethodsFrom(RSQLite, dbConnect, dbDisconnect)
+importMethodsFrom(XVector, subseq)
+importMethodsFrom(GenomicRanges, seqnames, strand, "strand<-", 
+                  findOverlaps, reduce)
+importMethodsFrom(rtracklayer, import.chain, liftOver)
+importMethodsFrom(BSgenome, getSeq)
+importMethodsFrom(methods, initialize, show)
+importMethodsFrom(S4Vectors, isConstant, elementNROWS, Rle, window, showAsCell)
+importMethodsFrom(IRanges, subject, ranges, "ranges<-",
+                  Views, start, end, findOverlaps, width, which, pintersect)
+importMethodsFrom(CNEr, querySeqs, targetSeqs, targetRanges, queryRanges)
+importMethodsFrom(DirichletMultinomial, fitted)
+importMethodsFrom(GenomeInfoDb, seqinfo)
+
+### -----------------------------------------------------------------
+### Import ordinary functions, variables in other packages
+importFrom(seqLogo, seqLogo, makePWM)
+importFrom(Biostrings, unitScale, PWMscoreStartingAt, 
+                       DNAStringSet, DNA_BASES, DNA_ALPHABET, readDNAStringSet, 
+                       readAAStringSet, writeXStringSet, IUPAC_CODE_MAP,
+                       DNAString)
+importFrom(caTools, runmean)
+importFrom(GenomicRanges, GRanges, GRangesList)
+importFrom(methods, is, new, as, slot)
+importFrom(RSQLite, SQLite)
+importFrom(IRanges, IRanges)
+importFrom(gtools, rdirichlet)
+importFrom(BiocParallel, MulticoreParam, bpmapply)
+importFrom(DirichletMultinomial, dmn, laplace, mixturewt)
+importFrom(TFMPvalue, TFMsc2pv)
+importFrom(S4Vectors, DataFrame, queryHits, subjectHits)
+importFrom(XML, xmlParse, xmlToList)
+importFrom(grid, grid.newpage, plotViewport, dataViewport, 
+           grid.xaxis, grid.polygon, pushViewport, grid.text, popViewport,
+           unit, gpar)
+importFrom(Biobase, rowMax, rowMin)
+importFrom("graphics", "par")
+importFrom("stats", "runif", "setNames")
+importFrom("utils", "write.table")
+importFrom(parallel, mclapply)
+
+### -----------------------------------------------------------------
+### Export S4 classes defined in TFBSTools
+###
+exportClasses(PFMatrix, PWMatrix, ICMatrix,
+  PFMatrixList, PWMatrixList, ICMatrixList,
+  SiteSet, SiteSetList, SitePairSet, SitePairSetList,
+  MotifSet
+  #PairwiseAlignmentTFBS
+  )
+
+### -----------------------------------------------------------------
+### Export non-generic functions
+###
+export(
+  ## AllClasses.r
+  PFMatrix, PFMatrixList,
+  ICMatrix, ICMatrixList,
+  PWMatrix, PWMatrixList,
+  MotifSet,
+  SitePairSetList, SitePairSet,
+  SiteSet, SiteSetList,
+  TFFMFirst, TFFMDetail, 
+
+  ## util-methods.r
+  shannon.entropy,
+  IUPAC2Matrix,
+  sampleRanges,
+
+  ## TFFMseqLogo.R
+  
+  ## Wrappers-methods.R
+  parseMEMEOutput,
+
+  ## IO.R
+  readXMLTFFM
+)
+
+### -----------------------------------------------------------------
+### Export S4 methods for generics not defined in TFBSTools
+###
+exportMethods(
+  ## XMatrix-methods.r
+  length,
+  ncol,
+  dim,
+  reverseComplement,
+  
+  ## XMatrixList-methods.r
+  showAsCell,
+  
+  ## SiteSet-methods.r
+  start, end,
+
+  ## coercion-methods.r
+  as.matrix, as.data.frame,
+
+  # XMatrix-methods.r
+  colSums,
+  rowSums,
+
+  ## Motif-methods.r
+  consensusMatrix
+)
+
+### -----------------------------------------------------------------
+### Export S4 generics defined in TFBSTools + export corresponding methods
+###
+export(
+  ## DB-methods.r
+  storeMatrix,
+  getMatrixSet,
+  getMatrixByID, getMatrixByName,
+  deleteMatrixHavingID,
+  initializeJASPARDB,
+
+  ## JASPAR.R
+  makeFlatFileDir, readJASPARMatrix,
+  
+  ## AllGenerics.r
+  ID, 
+  name, 
+  matrixClass, 
+  Matrix,
+  "Matrix<-",
+  bg, 
+  tags,
+  matrixType,
+  XMatrixList,
+  #alignments,
+
+  # XMatrix-methods.r
+#colSums,
+#  rowSums,
+
+  ## PWM-methods.r
+  toPWM,
+  searchSeq,
+  searchAln,
+  searchPairBSgenome,
+  PWMSimilarity,
+
+  ## ICM-methods.r
+  toICM,
+  seqLogo,
+  totalIC,
+
+  ## SiteSet-methods.r
+  writeGFF3, writeGFF2,
+  relScore,
+  views,
+  pvalues,
+  toGRangesList,
+
+  ## PairwiseAlignment-methods.r
+  calConservation,
+  #doSiteSearch
+
+  ## PFM-methods
+  PFMSimilarity,
+  permuteMatrix,
+
+  ## DirichletMixture.r
+  dmmEM, rPWMDmm,
+
+  ## Wrappers-methods.r
+  runMEME,
+  sitesSeq,
+ 
+  ## TFFM.R
+  getEmissionProb, getPosProb
+
+)

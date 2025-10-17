@@ -1,0 +1,13 @@
+citEntry(entry="article",
+         title = "TFBSTools: an R/Bioconductor package for transcription factor binding site analysis",
+         author = personList(as.person("Ge Tan"),
+                             as.person("Boris Lenhard")),
+         year = 2016,
+         journal = "Bioinformatics",
+         volume = "32",
+         issue = "10",
+         pages ="1555-1556",
+         doi = "10.1093/bioinformatics/btw024",
+         url = "http://bioinformatics.oxfordjournals.org/content/32/10/1555",
+         textVersion =
+         "Tan, G., and Lenhard, B. (2016). TFBSTools: an R/bioconductor package for transcription factor binding site analysis. Bioinformatics 32, 1555-1556.")
