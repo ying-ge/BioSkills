@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>MSstats: Protein/Peptide significance analysis</title>
+<style type="text/css">
+/**
+ * Prism.s theme ported from highlight.js's xcode style
+ */
+pre code {
+  padding: 1em;
+}
+.token.comment {
+  color: #007400;
+}
+.token.punctuation {
+  color: #999;
+}
+.token.tag,
+.token.selector {
+  color: #aa0d91;
+}
+.token.boolean,
+.token.number,
+.token.constant,
+.token.symbol {
+  color: #1c00cf;
+}
+.token.property,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin {
+  color: #c41a16;
+}
+.token.inserted {
+  background-color: #ccffd8;
+}
+.token.deleted {
+  background-color: #ffebe9;
+}
+.token.operator,
+.token.entity,
+.token.url,
+.language-css .token.string,
+.style .token.string {
+  color: #9a6e3a;
+}
+.token.atrule,
+.token.attr-value,
+.token.keyword {
+  color: #836c28;
+}
+.token.function,
+.token.class-name {
+  color: #DD4A68;
+}
+.token.regex,
+.token.important,
+.token.variable {
+  color: #5c2699;
+}
+.token.important,
+.token.bold {
+  font-weight: bold;
+}
+.token.italic {
+  font-style: italic;
+}
+</style>
+<style type="text/css">
+body {
+  font-family: sans-serif;
+  max-width: 800px;
+  margin: auto;
+  padding: 1em;
+  line-height: 1.5;
+  box-sizing: border-box;
+}
+body, .footnotes, code { font-size: .9em; }
+li li { font-size: .95em; }
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+pre, img { max-width: 100%; }
+pre, pre:hover {
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+pre code {
+  display: block;
+  overflow-x: auto;
+}
+code { font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace; }
+:not(pre) > code, code[class] { background-color: #F8F8F8; }
+code.language-undefined, pre > code:not([class]) {
+  background-color: inherit;
+  border: 1px solid #eee;
+}
+table {
+  margin: auto;
+  border-top: 1px solid #666;
+}
+table thead th { border-bottom: 1px solid #ddd; }
+th, td { padding: 5px; }
+thead, tfoot, tr:nth-child(even) { background: #eee; }
+blockquote {
+  color: #666;
+  margin: 0;
+  padding-left: 1em;
+  border-left: 0.5em solid #eee;
+}
+hr, .footnotes::before { border: 1px dashed #ddd; }
+.frontmatter { text-align: center; }
+#TOC .numbered li { list-style: none; }
+#TOC .numbered { padding-left: 0; }
+#TOC .numbered ul { padding-left: 1em; }
+table, .body h2 { border-bottom: 1px solid #666; }
+.body .appendix, .appendix ~ h2 { border-bottom-style: dashed; }
+.footnote-ref a::before { content: "["; }
+.footnote-ref a::after { content: "]"; }
+section.footnotes::before {
+  content: "";
+  display: block;
+  max-width: 20em;
+}
+
+@media print {
+  body {
+    font-size: 12pt;
+    max-width: 100%;
+  }
+  tr, img { page-break-inside: avoid; }
+}
+@media only screen and (min-width: 992px) {
+  pre { white-space: pre; }
+}
+</style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
+</head>
+<body>
+<div class="frontmatter">
+<div class="title"><h1>MSstats: Protein/Peptide significance analysis</h1></div>
+<div class="author"><h2></h2></div>
+<div class="date"><h3></h3></div>
+</div>
+<div class="body">
+<script type="text/javascript">
+document.addEventListener("DOMContentLoaded", function() {
+  document.querySelector("h1").className = "title";
+});
+</script>
+<script type="text/javascript">
+document.addEventListener("DOMContentLoaded", function() {
+  var links = document.links;  
+  for (var i = 0, linksLength = links.length; i < linksLength; i++)
+    if (links[i].hostname != window.location.hostname)
+      links[i].target = '_blank';
+});
+</script>
+<!--
+%\VignetteIndexEntry{MSstats: Protein/Peptide significance analysis}
+%\VignetteEngine{knitr::knitr}
+-->
+<h1 id="msstats-protein-peptide-significance-analysis">MSstats: Protein/Peptide significance analysis</h1>
+<p>Package: MSstats</p>
+<p>Author: Meena Choi <a href="mailto:mnchoi67@gmail.com">mnchoi67@gmail.com</a>, Tsung-Heng Tsai <a href="mailto:tsai.tsungheng@gmail.com">tsai.tsungheng@gmail.com</a>, Cyril Galitzine <a href="mailto:cyrildgg@gmail.com">cyrildgg@gmail.com</a></p>
+<p>Date: October 31, 2019</p>
+<p>This vignette summarizes the introduction and various options of all functionalities in MSstats. More details are available in <code>User Manual</code>.</p>
+<ul>
+<li>The types of experiment that MSstats can analyze are LC-MS, SRM, DIA(SWATH) with label-free or labeled synthetic peptides. MSstats does not support for metabolic labeling or iTRAQ experiments.</li>
+</ul>
+<h2 id="skylinetomsstatsformat">SkylinetoMSstatsFormat</h2>
+<p>Preprocess MSstats input report from Skyline and convert into the required input format for MSstats.</p>
+<h3 id="arguments_1">Arguments</h3>
+<ul>
+<li><code>input</code> : name of MSstats input report from Skyline, which includes feature-level data.</li>
+<li><code>annotation</code> : name of ‘annotation.txt’ data which includes <code>Condition</code>, <code>BioReplicate</code>, <code>Run</code>. If annotation is already complete in Skyline, use <code>annotation=NULL</code> (default). It will use the annotation information from input.</li>
+<li><code>removeiRT</code> : <code>removeiRT=TRUE</code>(default) will remove the proteins or peptides which are labeld ‘iRT’ in ‘StandardType’ column. <code>removeiRT=FALSE</code> will keep them.</li>
+<li><code>removeProtein_with1Peptide</code> : <code>removeProtein_with1Peptide=TRUE</code> will remove the proteins which have only 1 peptide and charge. <code>removeProtein_with1Peptide=FALSE</code> is default.</li>
+<li><code>filter_with_Qvalue</code> : <code>removeProtein_with1Peptide=TRUE</code>(default) will filter out the intensities that have greater than <code>qvalue_cutoff</code> in <code>DetectionQValue</code> column. Those intensities will be replaced with zero and will be considered as censored missing values for imputation purpose.</li>
+<li><code>qvalue_cutoff</code> : Cutoff for <code>DetectionQValue</code>. default is 0.01.</li>
+</ul>
+<h3 id="example_1">Example</h3>
+<pre><code class="language-r"># 'MSstatsInput.csv' is the MSstats report from Skyline.
+input &lt;- read.csv(file=&quot;MSstatsInput.csv&quot;)
+
+raw &lt;- SkylinetoMSstatsFormat(input)
+</code></pre>
+<h2 id="maxqtomsstatsformat">MaxQtoMSstatsFormat</h2>
+<p>Convert MaxQuant output into the required input format for MSstats.</p>
+<h3 id="arguments_2">Arguments</h3>
+<ul>
+<li><code>evidence</code> : name of <code>'evidence.txt'</code> data, which includes feature-level data.</li>
+<li><code>annotation</code> : name of <code>'annotation.txt'</code> data which includes <code>Raw.file</code>, <code>Condition</code>, <code>BioReplicate</code>, <code>Run</code>, <code>IsotopeLabelType</code> information.</li>
+<li><code>proteinGroups</code> : name of <code>'proteinGroups.txt'</code> data. It needs to matching protein group ID. If <code>proteinGroups=NULL</code>, use <code>'Proteins'</code> column in <code>'evidence.txt'</code>.</li>
+<li><code>proteinID</code> : <code>'Proteins'</code>(default) or <code>'proteinGroups'</code> in <code>'proteinGroup.txt'</code> for Protein ID.</li>
+<li><code>useUniquePeptide</code> : <code>useUniquePeptide=TRUE</code>(default) removes peptides that are assigned for more than one proteins. We assume to use unique peptide for each protein.</li>
+<li><code>summaryforMultipleRows</code> : <code>summaryforMultipleRows=max</code>(default) or sum, when there are multiple measurements for certain feature and certain run, use highest or sum of all.</li>
+<li><code>fewMeasurements</code> : <code>fewMeasurements='remove'</code>(default) will remove the features that have 1 or 2 measurements across runs.</li>
+<li><code>removeMpeptides</code> : <code>removeMpeptides=TRUE</code>(default) will remove the peptides including ‘M’ sequence.</li>
+<li><code>removeProtein_with1Peptide</code> : <code>removeProtein_with1Peptide=TRUE</code> will remove the proteins which have only 1 peptide and charge. <code>FALSE</code> is default.</li>
+</ul>
+<h3 id="example_2">Example</h3>
+<pre><code class="language-r"># Read in MaxQuant files
+proteinGroups &lt;- read.table(&quot;proteinGroups.txt&quot;, sep=&quot;\t&quot;, header=TRUE)
+
+infile &lt;- read.table(&quot;evidence.txt&quot;, sep=&quot;\t&quot;, header=TRUE)
+
+# Read in annotation including condition and biological replicates per run.
+# Users should make this annotation file. It is not the output from MaxQuant.
+annot &lt;- read.csv(&quot;annotation.csv&quot;, header=TRUE)
+
+raw &lt;- MaxQtoMSstatsFormat(evidence=infile, 
+                           annotation=annot, 
+                           proteinGroups=proteinGroups)
+</code></pre>
+<h2 id="progenesistomsstatsformat">ProgenesistoMSstatsFormat</h2>
+<p>Convert Progenesis output into the required input format for MSstats.</p>
+<h3 id="arguments_3">Arguments</h3>
+<ul>
+<li><code>input</code> : name of Progenesis output, which is wide-format. <code>Accession</code>, <code>Sequence</code>, <code>Modification</code>, <code>Charge</code> and one column for each run are required.</li>
+<li><code>annotation</code> : name of <code>'annotation.txt'</code> or <code>'annotation.csv'</code> data which includes <code>Condition</code>, <code>BioReplicate</code>, <code>Run</code> information. It will be matched with the column name of input for MS runs.</li>
+<li><code>useUniquePeptide</code> : <code>useUniquePeptide=TRUE</code>(default) removes peptides that are assigned for more than one proteins. We assume to use unique peptide for each protein.</li>
+<li><code>summaryforMultipleRows</code> : <code>summaryforMultipleRows=max</code>(default) or <code>sum</code>, when there are multiple measurements for certain feature and certain run, use highest or sum of multiple intensities.</li>
+<li><code>fewMeasurements</code> : <code>fewMeasurements='remove'</code>(default) will remove the features that have 1 or 2 measurements across runs.</li>
+<li><code>removeProtein_with1Peptide</code> : <code>removeProtein_with1Peptide=TRUE</code> will remove the proteins which have only 1 peptide and charge. <code>FALSE</code> is default.</li>
+</ul>
+<h3 id="example_3">Example</h3>
+<pre><code class="language-r">input &lt;- read.csv(&quot;output_progenesis.csv&quot;, stringsAsFactors=FALSE) 
+
+# Read in annotation including condition and biological replicates per run.
+# Users should make this annotation file. It is not the output from Progenesis.
+annot &lt;- read.csv('annotation.csv')
+
+raw &lt;- ProgenesistoMSstatsFormat(input, annotation=annot)
+</code></pre>
+<h2 id="spectronauttomsstatsformat">SpectronauttoMSstatsFormat</h2>
+<p>Convert Spectronaut output into the required input format for MSstats.</p>
+<h3 id="arguments_4">Arguments</h3>
+<ul>
+<li><code>input</code>: name of Spectronaut output, which is long-format. <code>ProteinName</code>, <code>PeptideSequence</code>, <code>PrecursorCharge</code>, <code>FragmentIon</code>, <code>ProductCharge</code>, <code>IsotopeLabelType</code>, <code>Condition</code>, <code>BioReplicate</code>, <code>Run</code>, <code>Intensity</code>, <code>F.ExcludedFromQuantification</code> are required. Rows with <code>F.ExcludedFromQuantification=True</code> will be removed.</li>
+<li><code>summaryforMultipleRows</code> : <code>summaryforMultipleRows=max</code>(default) or <code>sum</code>, when there are multiple measurements for certain feature and certain run, use highest or sum of multiple intensities.</li>
+</ul>
+<h3 id="example_4">Example</h3>
+<pre><code class="language-r">input &lt;- read.csv(&quot;output_spectronaut.csv&quot;, stringsAsFactors=FALSE) 
+
+quant &lt;- SpectronauttoMSstatsFormat(input)
+</code></pre>
+<h2 id="dataprocess">dataProcess</h2>
+<p>Data pre-processing and quality control of MS runs of the original raw data into quantitative data for model fitting and group comparison. Log transformation is automatically applied and additional variables are created in columns for model fitting and group comparison process. Three options of data pre-processing and quality control of MS runs in dataProcess are</p>
+<ul>
+<li>Transformation: logarithm transformation of intensity with base 2 or 10.</li>
+<li>Normalization: to remove systematic bias between MS runs.</li>
+</ul>
+<h3 id="arguments_5">Arguments</h3>
+<ul>
+<li><code>raw</code> : name of the raw (input) data set.</li>
+<li><code>logTrans</code> : logarithm transformation with base 2(default) or 10. If <code>logTrans=2</code>, the measurement of Variable <code>ABUNDANCE</code> is log-transformed with base 2. Same apply to <code>logTrans=10</code>.</li>
+<li><code>normalization</code> : normalization to remove systematic bias between MS runs. There are three different normalizations supported. <code>'equalizeMedians'</code> (default) represents constant normalization (equalizing the medians) based on reference signals is performed. <code>'quantile'</code> represents quantile normalization based on reference signals is performed. <code>'globalStandards'</code> represents normalization with global standards proteins. <code>FALSE</code> represents no normalization is performed.</li>
+<li><code>nameStandards</code> : vector of global standard peptide names. only for normalization with global standard peptides.</li>
+<li><code>fillIncompleteRows</code> : If the input dataset has incomplete rows, <code>TRUE</code> (default) adds the rows with intensity value=NA for missing peaks. <code>FALSE</code> reports error message with list of features which have incomplete rows.</li>
+<li><code>featureSubset</code> : <code>&quot;all&quot;</code> (default) uses all features that the data set has. <code>&quot;top3&quot;</code> uses top 3 features which have highest average of log2(intensity) across runs. <code>&quot;topN&quot;</code> uses top N features which has highest average of log2(intensity) across runs. It needs the input for <code>n_top_feature</code> option. <code>&quot;highQuality&quot;</code> flags uninformative feature and outliers.</li>
+<li><code>remove_uninformative_feature_outlier</code> : It only works after users used <code>featureSubset=&quot;highQuality&quot;</code> in dataProcess. <code>TRUE</code> allows to remove 1) the features are flagged in the column, <code>feature_quality=&quot;Uninformative&quot;</code> which are features with bad quality, 2) outliers that are flagged in the column, <code>is_outlier=TRUE</code>, for run-level summarization. <code>FALSE</code> (default) uses all features and intensities for run-level summarization.</li>
+<li><code>n_top_feature</code> : The number of top features for <code>featureSubset='topN'</code>. Default is <code>n_top_feature=3</code>, which means to use top 3 features.</li>
+<li><code>summaryMethod</code> : <code>&quot;TMP&quot;</code> (default) means Tukey’s median polish, which is robust estimation method. <code>&quot;linear&quot;</code> uses linear mixed model.</li>
+<li><code>equalFeatureVar</code> : only for <code>summaryMethod=&quot;linear&quot;</code>. Default is <code>TRUE</code>. Logical variable for whether the model should account for heterogeneous variation among intensities from different features. Default is TRUE, which assume equal variance among intensities from features. <code>FALSE</code> means that we cannot assume equal variance among intensities from features, then we will account for heterogeneous variation from different features.</li>
+<li><code>censoredInt</code> : Missing values are censored or at random. <code>'NA'</code> (default) assumes that all ‘NA’s in ‘Intensity’ column are censored. <code>'0'</code> uses zero intensities as censored intensity. In this case, NA intensities are missing at random. The output from Skyline and Progenesis should use ‘0’. Null assumes that all NA intensites are randomly missing.</li>
+<li><code>cutoffCensored</code> : Cutoff value for censoring. Only with <code>censoredInt='NA'</code> or <code>'0'</code>. Default is <code>'minFeature'</code>, which uses minimum value for each feature. <code>'minFeatureNRun'</code> uses the smallest between minimum value of corresponding feature and minimum value of corresponding run. <code>'minRun'</code> uses minumum value for each run.</li>
+<li><code>MBimpute</code> : only for <code>summaryMethod=&quot;TMP&quot;</code> and <code>censoredInt='NA'</code> or <code>'0'</code>. <code>TRUE</code> (default) imputes ‘NA’ or ‘0’ (depending on censoredInt option) by Accelated failure model. <code>FALSE</code> uses the values assigned by cutoffCensored.</li>
+<li><code>remove50missing</code> : only for <code>summaryMethod=&quot;TMP&quot;</code>. <code>TRUE</code> removes the runs which have more than 50% missing values. <code>FALSE</code> is default.</li>
+<li><code>address</code> : the name of folder that will store the results. Default folder is the current working directory. The other assigned folder has to be existed under the current working directory. An output csv file is automatically created with the default name of “BetweenRunInterferenceFile.csv”. The command address can help to specify where to store the file as well as how to modify the beginning of the file name.</li>
+<li><code>maxQuantileforCensored</code> : Maximum quantile for deciding censored missing values. Default is 0.999.</li>
+</ul>
+<h3 id="details-of-outputs">Details of outputs</h3>
+<h4 id="runleveldata-from-dataprocess">RunlevelData from dataProcess</h4>
+<ul>
+<li>LogIntensities : Estimated protein abundance for aa<code>RUN</code> and <code>Protein</code>.</li>
+<li>NumMeasuredFeature : Number of measured features in a <code>RUN</code> and <code>Protein</code>. It counts feature intensities greater than 1, after selecting all/topN/highquality features and removing features with only one measurement across MS runs.</li>
+<li>Missing percentage : Number of measured features in a <code>RUN</code> and <code>Protein</code> /total number of features in a <code>Proteins</code>.</li>
+<li>NumImputedFeature : Number of imputed intensities (censored intensities) in a <code>RUN</code> and <code>Protein</code>. This column is shown only if users allow to impute the missing value.</li>
+</ul>
+<h5 id="comparisonresult-from-groupcomparison-one-or-two-columns-will-be-added">ComparisonResult from groupComparison : one or two columns will be added.</h5>
+<ul>
+<li>MissingPercentage : Number of measured intensities/ total number of intensities (which is the number of features * the number of runs in a protein) by protein</li>
+<li>ImputationPercentage : Number of imputed intensities/total number of intensities by protein</li>
+</ul>
+<h3 id="example_5">Example</h3>
+<pre><code class="language-r">QuantData &lt;- dataProcess(SRMRawData)
+</code></pre>
+<h2 id="dataprocessplots">dataProcessPlots</h2>
+<p>Visualization for explanatory data analysis. To illustrate the quantitative data after data-preprocessing and quality control of MS runs, <code>dataProcessPlots</code> takes the quantitative data from function <code>dataProcess</code> as input and automatically generate three types of figures in pdf files as output :</p>
+<ul>
+<li>
+<p>Profile plot : to identify the potential sources of variation for each protein. One of output from <code>dataProcess</code>, <code>xxx$ProcessedData</code>, is used for profile plots. Another output from <code>dataProcess</code>, <code>xxx$RunlevelData</code>, is used for profile plots with summarization. X-axis represents MS runs. Y-axis is for log-intensities of transitions. Reference/endogenous signals are in the left/right panel. Line colors indicate peptides and line types indicate transitions. Type of dots(filled vs empty dot) indicates censored missing values or not. In summarization plots, gray dots and lines are the same as original profile plots with <code>xxx$ProcessedData</code>. Dark dots and lines are for summarized intensities from <code>xxx$RunlevelData</code>.</p>
+</li>
+<li>
+<p>Quality control plot : to illustrate the systematic bias between MS runs and to check normalization. After normalization, the reference signals for all proteins should be stable across MS runs. <code>xxx$ProcessedData</code> is used for plots. X-axis is for MS runs. Y-axis is for log-intensities of transition (<code>xxx$ProcessedData$ABUNDANCE</code>). Reference/endogenous signals are in the left/right panel. The pdf file contains (1) QC plot for all proteins and (2) QC plots for each protein separately.</p>
+</li>
+<li>
+<p>Mean plot for conditions : to illustrate mean and variability of each condition per protein. Summarized intensnties from <code>xxx$RunlevelData</code> are used for plots. X-axis is for condition. Y-axis is for summarized log transformed intensities. If <code>scale=TRUE</code>, the levels of conditions is scaled according to its actual values at x-axis. Red points indicate the mean for each condition. If <code>interval=&quot;CI&quot;</code>, error bars indicate the confidence interval with 0.95 significant level for each condition. If <code>interval=&quot;SD&quot;</code>, error bars indicate the standard deviation for each condition. <strong>The interval is not related with model-based analysis in <code>groupCompaison</code></strong>.</p>
+</li>
+</ul>
+<h3 id="arguments_6">Arguments</h3>
+<ul>
+<li><code>data</code> : name of the (output of <code>dataProcess</code> function) data set.</li>
+<li><code>type</code> : choice of visualization. <code>&quot;ProfilePlot&quot;</code> represents profile plot of log intensities across MS runs. <code>&quot;QCPlot&quot;</code> represents quality control plot of log intensities across MS runs. <code>&quot;ConditionPlot&quot;</code> represents mean plot of log ratios (Light/Heavy) across conditions.</li>
+<li><code>featureName</code> : for <code>&quot;ProfilePlot&quot;</code> only, <code>&quot;Transition&quot;</code> (default) means printing feature legend in transition-level. <code>&quot;Peptide&quot;</code> means printing feature legend in peptide-level. <code>&quot;NA&quot;</code> means no feature legend printing.</li>
+<li><code>ylimUp</code> : upper limit for y-axis in the log scale. <code>FALSE</code> (Default) for Profile Plot and QC Plot use the upper limit as rounded off maximum of log2(intensities) after normalization + 3. <code>FALSE</code> (Default) for Condition Plot is maximum of log ratio + SD or CI.</li>
+<li><code>ylimDown</code> : lower limit for y-axis in the log scale. <code>FALSE</code> (Default) for Profile Plot and QC Plot is 0. `FALSE`` (Default) for Condition Plot is minumum of log ratio - SD or CI.</li>
+<li><code>scale</code> : for <code>&quot;ConditionPlot&quot;</code> only, <code>FALSE</code> (default) means each conditional level is not scaled at x-axis according to its actual value (equal space at x-axis). <code>TRUE</code> means each conditional level is scaled at x-axis according to its actual value (unequal space at x-axis).</li>
+<li><code>interval</code> : for <code>&quot;ConditionPlot&quot;</code> only, <code>&quot;CI&quot;</code> (default) uses confidence interval with 0.95 significant level for the width of error bar. <code>&quot;SD&quot;</code> uses standard deviation for the width of error bar.</li>
+<li><code>x.axis.size</code> : size of x-axis labeling for “MS Runs” in Profile Plot and QC Plot, and “Condition” in Condition Plot. Default is <code>10</code>.</li>
+<li><code>y.axis.size</code> : size of y-axis labels. Default is <code>10</code>.</li>
+<li><code>text.size</code> : size of labels represented each condition at the top of graph in Profile Plot and QC plot. Default is <code>4</code></li>
+<li><code>text.angle</code> : angle of labels represented each condition at the top of graph in Profile Plot and QC plot or x-axis labeling in Condition plot. Default is <code>0</code>.</li>
+<li><code>legend.size</code> : size of feature legend (transition-level or peptide-level) above graph in Profile Plot. Default is <code>7</code>.</li>
+<li><code>dot.size.profile</code> : size of dots in profile plot. Default is <code>2</code>.</li>
+<li><code>dot.size.condition</code> : size of dots in condition plot. Default is <code>3</code>.</li>
+<li><code>width</code> : width of the saved file. Default is 10.</li>
+<li><code>height</code> : height of the saved file. Default is 10.</li>
+<li><code>which.Protein</code> : Protein list to draw plots. List can be names of Proteins or order numbers of Proteins from <code>levels(xxx$ProcessedData$PROTEIN)</code>. Default is <code>&quot;all&quot;</code>, which generates all plots for each protein.</li>
+<li><code>originalPlot</code> : <code>TRUE</code> (default) draws original profile plots.</li>
+<li><code>summaryPlot</code> : <code>TRUE</code> (default) draws profile plots with summarization for run levels.</li>
+<li><code>save_condition_plot_result</code> : <code>TRUE</code> saves the table with values using condition plots. Default is FALSE.</li>
+<li><code>address</code> : the name of folder that will store the results. Default folder is the current working directory. The other assigned folder has to be existed under the current working directory. An output pdf file is automatically created with the default name of <code>&quot;ProfilePlot.pdf&quot;</code> or <code>&quot;QCplot.pdf&quot;</code> or <code>&quot;ConditionPlot.pdf&quot;</code> or <code>&quot;ConditionPlot_value.csv&quot;</code>. The command address can help to specify where to store the file as well as how to modify the beginning of the file name. If <code>address=FALSE</code>, plot will be not saved as pdf file but showed in window.</li>
+</ul>
+<h3 id="example_6">Example</h3>
+<pre><code class="language-r"># QuantData &lt;- dataProcess(SRMRawData)
+# 
+# # Profile plot
+# dataProcessPlots(data=QuantData, type=&quot;ProfilePlot&quot;)
+# 
+# # Quality control plot 
+# dataProcessPlots(data=QuantData, type=&quot;QCPlot&quot;)	
+# 
+# # Quantification plot for conditions
+# dataProcessPlots(data=QuantData, type=&quot;ConditionPlot&quot;)
+</code></pre>
+<h2 id="groupcomparison">groupComparison</h2>
+<p>Tests for significant changes in protein abundance across conditions based on a family of linear mixed-effects models in targeted Selected Reaction Monitoring (SRM), Data-Dependent Acquisition (DDA or shotgun), and Data-Independent Acquisition (DIA or SWATH-MS)
+experiment. It is applicable to multiple types of sample preparation, including label-free workflows, workflows that use stable isotope labeled reference proteins and peptides, and workflows that use fractionation. Experimental design of case-control study (patients are not repeatedly measured) or time course study (patients are repeatedly measured) is automatically determined based on proper statistical model.</p>
+<h3 id="arguments_7">Arguments</h3>
+<ul>
+<li><code>contrast.matrix</code> : comparison between conditions of interests. Based on the levels of conditions, specify 1 or -1 to the conditions of interests and 0 otherwise. The levels of conditions are sorted alphabetically. Command <code>levels(xxx$ProcessedData$GROUP_ORIGINAL)</code> after using <code>dataProcess</code> function can illustrate the actual order of the levels of conditions.</li>
+<li><code>data</code> : name of the (output of dataProcess function) data set.</li>
+</ul>
+<h3 id="example_7">Example</h3>
+<pre><code class="language-r"># QuantData &lt;- dataProcess(SRMRawData)
+# 
+# levels(QuantData$ProcessedData$GROUP_ORIGINAL)
+# comparison &lt;- matrix(c(-1,0,0,0,0,0,1,0,0,0), nrow=1)
+# row.names(comparison) &lt;- &quot;T7-T1&quot;
+# 
+# # Tests for differentially abundant proteins with models:
+# testResultOneComparison &lt;- groupComparison(contrast.matrix=comparison, data=QuantData)
+</code></pre>
+<h2 id="groupcomparisonplots">groupComparisonPlots</h2>
+<p>Visualization for model-based analysis and summarizing differentially abundant proteins. To summarize the results of log-fold changes and adjusted p-values for differentially abundant proteins, <code>groupComparisonPlots</code> takes testing results from function <code>groupComparison</code> as input and automatically generate three types of figures in pdf files as output :</p>
+<ul>
+<li>
+<p>Volcano plot : For each comparison separately. It illustrates actual log-fold changes and adjusted p-values for each comparison separately with all proteins. The x-axis is the log fold change. The base of logarithm transformation is the same as specified in “logTrans” from <code>dataProcess</code>. The y-axis is the negative log2 or log10 adjusted p-values. The horizontal dashed line represents the FDR cutoff. The points below the FDR cutoff line are non-significantly abundant proteins (colored in black). The points above the FDR cutoff line are significantly abundant proteins (colored in red/blue for up-/down-regulated). If fold change cutoff is specified (<code>FCcutoff = specific value</code>), the points above the FDR cutoff line but within the FC cutoff line are non-significantly abundant proteins (colored in black).</p>
+</li>
+<li>
+<p>Heatmap : For multiple comparisons. It illustratea up-/down-regulated proteins for multiple comparisons with all proteins. Each column represents each comparison of interest. Each row represents each protein. Color red/blue represents proteins in that specific comparison are significantly up-regulated/down-regulated proteins with FDR cutoff and/or FC cutoff. The color scheme shows the evidences of significance. The darker color it is, the stronger evidence of significance it has. Color gold represents proteins are not significantly different in abundance.</p>
+</li>
+<li>
+<p>Comparison plot : For multiple comparisons per protein. It illustrates log-fold change and its variation of multiple comparisons for single protein. X-axis is comparison of interest. Y-axis is the log fold change. The red points are the estimated log fold change from the model. The error bars are the confidence interval with 0.95 significant level for log fold change. This interval is only based on the standard error, which is estimated from the model.</p>
+</li>
+</ul>
+<h3 id="arguments_8">Arguments</h3>
+<ul>
+<li><code>data</code> : <code>xxx$ComparisonResult</code> in testing output from function <code>groupComparison</code>.</li>
+<li><code>type</code> : choice of visualization. <code>&quot;VolcanoPlot&quot;</code> represents volcano plot of log fold changes and adjusted p-values for each comparison separately. <code>&quot;Heatmap&quot;</code> represents heatmap of adjusted p-values for multiple comparisons. <code>&quot;ComparisonPlot&quot;</code> represents comparison plot of log fold changes for multiple comparisons per protein.</li>
+<li><code>sig</code> : FDR cutoff for the adjusted p-values in heatmap and volcano plot. \(100(1-sig)\)% confidence interval will be drawn. <code>sig=0.05</code> is default.</li>
+<li><code>FCcutoff</code> : for volcano plot or heatmap, whether involve fold change cutoff or not. <code>FALSE</code> (default) means no fold change cutoff is applied for significance analysis. <code>FCcutoff = specific value</code> means specific fold change cutoff is applied.</li>
+<li><code>logBase.pvalue</code> : for volcano plot or heatmap, (-) logarithm transformation of adjusted p-value with base 2 or 10(default).</li>
+<li><code>ylimUp</code> : for all three plots, upper limit for y-axis. <code>FALSE</code> (default) for volcano plot/heatmap use maximum of -log2 (adjusted p-value) or -log10 (adjusted p-value). <code>FALSE</code> (default) for comparison plot uses maximum of log-fold change + CI.</li>
+<li><code>ylimDown</code> : for all three plots, lower limit for y-axis. <code>FALSE</code> (default) for volcano plot/heatmap use minimum of -log2 (adjusted p-value) or -log10 (adjusted p-value). <code>FALSE</code> (default) for comparison plot uses minimum of log-fold change - CI.</li>
+<li><code>xlimUp</code> : for Volcano plot, the limit for x-axis. <code>FALSE</code> (default) uses the maximum for absolute value of log-fold change or 3 as default if maximum for absolute value of log-fold change is less than 3.</li>
+<li><code>x.axis.size</code> : size of axes labels, e.g. name of the comparisons in heatmap, and in comparison plot. Default is <code>10</code>.</li>
+<li><code>y.axis.size</code> : size of axes labels, e.g. name of targeted proteins in heatmap. Default is <code>10</code>.</li>
+<li><code>dot.size</code> : size of dots in volcano plot and comparison plot. Default is <code>3</code>.</li>
+<li><code>text.size</code> : size of <code>ProteinName</code> label in the graph for Volcano Plot. Default is <code>4</code>.</li>
+<li><code>legend.size</code> : size of legend for color at the bottom of volcano plot.  Default is <code>7</code>.</li>
+<li><code>ProteinName</code> : for volcano plot only, whether display protein names next to dots or not. <code>TRUE</code> (default) means protein names, which are significant, are displayed next to the points. <code>FALSE</code> means no protein names are displayed.</li>
+<li><code>numProtein</code> : The number of proteins which will be presented in each heatmap. Default is <code>100</code>. Maximum possible number of protein for one heatmap is 180.</li>
+<li><code>clustering</code> : Determines how to order proteins and comparisons. Hierarchical cluster analysis with Ward method(minimum variance) is performed. <code>'protein'</code> (default) means that protein dendrogram is computed and reordered based on protein means (the order of row is changed). <code>'comparison'</code> means comparison dendrogram is computed and reordered based on comparison means (the order of comparison is changed). <code>'both'</code> means to reorder both protein and comparison.</li>
+<li><code>width</code> : width of the saved file. Default is <code>10</code>.</li>
+<li><code>height</code> : height of the saved file. Default is <code>10</code>.</li>
+<li><code>which.Comparison</code> : list of comparisons to draw plots. List can be labels of comparisons or order numbers of comparisons from <code>levels(xxx$Label)</code>, such as <code>levels(xxx$ComparisonResult$Label)</code>. Default is <code>&quot;all&quot;</code>, which generates all plots for each protein.</li>
+<li><code>address</code> : the name of folder that will store the results. Default folder is the current working directory. The other assigned folder has to be existed under the current working directory. An output pdf file is automatically created with the default name of <code>&quot;VolcanoPlot.pdf&quot;</code> or <code>&quot;Heatmap.pdf&quot;</code> or <code>&quot;ComparisonPlot.pdf&quot;</code>. The command address can help to specify where to store the file as well as how to modify the beginning of the file name. If <code>address=FALSE</code>, plot will be not saved as pdf file but showed in window.</li>
+</ul>
+<h3 id="example_8">Example</h3>
+<pre><code class="language-r"># QuantData &lt;- dataProcess(SRMRawData)
+# 
+# # based on multiple comparisons  (T1 vs T3; T1 vs T7; T1 vs T9)
+# comparison1&lt;-matrix(c(-1,0,1,0,0,0,0,0,0,0),nrow=1)
+# comparison2&lt;-matrix(c(-1,0,0,0,0,0,1,0,0,0),nrow=1)
+# comparison3&lt;-matrix(c(-1,0,0,0,0,0,0,0,1,0),nrow=1)
+# comparison&lt;-rbind(comparison1,comparison2, comparison3)
+# row.names(comparison)&lt;-c(&quot;T3-T1&quot;,&quot;T7-T1&quot;,&quot;T9-T1&quot;)
+# 
+# testResultMultiComparisons &lt;- groupComparison(contrast.matrix=comparison, data=QuantData)
+# 
+# # Volcano plot 
+# groupComparisonPlots(data=testResultMultiComparisons$ComparisonResult, type=&quot;VolcanoPlot&quot;)
+# 
+# # Heatmap 
+# groupComparisonPlots(data=testResultMultiComparisons$ComparisonResult, type=&quot;Heatmap&quot;)
+# 
+# # Comparison Plot
+# groupComparisonPlots(data=testResultMultiComparisons$ComparisonResult, type=&quot;ComparisonPlot&quot;)
+</code></pre>
+<h2 id="modelbasedqcplots">modelBasedQCPlots</h2>
+<p>Results based on statistical models for whole plot level inference are accurate as long as the assumptions of the model are met. The model assumes that the measurement errors are normally distributed with mean 0 and constant variance. The assumption of a constant variance can be checked by examining the residuals from the model.</p>
+<p>To check the assumption of linear model for whole plot inference, <code>modelBasedQCPlots</code> takes the results after fitting models from function <code>groupComparison</code> as input and automatically generate two types of figures in pdf files as output.</p>
+<ul>
+<li>
+<p>Normal quantile-quantile plot : For checking normally distributed errors. A normal quantile-quantile plot for each protein is generated in order to check whether the errors are well approximated by a normal distribution. If points fall approximately along a straight line, then the assumption is appropriate for that protein. Only large deviations from the line are problematic.</p>
+</li>
+<li>
+<p>Residual plot : The plots of residuals against predicted (fitted) values. If it shows a random scatter, then the assumption is appropriate.</p>
+</li>
+</ul>
+<h3 id="arguments_9">Arguments</h3>
+<ul>
+<li><code>data</code> : output from function <code>groupComparison</code>.</li>
+<li><code>type</code> : choice of visualization. <code>&quot;QQPlots&quot;</code> represents normal quantile-quantile plot for each protein after fitting models. <code>&quot;ResidualPlots&quot;</code> represents a plot of residuals versus fitted values for each protein in the dataset.</li>
+<li><code>axis.size</code> : size of axes labels. Default is <code>10</code>.</li>
+<li><code>dot.size</code> : size of points in the graph for residual plots and QQ plots. Default is <code>3</code>.</li>
+<li><code>text.size</code> : size of labeling for feature names only in normal quantile-quantile plots separately for each feature. Default is <code>7</code>.</li>
+<li><code>legend.size</code> : size of legend for feature names only in residual plots. Default is <code>7</code>.</li>
+<li><code>width</code> : width of the saved file. Default is <code>10</code>.</li>
+<li><code>height</code> : height of the saved file. Default is <code>10</code>.</li>
+<li><code>address</code> : the name of folder that will store the results. Default folder is the current working directory. The other assigned folder has to be existed under the current working directory. If <code>type=&quot;residualPlots&quot;</code> or <code>&quot;QQPlots&quot;</code>, <code>&quot;ResidualPlots.pdf&quot;</code> or <code>&quot;QQPlots.plf&quot;</code> will be generated. The command address can help to specify where to store the file as well as how to modify the beginning of the file name. If <code>address=FALSE</code>, plot will be not saved as pdf file but showed in window.</li>
+</ul>
+<h3 id="example_9">Example</h3>
+<pre><code class="language-r"># testResultOneComparison &lt;- groupComparison(contrast.matrix=comparison, data=QuantData)
+# 
+# # normal quantile-quantile plots
+# modelBasedQCPlots(data=testResultOneComparison, type=&quot;QQPlots&quot;)
+# 
+# # residual plots
+# modelBasedQCPlots(data=testResultOneComparison, type=&quot;ResidualPlots&quot;)
+</code></pre>
+<h2 id="designsamplesize">designSampleSize</h2>
+<p>Calculate sample size for future experiments of a Selected Reaction Monitoring (SRM), Data-Dependent Acquisition (DDA or shotgun), and Data-Independent Acquisition (DIA or SWATH-MS) experiment based on intensity-based linear model. The function fits the model and uses variance components to calculate sample size. The underlying model fitting with intensity-based linear model with technical MS run replication. Estimated sample size is rounded to 0 decimal. Two options of the calculation:</p>
+<ul>
+<li>number of biological replicates per condition</li>
+<li>power</li>
+</ul>
+<h3 id="arguments_10">Arguments</h3>
+<ul>
+<li><code>data</code> : <code>'fittedmodel'</code> in testing output from function <code>groupComparison</code>.</li>
+<li><code>desiredFC</code> : the range of a desired fold change which includes the lower and upper values of the desired fold change.</li>
+<li><code>FDR</code> : a pre-specified false discovery ratio (FDR) to control the overall false positive. Default is <code>0.05</code>.</li>
+<li><code>numSample</code> : minimal number of biological replicates per condition. <code>TRUE</code> represents you require to calculate the sample size for this category, else you should input the exact number of biological replicates.</li>
+<li><code>power</code> : a pre-specified statistical power which defined as the probability of detecting a true fold change. <code>TRUE</code> represent you require to calculate the power for this category, else you should input the average of power you expect. Default is <code>0.9</code>.</li>
+</ul>
+<h3 id="example_10">Example</h3>
+<pre><code class="language-r"># QuantData &lt;- dataProcess(SRMRawData)
+# head(QuantData$ProcessedData)
+# 
+# ## based on multiple comparisons  (T1 vs T3; T1 vs T7; T1 vs T9)
+# comparison1 &lt;- matrix(c(-1,0,1,0,0,0,0,0,0,0),nrow=1)
+# comparison2 &lt;- matrix(c(-1,0,0,0,0,0,1,0,0,0),nrow=1)
+# comparison3 &lt;- matrix(c(-1,0,0,0,0,0,0,0,1,0),nrow=1)
+# comparison &lt;- rbind(comparison1,comparison2, comparison3)
+# row.names(comparison) &lt;- c(&quot;T3-T1&quot;,&quot;T7-T1&quot;,&quot;T9-T1&quot;)
+# 
+# testResultMultiComparisons &lt;- groupComparison(contrast.matrix=comparison,data=QuantData)
+# 
+# #(1) Minimal number of biological replicates per condition
+# designSampleSize(data=testResultMultiComparisons$fittedmodel, numSample=TRUE,
+#   desiredFC=c(1.25,1.75), FDR=0.05, power=0.8)
+# 
+# #(2) Power calculation
+# designSampleSize(data=testResultMultiComparisons$fittedmodel, numSample=2,
+#   desiredFC=c(1.25,1.75), FDR=0.05, power=TRUE)
+</code></pre>
+<h2 id="designsamplesizeplots">designSampleSizePlots</h2>
+<p>To illustrate the relationship of desired fold change and the calculated minimal number sample size which are</p>
+<ul>
+<li>Number of biological replicates per condition</li>
+<li>power.</li>
+</ul>
+<p>The input is the result from function <code>designSampleSize</code>.</p>
+<h3 id="arguments_11">Arguments</h3>
+<ul>
+<li><code>data</code> : output from function <code>designSampleSize</code>.</li>
+</ul>
+<h3 id="example_11">Example</h3>
+<pre><code class="language-r"># # (1) Minimal number of biological replicates per condition
+# result.sample &lt;- designSampleSize(data=testResultMultiComparisons$fittedmodel, numSample=TRUE,
+#                                 desiredFC=c(1.25,1.75), FDR=0.05, power=0.8)
+# designSampleSizePlots(data=result.sample)
+# 
+# # (2) Power
+# result.power &lt;- designSampleSize(data=testResultMultiComparisons$fittedmodel, numSample=2,
+#                                desiredFC=c(1.25,1.75), FDR=0.05, power=TRUE)
+# designSampleSizePlots(data=result.power)
+</code></pre>
+<h2 id="quantification">quantification</h2>
+<p>Model-based quantification for each condition or for each biological samples per protein in a targeted Selected Reaction Monitoring (SRM), Data-Dependent Acquisition (DDA or shotgun), and Data-Independent Acquisition (DIA or SWATH-MS) experiment. Quantification takes the processed data set by <code>dataProcess</code> as input and automatically generate the quantification results (data.frame) with long or matrix format. The quantification for endogenous samples is based on run summarization from subplot model, with TMP robust estimation.</p>
+<ul>
+<li>
+<p>Sample quantification : individual biological sample quantification for each protein. The label of each biological sample is a combination of the corresponding group and the sample ID. If there are no technical replicates or experimental replicates per sample, sample quantification is the same as run summarization from dataProcess (<code>xxx$RunlevelData</code> from <code>dataProcess</code>). If there are technical replicates or experimental replicates, sample quantification is median among run quantification corresponding MS runs.</p>
+</li>
+<li>
+<p>Group quantification : quantification for individual group or individual condition per protein. It is median among sample quantification.</p>
+</li>
+</ul>
+<h3 id="arguments_12">Arguments</h3>
+<ul>
+<li><code>data</code> : name of the (processed) data set from <code>dataPRocess</code>.</li>
+<li><code>type</code> : choice of quantification. <code>&quot;Sample&quot;</code> or <code>&quot;Group&quot;</code> for protein sample quantification or group quantification.</li>
+<li><code>format</code> : choice of returned format. <code>&quot;long&quot;</code> for long format which has the columns named <code>Protein</code>, <code>Condition</code>, <code>LogIntensities</code> (and <code>BioReplicate</code> if it is subject quantification), <code>NumFeature</code> for number of transitions for a protein, and <code>NumPeaks</code> for number of observed peak intensities for a protein. <code>&quot;matrix&quot;</code> for data matrix format which has the rows for Protein and the columns, which are <code>Groups</code>(or <code>Conditions</code>) for group quantification or the combinations of <code>BioReplicate</code> and <code>Condition</code> (labeled by <code>&quot;BioReplicate&quot;_&quot;Condition&quot;</code>) for sample quantification. Default is <code>&quot;matrix&quot;</code>, whether <code>format=&quot;long&quot;</code> or <code>&quot;matrix&quot;</code>, both files, <code>&quot;Group or SampleQuantification_longformat.csv&quot;</code> and <code>&quot;Group or SampleQuantification_dataMatrix.csv&quot;</code> will be stored in the assigned folder.</li>
+</ul>
+<h3 id="example_12">Example</h3>
+<pre><code class="language-r"># QuantData &lt;- dataProcess(SRMRawData)
+# 
+# # Sample quantification
+# sampleQuant &lt;- quantification(QuantData)
+# 
+# # Group quantification
+# groupQuant &lt;- quantification(QuantData, type=&quot;Group&quot;)
+</code></pre>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-core.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/combine/npm/katex/dist/katex.min.js,npm/katex/dist/contrib/auto-render.min.js,npm/@xiee/utils/js/render-katex.js" defer></script>
+</body>
+</html>
