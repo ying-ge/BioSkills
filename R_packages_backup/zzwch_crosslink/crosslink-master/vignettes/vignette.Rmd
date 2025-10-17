@@ -1,0 +1,574 @@
+---
+title: "crosslink"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{crosslink}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 6, 
+  fig.height = 5
+)
+```
+
+# An R package for network visualization of grouped nodes
+
+The goal of crosslink is to visualize the network of grouped nodes
+
+
+## 1. Installation
+
+You can install the released version of crosslink from [github](https://github.com/zzwch/crosslink) with:
+
+```{r include = T, eval = F}
+remotes::install_github("zzwch/crosslink", build_vignettes = TRUE)
+
+```
+
+Or download the compressed file [Link](https://codeload.github.com/zzwch/crosslink/zip/refs/heads/master),
+then run 
+```{r eval=F}
+remotes::install_local(path = "./crosslink-master.zip", build_vignettes = TRUE)
+
+```
+
+
+
+## 2. Quick start
+
+Examples of typical crosslink usage.
+
+```{r}
+library(crosslink)
+
+# generate a CrossLink object
+cl <- crosslink(demo$nodes, demo$edges, demo$cross.by, odd.rm = F,spaces = "flank")
+
+# set headers if needed
+cl %<>% set_header(header = c("A","B","C","D","E","F"))
+
+# plot the network
+
+# By default, node color is coded and node size is proportional to its degree (calculated internally).
+# And edge color is coded by the cross group of the edge's source node.
+cl %>% cl_plot()
+
+```
+
+Users can also custom the aesthetics for node, edge, label and header by using cl_plot, which wrapped multiple ggplot2::geom_* functions in one interface. Please see below (Plotting modules) for more details.
+
+
+
+## 3. Step by step
+
+This is a basic example of the basic function of crosslink packages,including 
+1). Input data
+2). Generate CrossLink class
+3). Coordinate transformation
+4). Layout modules
+5). Plotting modules
+
+### 1). Input data
+
+crosslink needs two files as input.   
+a. nodes (must have two columns: node name and node type)  
+b. edges data (must have two columns: source node and target node).   
+
+Here, crosslink uses the function 'gen_demo' to generate demo data. 
+
+```{r}
+n <- 6
+demo <- gen_demo(n_cross = n,n_node = 4:(n+3), n_link = 3:(n+1), seed = 66)
+nodes <- demo$nodes
+edges <- demo$edges
+cross.by <- demo$cross.by
+```
+
+### 2). Generate crossLink class
+
+crosslink can generate an object of crosslink class for plot.
+
+```{r}
+# users can define 'odd.rm' to choose if remove the nodes have zero relationship with any other nodes when generate crosslink class
+# user can set intervals between nodes and gaps through spaces and gaps.
+cl <- crosslink(nodes, edges, cross.by, odd.rm = F,spaces = "flank")
+
+# Header can be customized through 'set_header'
+cl %<>% set_header(header = c("A","B","C","D","E","F"))
+```
+
+
+### 3). Coordinate transformation
+
+The `default` layout is initialized by `crosslink` function.
+```{r}
+cl %>% cl_active() # get currrently active layout information of a CrossLink object
+```
+And, currently active layout will be based on for transforming coordinates. 
+You can set another layout as active layout. 
+All available layouts can be listed. See `layout modules` to set more layouts.
+
+```{r}
+cl %>% cl_layouts()  # get all available layouts in a CrossLink object
+cl_active(cl) <- "default" # set your favorate layout 
+```
+
+Coordinate transformation consists of affine transformation and functional transformation. 
+The `tf_affine` function contains `tf_rotate`, `tf_shift`, `tf_shear`, `tf_flip` and `tf_scale` function. 
+The `tf_fun` interface allows user to custom transforming function.
+
+**Note** : The active layout before transformation will be based on to perform transforming, and the transformed coordinates will be stored in 'transforming' layout (Default, set `layout` to change it, and a novel layout is permitted.).
+
+```{r}
+# tf_rotate, rotating in a specific angle with (x,y) as the center.
+cl %>% tf_rotate(x=0,y=1,angle = 45) %>% cl_plot()
+# tf_shift, shifting a relative distance according to x-axis or y-axis
+cl %>% tf_shift(x=1,y=-1) %>% cl_plot()
+# tf_shear
+cl %>% tf_shear(axis = "x",angle = 60) %>% cl_plot()
+# tf_flip, flip the figure according to x-axis or y-axis
+cl %>% tf_flip(axis = "y") %>% cl_plot()
+# tf_scale
+cl %>% tf_scale(x=0, y=1, scale.x = 5, scale.y = 5) %>% cl_plot() 
+# tf_fun, coordinate transformation according to custom-defined function
+cl %>% tf_fun(fun = sin,along = "y",xrange.from=c(0,0.5*pi)) %>% cl_plot()
+# combined transformation functions
+cl %>% tf_flip(axis = "y") %>% tf_fun(fun = sin,along = "y",xrange.from=c(0,0.5*pi)) %>% cl_plot()
+```
+
+### 4). Layout modules
+
+Different layout styles can be stored in a CrossLink object.
+
+Because 'default' layout is routinely used as base layout for the layout module, 
+it is strongly recommended not to override the 'default' layout (**Important**), 
+unless you have known the transformation and layout modules well! 
+
+Several commonly used layout styles are predefined, including row, column, arc, polygon and hive. 
+And crosses can be placed in one or multiple layouts.
+
+**Note** : The ‘set_header’ function can be called to conveniently place headers after layouting. 
+
+```{r}
+# The 'default' layout is actually column. 
+cl %>% cl_plot()
+# layout by column
+cl %>% layout_column(layout_save = "column") %>% cl_plot()
+# layout by row
+cl %>% layout_row(layout_save = "row") %>% cl_plot()
+# layout by arc, set header after transformation
+cl %>% layout_arc(angles = 60,crosses = c("E","F"), layout_save = "arc") %>% set_header(hjust = 0.5, vjust = 1)%>% cl_plot()
+# layout by polygon (list of angles must have the same length with crosses)
+cl %>% layout_polygon(layout_save = "polygon") %>% cl_plot()
+# layout by hive
+cl %>% layout_hive(layout_save = "hive") %>% cl_plot()
+```
+
+
+### 5). Plotting modules
+
+We introduce this wrapper function `cl_plot` in three steps. 
+
+a. quick plotting (`cl_plot`)    
+b. aesthetic settings ( The color, size, type and text of the nodes and lines in the network)   
+c. combination of the network diagram with the corresponding node annotation graph in aligning coordinates   
+
+#### a. quick plotting
+```{r}
+cl %>% cl_plot()
+```
+
+
+#### b. aesthetic settings
+```{r}
+# aesthetic settings based on ggplot2 system, some specific examples are shown below.
+
+# show available variables for aesthetic setting
+cl %>% show_aes()
+```
+
+
+```{r}
+# set colors, shapes and size of nodes
+# cross:a named list of arguments for crosses. usage same as ggplot2::geom_point(). Set NULL to use default settings, or Set NA to not show.
+cl %>% cl_plot(cross = list(mapping =  aes(color = type, shape= type),
+                            scale   = list(color = scale_color_manual(values = RColorBrewer::brewer.pal(6, "Dark2"),
+                                                                      guide = guide_legend(ncol = 2)),
+                                           size  = scale_size_continuous(range = c(1,5), 
+                                                                      guide = guide_legend(ncol = 2)),
+                                           shape  = scale_shape_manual(values = c(13:18),
+                                                                      guide = guide_legend(ncol = 2))
+                                          )
+                           ))
+```
+
+
+```{r eval = F}
+# set colors, linetypes and size of edges
+# link: a named list of arguments for links. usage same as ggplot2::geom_segment(). Set NULL to use default settings, or Set NA to not show.
+cl %>% cl_plot(link = list(mapping =  aes(color = src.cross, linetype =src.cross, size = src.degree),
+                           scale   = list(color = scale_color_manual(values = RColorBrewer::brewer.pal(5, "Dark2"),
+                                                                    guide = guide_legend(ncol = 2)),
+                                          size  = scale_size_continuous(range = c(1,3), 
+                                                                      guide = guide_legend(ncol = 2)),
+                                          linetype = scale_linetype_manual(values = c(1:6),
+                                                                    guide = guide_legend(ncol = 2))
+                                         )
+                          ),
+               cross = list(show.legend = F) # disable cross's legends
+               )
+```
+
+
+```{r}
+# set header styles
+# header:	a named list of arguments for headers. usage same as ggplot2::geom_text(). Set NULL to use default settings, or Set NA to not show.
+cl %>% cl_plot(header = list(mapping = aes(color= cross),
+                               scale = list(color = scale_color_manual(values = RColorBrewer::brewer.pal(8, "Dark2"))),
+                                size = 5.5
+                             ))
+```
+
+
+```{r}
+# set aesthetics (e.g., color, size, position) of labels
+# label: a named list of arguments for labels of nodes. usage same as ggplot2::geom_text(). Set NULL to use default settings, or Set NA to not show.
+cl %>% cl_plot(label = list(mapping =  aes(color = type),
+                            scale   = list(color = scale_color_manual(values = RColorBrewer::brewer.pal(8, "Dark2"),
+                                                                      guide = guide_legend(ncol = 2))
+                                          ),
+                            nudge_y = -0.3, size = 4
+                           ))
+```
+
+
+```{r}
+# set figure theme 
+# add:	other gg object to be added to final plot, such as theme().
+theme_use <- theme(legend.position = "top", aspect.ratio = 1,
+                   axis.title = element_blank(),
+                   axis.text = element_blank(),
+                   axis.ticks = element_blank(),
+                   panel.grid = element_blank(),
+                   panel.background = element_blank())
+
+cl %>% cl_plot(add = theme_use)
+```
+
+
+```{r fig.height=6, fig.width= 7 }
+# combined all aesthetic settings.
+cl %>% cl_plot(cross = list(mapping =  aes(color = type, shape= type),
+                            scale   = list(color = scale_color_manual(values = RColorBrewer::brewer.pal(8, "Dark2"),
+                                                                      guide = guide_legend(ncol = 2)),
+                                           size  = scale_size_continuous(range = c(1,5), 
+                                                                      guide = guide_legend(ncol = 2)),
+                                           shape  = scale_shape_manual(values = c(13:18),
+                                                                      guide = guide_legend(ncol = 2))
+                                          )
+                           ),
+               link = list(mapping =  aes(x = x + 0.1, xend = xend -0.1,
+                                          color = src.cross,linetype =src.cross, size = src.degree),
+                            scale   = list(color = scale_color_manual(values = RColorBrewer::brewer.pal(8, "Dark2"),
+                                                                      guide = guide_legend(ncol = 2)),
+                                           size  = scale_size_continuous(range = c(1,3), 
+                                                                      guide = guide_legend(ncol = 2)),
+                                           linetype = scale_linetype_manual(values = c(1:6),
+                                                                      guide = guide_legend(ncol = 2))
+                                           ),
+                            size = 1.5
+                            ),
+               header = list(mapping = aes(color= cross),
+                               scale = list(color = scale_color_manual(values = RColorBrewer::brewer.pal(8, "Dark2"),
+                                                                       guide = guide_legend(ncol = 2))),
+                                size = 5.5
+                             ),
+               label = list(nudge_y = -0.3, size = 4
+                           ),
+               add = theme_use
+               )
+
+```
+
+
+#### c. annotation figure
+```{r fig.width=8}
+# cl_annotation： add annotation figure. 
+# top, bottom, left or  right	: ggplot object
+# top.by, bottom.by, left.by, right.by : name of cross by which to align ggplot
+
+ann.data <- data.frame(F=factor(paste0("F",c(1:10)),levels=paste0("F",c(10:1))),value=sample(size = 10,x=c(1:10)))
+ann.data %>% ggplot(mapping = aes(x=F,y=value))+geom_bar(stat="identity")+coord_flip() -> rgtAnn
+
+cl %>% cl_plot(annotation=cl_annotation(right= rgtAnn,right.by ="F"))
+
+```
+
+#### d. custom plots using ggplot2
+
+Retrieving the metadata for nodes, edges and headers, with which users can plot the network in any way they like.
+
+```{r}
+
+cl %>% get_cross()   # get node information
+cl %>% get_link()    # get edges information
+cl %>% get_header()  # get header of crosslink object 
+```
+
+
+## 4. Examples
+
+There are several examples and practical applications.
+
+### 1). examples used in the paper
+
+generate a CrossLink object
+
+```{r}
+cl <- crosslink(demo$nodes, demo$edges, demo$cross.by, odd.rm = F,spaces = "flank")
+cl %<>% set_header(header = c("A","B","C","D","E","F"))
+```
+
+#### a. layout by row
+```{r}
+cl %>% layout_row() %>%
+  set_header(hjust = 0, vjust = 0.5) %>%
+   cl_plot(cross = list(mapping = aes(fill=type),
+                        scale   = list(color = scale_color_manual(values = RColorBrewer::brewer.pal(8, "Dark2")),
+                                        fill = scale_fill_manual( values = RColorBrewer::brewer.pal(8, "Dark2"))),
+                        size=8,shape=24, color = "black"
+                       ),
+          link   = list(mapping = aes(color = src.cross),
+                        size=1.5, linetype=1),
+          label  = list(color="white"),
+          header = list(mapping = aes(color= cross),
+                        scale = list(color = scale_color_manual(values = RColorBrewer::brewer.pal(8, "Dark2"))),
+                        size=5, show.legend = F
+                       )
+          )  %>%
+  cl_void(th = theme(aspect.ratio = 1))
+
+```
+
+#### b. layout by rotate
+```{r}
+cl %>% 
+   tf_rotate(angle = 10, by.each.cross = T) %>%
+   cl_plot(cross = list(mapping = aes(fill = type),
+                       scale = list(fill = scale_fill_manual(values = RColorBrewer::brewer.pal(8, "Dark2"))),
+                       size=10, shape=24, color = "black"
+                       ),
+          link   = list(mapping = aes(color = src.cross),
+                        size=1.5, linetype=1),
+          label = list(color="white"),
+          header = list(mapping = aes(color= cross),
+                       scale = list(color = scale_color_manual(values = RColorBrewer::brewer.pal(8, "Dark2"))),
+                       size=5, show.legend = F
+                       )
+          )  %>%
+  cl_void(th = theme(aspect.ratio = 1))
+
+          
+```
+
+#### c. layout by polygon
+```{r}
+cl %>% layout_polygon() %>%
+   #tf_rotate(angle = 45, by.each.cross = F) %>%  # If the grouping is 4, rotate by this parameter and change from diamond to square 
+   cl_plot(cross = list(mapping = aes(color = type),
+                        scale = list(color = scale_color_manual(values = RColorBrewer::brewer.pal(8, "Dark2"))),
+                        size=10,shape=16
+                       ),
+           link   = list(geom = "curve",
+                         mapping = aes(color = src.cross),
+                         size=1.5, linetype=1
+                         ),
+           label = list(color="white"),
+           header= list(mapping = aes(color= cross),
+                        scale = list(color = scale_color_manual(values = RColorBrewer::brewer.pal(8, "Dark2"))),
+                        size=5
+                        )
+          )  %>%
+  cl_void(th = theme(aspect.ratio = 1))
+
+```
+
+#### d. layout by hive
+
+```{r}
+cl %>% layout_hive(angles=rep(60,6)) %>% #length of angles must be same with the numbers of groups
+       cl_plot(cross = list(mapping = aes(color = type),
+                       scale = list(color = scale_color_manual(values = RColorBrewer::brewer.pal(8, "Dark2"))),
+                       size=10,shape=18
+                       ),
+               link   = list(geom = "curve", curvature = -0.5,
+                             mapping = aes(color = src.cross),
+                             size=1.5, linetype=1),
+               label = list(color="white"),
+               header= list(mapping = aes(color= cross),
+                            scale = list(color = scale_color_manual(values = RColorBrewer::brewer.pal(8, "Dark2"))),
+                            size=5
+                            )
+          )  %>%
+  cl_void(th = theme(aspect.ratio = 1))
+```
+
+#### e. layout by arc
+
+```{r}
+cl %>% layout_arc(angles = 45) %>% #length of angles must be same with the numbers of crosses
+       cl_plot(cross = list(mapping = aes(color = type),
+                            scale = list(color = scale_color_manual(values = RColorBrewer::brewer.pal(8, "Dark2"))),
+                            size=10, shape=18
+                           ),
+               link   = list(mapping = aes(color = src.cross),
+                             size=1, linetype=2),
+               label = list(color="white"),
+               header= list(mapping = aes(color= cross),
+                            scale = list(color = scale_color_manual(values = RColorBrewer::brewer.pal(8, "Dark2"))),
+                            size=5
+                           )
+               ) %>%
+  cl_void(th = theme(aspect.ratio = 1))
+
+```
+
+#### f. layout by combination of several methods
+
+```{r}
+cl %>% 
+  layout_polygon(crosses = c("A","B","C","D"), layout_save = "combined") %>%
+  layout_row(crosses = c("E", "F"), layout_save = "combined") %>% 
+  tf_rotate(crosses=c("A","B","C","D"), x = 0, y = 0, angle = -45) %>% 
+  tf_scale(crosses = c("E", "F"), x = 0.5, y = 0.5, scale.x = sqrt(2), scale.y = 3) %>%
+  cl_align(crosses.1 = c("A","B","C","D"), crosses.2 = c("E", "F"), 
+           align.x = T, align.y = T, 
+           anchor.1 = c(0.5, 0),
+           anchor.2 = c(0.5, 2)) %>% 
+   cl_plot(cross = list(mapping = aes(color = type),
+                       scale = list(color = scale_color_manual(values = RColorBrewer::brewer.pal(8, "Dark2"))),
+                       size=10,shape=19
+                       ),
+          link   = list(color="grey75",size=1,linetype=3),
+          label  = list(color="white"),
+          header = list(mapping = aes(color= cross),
+                       scale = list(color = scale_color_manual(values = RColorBrewer::brewer.pal(8, "Dark2"))),
+                       size=5
+                       )
+   ) %>%
+  cl_void(th = theme(aspect.ratio = 1))
+           
+```
+
+### 2). examples of complex figure
+
+```{r }
+library(dplyr)
+library(reshape)
+theme_classic() +
+  theme(axis.text = element_blank(),
+        axis.line.x = element_blank(),
+        axis.ticks.x = element_blank()) ->theme_use2
+
+
+## crosslink project
+cl <- crosslink(example$nodes,example$edges,cross.by="type")
+
+cl %>% cl_plot()
+
+cl <- set_header(cl,header=unique(get_cross(cl)$cross))
+
+cl %>% layout_polygon(crosses = c("Mir","Meth","Gene","Drug"),layout_based = "default") %>%
+       tf_rotate(crosses= c("Mir","Meth","Gene","Drug"),angle = rep(45,4),layout="default") %>%
+       tf_shift(x=0.2*(-1),y=1.5,crosses=c("Mir","Meth"),layout="default") -> cl
+
+
+# plot annotation
+top <- nodes$id[nodes$type == "Mir"] # set the order as you like
+bottom <- nodes$id[nodes$type == "Gene"] # set the order as you like
+right <- nodes$id[nodes$type == "Meth"] # set the order as you like
+
+# Top plot
+topAnn <-  mirData %>%
+  mutate(mir_f = factor(mir, top)) %>%
+  ggplot(mapping = aes(x=mir,y=-lfc)) +
+  geom_bar(fill = "#E7298A",
+           stat = "identity",
+           width = 0.5) + 
+  labs(x = NULL, y = "log2(Fold Change)") +
+  theme_use2
+topAnn
+
+# Bottom plot
+botAnn <- geneData %>%
+  mutate(meth_f = factor(gene, bottom)) %>%
+  ggplot(mapping = aes(x=gene,y=-lfc)) +
+  geom_bar(fill =  RColorBrewer::brewer.pal(8, "Dark2")[c(1:5,7:9)][2],
+           stat = "identity",
+           width = 0.5) +
+  labs(x = NULL, y = "Difference") +
+  theme_use2
+botAnn
+
+# right plot
+rgtAnn <- methData %>%
+  mutate(mir_f = factor(meth, right)) %>%
+  ggplot(mapping = aes(x=meth,y=-lfc)) +
+  geom_bar(fill = RColorBrewer::brewer.pal(8, "Dark2")[c(1:5,7:9)][3],
+           stat = "identity", 
+           width = 0.5) +
+  labs(x = NULL, y = "log2(Fold Change)") +
+  theme_use2 +
+  coord_flip()
+
+rgtAnn
+
+# left plot
+mat = matrix(sample(1:100, 64, replace = T), nrow = 8)
+colnames(mat)=as.character(cl@cross$Drug)
+ggplot(data = melt(mat), aes(X1, X2, fill = value))+
+     geom_tile(color = "white")+ 
+     scale_fill_gradient2(low = "blue", high = "darkgreen", mid = "white",midpoint = 0) + 
+     xlab("")+ylab("")+theme_classic()+
+     theme(legend.position = "right",
+          axis.line = element_blank(),
+          axis.ticks = element_blank(),
+           axis.text = element_blank()) -> lftAnno
+lftAnno
+```
+
+
+Combine network plot and four annotation plots
+
+```{r fig.width=10, fig.height=8}
+cl_plot(cl,
+       annotation=cl_annotation(top = topAnn,top.by = "Mir",top.height = 0.5,
+                                bottom = botAnn,bottom.by = "Gene",bottom.height = 0.5,
+                                right = rgtAnn,right.by ="Meth",right.width = 0.5,
+                                left = lftAnno,left.by = "Drug" ,left.width = 0.5),
+       cross = list(mapping = aes(color = type,size=degree,shape=type),
+       scale = list(color = scale_color_manual(values = RColorBrewer::brewer.pal(8, "Dark2")[c(1:5,7:9)]),
+                    shape = scale_shape_manual(values = 15:23),
+                    size  = scale_size_continuous(range=c(1,5)))),
+       link  = list(mapping = aes(color = type,linetype=type,size=cor),
+                    scale = list(color = scale_color_manual(values = RColorBrewer::brewer.pal(8, "Set1")[c(1:5,7:9)]),
+                                 linetype=scale_linetype_manual(values = c(1:4)),
+                                 size=scale_size(range = c(1,2)))),
+       header=NA,
+       label = list(color="black"
+                    ,angle=c(rep(0,8),rep(90,10),rep(0,10),rep(90,6))
+                    ,nudge_x=c(rep(-2,8),rep(0,10),rep(2,10),rep(0,6))
+                    ,nudge_y=c(rep(0,8),rep(-2,10),rep(0,10),rep(2,6))),
+       add   =  theme(panel.background = element_blank(),
+                      axis.title = element_blank(),
+                      panel.grid = element_blank(),
+                      axis.ticks = element_blank(),
+                      axis.text = element_blank()))
+
+
+```
