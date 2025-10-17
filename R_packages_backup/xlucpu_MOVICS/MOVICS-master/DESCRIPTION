@@ -1,0 +1,108 @@
+Package: MOVICS
+Title: Multi-Omics integration and VIsualization in Cancer Subtyping
+Version: 0.99.17
+Authors@R: 
+    person(given = "Xiaofan",
+           family = "Lu",
+           role = c("aut", "cre"),
+           email = "xlu.cpu@foxmail.com",
+           comment = c(ORCID = "0000-0003-2417-6548"))
+Description: This package provides a unified interface for 10 state-of-the-art multi-omics clustering algorithms, and forms a pipeline for most commonly used downstream analyses in cancer subtyping researches and to create feature rich customizable visualzations with minimal effort.
+Depends: R (>= 4.0.1)
+License: GPL-3 + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Suggests: 
+    testthat,
+    knitr,
+    rmarkdown,
+    kableExtra
+Remotes: 
+    github::maxconway/SNFtool@master, github::danro9685/CIMLR@R, github::Lothelab/CMScaller@master, github::davidgohel/officer@master
+Imports: 
+    CIMLR,
+    ClassDiscovery,
+    ConsensusClusterPlus,
+    IntNMF,
+    PINSPlus,
+    SNFtool,
+    coca,
+    dplyr,
+    ggplot2,
+    iClusterPlus,
+    mogsa,
+    vegan,
+    circlize,
+    survival,
+    survminer,
+    ggpp,
+    tibble,
+    limma,
+    DESeq2,
+    edgeR,
+    aricode,
+    ggalluvial,
+    flexclust,
+    reshape2,
+    clusterProfiler,
+    GSVA,
+    grid,
+    cowplot,
+    jstable,
+    impute,
+    CMScaller,
+    car,
+    genefilter,
+    ggpubr,
+    preprocessCore,
+    ridge,
+    sva,
+    grDevices,
+    maftools,
+    patchwork,
+    ComplexHeatmap (>= 2.5.5),
+    pamr,
+    clusterRepro,
+    officer
+VignetteBuilder: knitr
+RoxygenNote: 7.1.1
+biocViews: Clustering, DifferentialExpression, GeneSetEnrichment, MultipleComparison, SomaticMutation, CopyNumberVariation, Survival
+URL: https://github.com/xlucpu/MOVICS
+BugReports: https://github.com/xlucpu/MOVICS/issues
+Collate: 
+    'compAgree.R'
+    'compClinvar.R'
+    'compDrugsen.R'
+    'compFGA.R'
+    'compMut.R'
+    'compSurv.R'
+    'compTMB.R'
+    'getCIMLR.R'
+    'getCOCA.R'
+    'getClustNum.R'
+    'getConsensusClustering.R'
+    'getConsensusMOIC.R'
+    'getSilhouette.R'
+    'getElites.R'
+    'getIntNMF.R'
+    'getLRAcluster.R'
+    'getMOIC.R'
+    'getMoCluster.R'
+    'getMoHeatmap.R'
+    'getNEMO.R'
+    'getPINSPlus.R'
+    'getSNF.R'
+    'getStdiz.R'
+    'getiClusterBayes.R'
+    'runDEA.R'
+    'runGSEA.R'
+    'runGSVA.R'
+    'runMarker.R'
+    'runNTP.R'
+  	'runPAM.R'
+  	'runKappa.R'
+    'pRRophetic.R'
+    'LRAcluster.R'
+    'quiet.R'
+    'dataset.R'
+    'global.R'
