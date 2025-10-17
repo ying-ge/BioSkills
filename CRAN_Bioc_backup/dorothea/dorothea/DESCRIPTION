@@ -1,0 +1,65 @@
+Package: dorothea
+Type: Package
+Title: Collection Of Human And Mouse TF Regulons
+Version: 1.14.1
+Authors@R: c(
+    person(given = "Pau",
+           family = "Badia-i-Mompel",
+           role = c("cre"),
+           email = "pau.badia@uni-heidelberg.de",
+           comment = c(ORCID = "0000-0002-1004-3923")),
+    person(given = "Daniel",
+           family = "Dimitrov",
+           role = c("aut"),
+           email = "daniel.dimitrov@uni-heidelberg.de",
+           comment = c(ORCID = "0000-0002-5197-2112")),
+    person(given = "Christian H.",
+           family = "Holland",
+           role = c("aut"),
+           email = "cholland2408@gmail.com",
+           comment = c(ORCID = "0000-0002-3060-5786")),
+    person(given = "Luz",
+           family = "Garcia-Alonso",
+           role = "aut"),
+    person(given = "Alberto",
+           family = "Valdeolivas",
+           role = "ctb"),
+    person(given = "Minoo",
+           family = "Ashtiani",
+           role = "ctb"),
+    person(given = "Attila",
+           family = "Gabor",
+           role = "ctb")
+           )
+Description: DoRothEA is a gene regulatory network containing signed transcription factor (TF) - target gene interactions. DoRothEA regulons, the collection of a TF and its transcriptional targets, were curated and collected from different types of evidence for both human and mouse. A confidence level was assigned to each TF-target interaction based on the number of supporting evidence.
+URL: https://saezlab.github.io/dorothea/,
+        https://github.com/saezlab/dorothea
+BugReports: https://github.com/saezlab/dorothea/issues
+Depends: R (>= 4.0)
+License: GPL-3 + file LICENSE
+Encoding: UTF-8
+LazyData: true
+LazyDataCompression: xz
+RoxygenNote: 7.2.3
+VignetteBuilder: knitr
+biocViews: ExperimentData, Homo_sapiens_Data, Mus_musculus_Data
+Imports: dplyr, magrittr, bcellViper, decoupleR,
+Suggests: Biobase, BiocStyle, OmnipathR, viper, knitr, pheatmap,
+        pkgdown, rmarkdown, Seurat, SingleCellExperiment,
+        SummarizedExperiment, testthat (>= 2.1.0), tibble, tidyr, utils
+git_url: https://git.bioconductor.org/packages/dorothea
+git_branch: RELEASE_3_18
+git_last_commit: 29657a5
+git_last_commit_date: 2024-02-26
+Repository: Bioconductor 3.18
+Date/Publication: 2024-02-27
+NeedsCompilation: no
+Packaged: 2024-02-27 15:31:27 UTC; biocbuild
+Author: Pau Badia-i-Mompel [cre] (<https://orcid.org/0000-0002-1004-3923>),
+  Daniel Dimitrov [aut] (<https://orcid.org/0000-0002-5197-2112>),
+  Christian H. Holland [aut] (<https://orcid.org/0000-0002-3060-5786>),
+  Luz Garcia-Alonso [aut],
+  Alberto Valdeolivas [ctb],
+  Minoo Ashtiani [ctb],
+  Attila Gabor [ctb]
+Maintainer: Pau Badia-i-Mompel <pau.badia@uni-heidelberg.de>
