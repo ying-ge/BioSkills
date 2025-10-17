@@ -1,0 +1,59 @@
+---
+title: "Alternative strategies for deploying workflowr websites"
+subtitle: "workflowr version `r utils::packageVersion('workflowr')`"
+author: "John Blischak"
+date: "`r Sys.Date()`"
+output:
+  rmarkdown::html_vignette:
+    toc: true
+vignette: >
+  %\VignetteIndexEntry{Alternative strategies for deploying workflowr websites}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+## Introduction
+
+The [Getting Started vignette][vig-getting-started] provides instructions for
+deploying the workflowr website using the service [GitHub Pages][gh-pages]
+because it is quick and convenient. However, the static website created by
+workflowr can be deployed using any strategy you like. Below are instructions
+for deploying the workflowr website contributed by other workflowr users. If you
+would like to contribute instructions for another deployment strategy, please
+fork the [workflowr repository][workflowr] on GitHub and add your instructions
+to this file. If you need any assistance with this, please
+don't hesitate to open an [Issue][wflow-issues].
+
+[gh-pages]: https://pages.github.com/
+[vig-getting-started]: wflow-01-getting-started.html
+[wflow-issues]: https://github.com/workflowr/workflowr/issues
+[workflowr]: https://github.com/workflowr/workflowr
+
+## Amazon S3 (password-protected)
+
+Another way to privately share your workflowr site is by uploading it to [Amazon
+S3][s3]. S3 is an object storage service for the Amazon cloud, and can be used
+to host static websites. Basic HTTP authentication can be accomplished using
+[CloudFront][cloudfront], Amazon's content delivery network, and
+[Lamba@Edge][lambda], which enables the execution of serverless functions to
+customize content delivered by the CDN. This [blog post][hackernoon] goes into
+more detail about what that all means. Some templates for scripting the process are
+[here][dumrauf].
+
+Contributed by E. David Aja ([edavidaja][]).
+
+[cloudfront]: https://aws.amazon.com/cloudfront/
+[edavidaja]: https://github.com/edavidaja
+[dumrauf]: https://github.com/dumrauf/serverless_static_website_with_basic_auth
+[hackernoon]: https://hackernoon.com/serverless-password-protecting-a-static-website-in-an-aws-s3-bucket-bfaaa01b8666
+[lambda]: https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/lambda-at-the-edge.html
+[s3]: https://aws.amazon.com/s3/
+
+## GitLab Pages
+
+To deploy your workflowr website with [GitLab Pages][gitlab], you can use the
+function `wflow_use_gitlab()`. You can choose if the site is public or private.
+For more details, please see the dedicated vignette [Hosting workflowr websites
+using GitLab](wflow-06-gitlab.html).
+
+[gitlab]: https://docs.gitlab.com/user/project/pages/

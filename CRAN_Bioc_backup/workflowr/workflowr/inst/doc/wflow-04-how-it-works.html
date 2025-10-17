@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="John Blischak" />
+
+<meta name="date" content="2025-08-18" />
+
+<title>How the workflowr package works</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">How the workflowr package works</h1>
+<h3 class="subtitle">workflowr version 1.7.2</h3>
+<h4 class="author">John Blischak</h4>
+<h4 class="date">2025-08-18</h4>
+
+
+<div id="TOC">
+<ul>
+<li><a href="#overview" id="toc-overview">Overview</a></li>
+<li><a href="#where-are-the-figures" id="toc-where-are-the-figures">Where are the figures?</a></li>
+<li><a href="#additional-tools" id="toc-additional-tools">Additional
+tools</a></li>
+<li><a href="#background-and-related-work" id="toc-background-and-related-work">Background and related
+work</a></li>
+<li><a href="#further-reading" id="toc-further-reading">Further
+reading</a></li>
+</ul>
+</div>
+
+<p>The workflowr package combines many powerful tools in order to
+produce a research website. It is absolutely <strong>not</strong>
+necessary to understand all the underlying tools to take advantage of
+workflowr, and in fact that is one of the primary goals of workflowr: to
+allow researchers to focus on their analyses without having to worry too
+much about the technical details. However, if you are interested in
+implementing advanced customization options, contributing to workflowr,
+or simply want to learn more about these tools, the sections below
+provide some explanations of how workflowr works.</p>
+<div id="overview" class="section level2">
+<h2>Overview</h2>
+<p><a href="https://cran.r-project.org/">R</a> is the computer
+programming language used to perform the analysis. <a href="https://yihui.org/knitr/">knitr</a> is an R package that executes
+code chunks in an R Markdown file to create a Markdown file. <a href="https://daringfireball.net/projects/markdown/">Markdown</a> is a
+lightweight markup language that is easier to read and write than HTML.
+<a href="https://rmarkdown.rstudio.com/">rmarkdown</a> is an R package
+that combines the functionality of <a href="https://yihui.org/knitr/">knitr</a> and the document converter <a href="https://pandoc.org/">pandoc</a>. <a href="https://pandoc.org/">Pandoc</a> powers the conversion of <a href="https://yihui.org/knitr/">knitr</a>-produced Markdown files into
+HTML, Word, or PDF documents. Additionally, newer versions of <a href="https://rmarkdown.rstudio.com/">rmarkdown</a> contain functions
+for building websites. The styling of the websites is performed by the
+web framework <a href="https://getbootstrap.com/">Bootstrap</a>. <a href="https://getbootstrap.com/">Bootstrap</a> implements the navigation
+bar at the top of the website, has many available themes to customize
+the look of the site, and dynamically adjusts the website so it can be
+viewed on a desktop, tablet, or mobile device. The <a href="https://rmarkdown.rstudio.com/">rmarkdown</a> website
+configuration file <code>_site.yml</code> allows convenient
+customization of the <a href="https://getbootstrap.com/">Bootstrap</a>
+navigation bar and theme.</p>
+<p><a href="https://git-scm.com/">Git</a> is a distributed version
+control system (VCS) that tracks code development. It has many powerful
+features, but only a handful of the main functions are required to use
+workflowr. <a href="https://cran.r-project.org/package=git2r">git2r</a>
+is an R package which provides an interface to <a href="https://libgit2.org/">libgit2</a>, which is a portable, pure C
+implementation of the Git core methods (this is why you don’t need to
+install Git before using workflowr). <a href="https://github.com/">GitHub</a> is a website that hosts <a href="https://git-scm.com/">Git</a> repositories and additionally
+provides collaboration tools for developing software. <a href="https://pages.github.com/">GitHub Pages</a> is a <a href="https://github.com/">GitHub</a> service that offers free hosting
+of <a href="https://en.wikipedia.org/wiki/Static_web_page">static
+websites</a>. By placing the HTML files for the website in the
+subdirectory <code>docs/</code>, <a href="https://pages.github.com/">GitHub Pages</a> serves them
+online.</p>
+<p>To aid reproducibility, workflowr provides an R Markdown output
+format <code>wflow_html()</code> template that automatically sets a seed
+for random number generation, records the session information, and
+reports the status of the Git repository (so you always know which
+version of the code produced the results contained in that particular
+file). These options are controlled by the settings in
+<code>_workflowr.yml</code>. It also provides a custom site generator
+<code>wflow_site()</code> that enables <code>wflow_html()</code> to work
+with R Markdown websites. These options are controlled in
+<code>analysis/_site.yml</code>.</p>
+</div>
+<div id="where-are-the-figures" class="section level2">
+<h2>Where are the figures?</h2>
+<p>workflowr saves the figures into an organized, hierarchical directory
+structure within <code>analysis/</code>. For example, the first figure
+generated by the chunk named <code>plot-data</code> in the file
+<code>filename.Rmd</code> will be saved as
+<code>analysis/figure/filename.Rmd/plot-data-1.png</code>. Furthermore,
+the figure files are <em>moved</em> to <code>docs/</code> when
+<code>render_site</code> is run (this is the rmarkdown package function
+called by <code>wflow_build</code>, <code>wflow_publish</code>, and the
+RStudio Knit button).</p>
+<p>The figures have to be committed to the Git repository in
+<code>docs/</code> in order to be displayed properly on the website.
+<code>wflow_publish</code> automatically commits the figures in
+<code>docs</code> corresponding to new or updated R Markdown files, and
+<code>analysis/figure/</code> is in the <code>.gitignore</code> file to
+prevent accidentally committing duplicate files.</p>
+<p>Because workflowr requires the figures to be saved to a specific
+location in order to function properly, it will override any custom
+setting of the knitr option <code>fig.path</code> (which controls where
+figure files are saved) and insert a warning into the HTML file to alert
+the user that their value for <code>fig.path</code> was ignored.</p>
+</div>
+<div id="additional-tools" class="section level2">
+<h2>Additional tools</h2>
+<p><a href="https://posit.co/">Posit Software, PBC</a> is a company that
+develops open source software for R users. They are the principal
+developers of <a href="https://posit.co/products/open-source/rstudio/">RStudio</a>, an
+integrated development environment (IDE) for R, and the <a href="https://rmarkdown.rstudio.com/">rmarkdown</a> package. Because of
+this tight integration, new developments in the <a href="https://rmarkdown.rstudio.com/">rmarkdown</a> package are quickly
+incorporated into the <a href="https://posit.co/products/open-source/rstudio/">RStudio</a> IDE.
+While not strictly required for using workflowr, using <a href="https://posit.co/products/open-source/rstudio/">RStudio</a>
+provides many benefits, including:</p>
+<ul>
+<li><p>RStudio projects make it easier to setup your R environment,
+e.g. set the correct working directory, and quickly switch between
+different projects</p></li>
+<li><p>The Git pane allows you to conveniently view your changes and run
+the main Git functions</p></li>
+<li><p>The Viewer pane displays the rendered HTML results for immediate
+feedback</p></li>
+<li><p>Clicking the <code>Knit</code> button automatically uses the <a href="https://getbootstrap.com/">Bootstrap</a> options specified in
+<code>_site.yml</code> and moves the rendered HTML to the website
+subdirectory <code>docs/</code> (requires version 1.0 or
+greater)</p></li>
+<li><p>Includes an up-to-date copy of <a href="https://pandoc.org/">pandoc</a> so you don’t have to install or
+update it</p></li>
+<li><p>Tons of other cool <a href="https://posit.co/products/open-source/rstudio/">features</a> like
+debugging and source code inspection</p></li>
+</ul>
+<p>Another key R package used by workflowr is <a href="https://cran.r-project.org/package=rprojroot">rprojroot</a>. This
+package finds the root of the repository, so workflowr functions like
+<code>wflow_build</code> will work the same regardless of the current
+working directory. Specifically, <a href="https://cran.r-project.org/package=rprojroot">rprojroot</a>
+searches for the RStudio project <code>.Rproj</code> file at the base of
+the workflowr project (so don’t delete it!).</p>
+</div>
+<div id="background-and-related-work" class="section level2">
+<h2>Background and related work</h2>
+<p>There is lots of interest and development around reproducible
+research with R. Projects like workflowr are possible due to two key
+developments. First, the R packages <a href="https://yihui.org/knitr/">knitr</a> and <a href="https://rmarkdown.rstudio.com/">rmarkdown</a> have made it easy
+for any R programmer to generate reports that combine text, code,
+output, and figures. Second, the version control software <a href="https://git-scm.com/">Git</a>, the Git hosting site <a href="https://github.com/">GitHub</a>, and the static website hosting
+service <a href="https://pages.github.com/">GitHub Pages</a> have made
+it easy to share not only source code but also static HTML files
+(i.e. no need to purchase a domain name, setup a server, etc).</p>
+<p>My first attempt at sharing a reproducible project online was <a href="https://jdblischak.github.io/singleCellSeq/analysis/">singleCellSeq</a>.
+Basically, I started by copying the documentation website of <a href="https://rmarkdown.rstudio.com/">rmarkdown</a> and added some
+customizations to organize the generated figures and to insert the
+status of the Git repository directly into the HTML pages. The workflowr
+R package is my attempt to simplify my previous workflow and provide
+helper functions so that any researcher can take advantage of this
+workflow.</p>
+<p>Workflowr encompasses multiple functions: 1) provides a project
+template, 2) version controls the R Markdown and HTML files, and 3)
+builds a website. Furthermore, it provides R functions to perform each
+of these steps. There are many other related works that provide similar
+functionality. Some are templates to be copied, some are R packages, and
+some involve more complex software (e.g. static blog software).
+Depending on your use case, one of the related works listed at <a href="https://github.com/jdblischak/r-project-workflows#readme">r-project-workflows</a>
+may better suit your needs. Please check them out!</p>
+</div>
+<div id="further-reading" class="section level2">
+<h2>Further reading</h2>
+<ul>
+<li><p>How the code, results, and figures are executed and displayed can
+be customized using <a href="https://yihui.org/knitr/options/">knitr
+chunk and package options</a></p></li>
+<li><p>How <a href="https://bookdown.org/yihui/rmarkdown/rmarkdown-site.html">R
+Markdown websites</a> are configured</p></li>
+<li><p>The many <a href="https://posit.co/products/open-source/rstudio/">features</a> of
+the <a href="https://posit.co/products/open-source/rstudio/">RStudio</a>
+IDE</p></li>
+<li><p><a href="https://docs.github.com/articles/configuring-a-publishing-source-for-github-pages">Directions</a>
+to publish a <a href="https://pages.github.com/">GitHub Pages</a> site
+using the <code>docs/</code> subdirectory</p></li>
+</ul>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
