@@ -22,8 +22,10 @@
 - ⚡ **效率提升**：告别搜索试错，专注于科学问题本身
 
 **示例**：
-> 输入："单细胞RNA-seq差异表达 + 细胞通讯分析"  
-> 输出："Seurat + DESeq2 + CellChat + ggplot2完整流程，含关键参数和可视化方案"
+- 输入：点击左上角Ask Zread————Ask AI，把文章中的method粘贴进去
+- [查看示例输出](https://github.com/ying-ge/BioSkills/blob/main/docs/test.md)
+
+---
 
 🎯 **这不是一个普通的包列表，这是你的生物信息学私人顾问！**
 
