@@ -1,0 +1,7 @@
+exportPattern("^[[:alpha:]]+")
+S3method(plot, givitiCalibrationBelt)
+importFrom("grDevices", "gray")
+importFrom("graphics", "arrows", "lines", "plot", "polygon", "text")
+importFrom("stats", "as.formula", "binomial", "coef", "dchisq",
+           "formula", "glm", "integrate", "logLik", "na.omit",
+           "pchisq", "qchisq", "uniroot", "update", "vcov")
