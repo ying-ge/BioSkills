@@ -1,0 +1,7 @@
+Package: phyloseq
+Version: 1.46.0
+Source: Bioconductor BioCsoft
+URL: https://bioconductor.org/packages/3.18/bioc/src/contrib/phyloseq_1.46.0.tar.gz
+Size: 5.44 MB
+Download Date: 2025-10-17
+
