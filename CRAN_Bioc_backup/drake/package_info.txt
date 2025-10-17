@@ -1,0 +1,7 @@
+Package: drake
+Version: 7.13.11
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/drake_7.13.11.tar.gz
+Size: 1.04 MB
+Download Date: 2025-10-17
+
