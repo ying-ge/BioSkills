@@ -1,0 +1,42 @@
+Package: scran
+Version: 1.30.2
+Date: 2024-01-19
+Title: Methods for Single-Cell RNA-Seq Data Analysis
+Description: 
+    Implements miscellaneous functions for interpretation of single-cell RNA-seq data.
+    Methods are provided for assignment of cell cycle phase, detection of highly
+    variable and significantly correlated genes, identification of marker genes,
+    and other common tasks in routine single-cell analysis workflows.
+Authors@R: 
+    c(person("Aaron", "Lun", role = c("aut", "cre"), email = "infinite.monkeys.with.keyboards@gmail.com"), 
+    person("Karsten", "Bach", role = "aut"),
+    person("Jong Kyoung", "Kim", role = "ctb"), 
+    person("Antonio", "Scialdone", role="ctb"))
+Depends: SingleCellExperiment, scuttle
+Imports: SummarizedExperiment, S4Vectors, BiocGenerics, BiocParallel,
+        Rcpp, stats, methods, utils, Matrix, edgeR, limma, igraph,
+        statmod, DelayedArray, DelayedMatrixStats, BiocSingular,
+        bluster, metapod, dqrng, beachmat
+Suggests: testthat, BiocStyle, knitr, rmarkdown, HDF5Array, scRNAseq,
+        dynamicTreeCut, ResidualMatrix, ScaledMatrix, DESeq2, monocle,
+        Biobase, pheatmap, scater
+biocViews: ImmunoOncology, Normalization, Sequencing, RNASeq, Software,
+        GeneExpression, Transcriptomics, SingleCell, Clustering
+LinkingTo: Rcpp, beachmat, BH, dqrng, scuttle
+License: GPL-3
+NeedsCompilation: yes
+VignetteBuilder: knitr
+SystemRequirements: C++11
+RoxygenNote: 7.1.2
+git_url: https://git.bioconductor.org/packages/scran
+git_branch: RELEASE_3_18
+git_last_commit: f01bc21
+git_last_commit_date: 2024-01-20
+Repository: Bioconductor 3.18
+Date/Publication: 2024-01-22
+Packaged: 2024-01-23 00:05:17 UTC; biocbuild
+Author: Aaron Lun [aut, cre],
+  Karsten Bach [aut],
+  Jong Kyoung Kim [ctb],
+  Antonio Scialdone [ctb]
+Maintainer: Aaron Lun <infinite.monkeys.with.keyboards@gmail.com>
