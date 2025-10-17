@@ -1,4 +1,4 @@
-name: Download Python Packages (逐个推送版)
+name: Download Python Packages (逐个推送版 - 修复版)
  
 on:
   workflow_dispatch:
@@ -82,16 +82,16 @@ jobs:
         GITHUB_REPOSITORY: ${{ github.repository }}
         PACKAGE_FILE: ${{ github.event.inputs.package_file || '.github/docs/lib_python.txt' }}
       run: |
-        # 创建逐个下载的Python脚本
+        # 创建逐个下载的Python脚本（修复版）
         cat > incremental_download.py << 'EOF'
         import os
-        sys
+        import sys
         import yaml
-        json
+        import json
         import time
+        import subprocess
         from pathlib import Path
         from tqdm import tqdm
-        import subprocess
         
         def write_progress(package_name, status, size_mb=0, category=""):
             """写入进度信息"""
@@ -239,6 +239,16 @@ jobs:
             main()
         EOF
         
+        # 测试Python脚本语法
+        echo "🧪 测试Python脚本语法..."
+        python -m py_compile incremental_download.py
+        if [ $? -eq 0 ]; then
+            echo "✅ Python脚本语法正确"
+        else
+            echo "❌ Python脚本语法错误"
+            exit 1
+        fi
+        
         # 在后台运行下载脚本
         echo "🚀 开始逐个下载Python包..."
         python incremental_download.py classified_packages.yml Python_packages_backup &
@@ -311,7 +321,7 @@ jobs:
             fi
           fi
           
-          # 每30秒检查一次下载进程状态
+          # 每3秒检查一次下载进程状态
           sleep 3
         done
         
@@ -355,7 +365,6 @@ jobs:
           # 读取并显示统计信息
           python3 << 'EOF'
           import json
-          import sys
           
           try:
               with open('download_summary.json', 'r') as f:
@@ -368,7 +377,7 @@ jobs:
               print(f"| ⏰ 完成时间 | {summary['completion_time']} | 备份完成时间 |")
           except Exception as e:
               print(f"❌ 无法读取统计信息: {e}")
-          EOF
+          EOF >> $GITHUB_STEP_SUMMARY
         else
           echo "| 状态 | 数量 | 备注 |" >> $GITHUB_STEP_SUMMARY
           echo "|------|------|------|" >> $GITHUB_STEP_SUMMARY
