@@ -1,0 +1,37 @@
+Package: ReactomePA
+Type: Package
+Title: Reactome Pathway Analysis
+Version: 1.46.0
+Authors@R: c(person(given = "Guangchuang", family = "Yu",
+	   	    email = "guangchuangyu@gmail.com",
+		    role  = c("aut", "cre")),
+	     person(given = "Vladislav", family = "Petyuk",
+	     	    email = "petyuk@gmail.com",
+		    role  = "ctb"))
+Maintainer: Guangchuang Yu <guangchuangyu@gmail.com>
+Description: This package provides functions for pathway analysis based on
+    REACTOME pathway database. It implements enrichment analysis, gene set
+    enrichment analysis and several functions for visualization.
+Depends: R (>= 3.4.0)
+Imports: AnnotationDbi, DOSE (>= 3.5.1), enrichplot, ggplot2 (>=
+        3.3.5), ggraph, reactome.db, igraph, graphite, gson
+Suggests: BiocStyle, clusterProfiler, knitr, rmarkdown, org.Hs.eg.db,
+        prettydoc, testthat
+VignetteBuilder: knitr
+ByteCompile: true
+License: GPL-2
+URL: https://yulab-smu.top/biomedical-knowledge-mining-book/
+BugReports: https://github.com/GuangchuangYu/ReactomePA/issues
+Packaged: 2023-10-24 22:40:06 UTC; biocbuild
+biocViews: Pathways, Visualization, Annotation, MultipleComparison,
+        GeneSetEnrichment, Reactome
+RoxygenNote: 7.2.1
+Encoding: UTF-8
+git_url: https://git.bioconductor.org/packages/ReactomePA
+git_branch: RELEASE_3_18
+git_last_commit: 4fc270b
+git_last_commit_date: 2023-10-24
+Date/Publication: 2023-10-24
+NeedsCompilation: no
+Author: Guangchuang Yu [aut, cre],
+  Vladislav Petyuk [ctb]
