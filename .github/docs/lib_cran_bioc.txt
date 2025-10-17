@@ -278,6 +278,7 @@ RTN
 rtracklayer
 rtiff
 rstanarm
+rsynthbio
 scales
 scater
 scDblFinder
