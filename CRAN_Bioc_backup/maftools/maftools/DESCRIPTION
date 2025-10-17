@@ -1,0 +1,43 @@
+Type: Package
+Package: maftools
+Title: Summarize, Analyze and Visualize MAF Files
+Version: 2.18.0
+Date: 2021-04-30
+Authors@R: 
+    person(given = "Anand",
+           family = "Mayakonda",
+           role = c("aut", "cre"),
+           email = "anand_mt@hotmail.com",
+           comment = c(ORCID = "0000-0003-1162-687X"))
+Maintainer: Anand Mayakonda <anand_mt@hotmail.com>
+Description: Analyze and visualize Mutation Annotation Format (MAF) files
+    from large scale sequencing studies. This package provides various
+    functions to perform most commonly used analyses in cancer genomics
+    and to create feature rich customizable visualzations with minimal
+    effort.
+License: MIT + file LICENSE
+URL: https://github.com/PoisonAlien/maftools
+BugReports: https://github.com/PoisonAlien/maftools/issues
+Depends: R (>= 3.3)
+Imports: data.table, grDevices, methods, RColorBrewer, Rhtslib,
+        survival, DNAcopy
+Suggests: berryFunctions, Biostrings, BSgenome,
+        BSgenome.Hsapiens.UCSC.hg19, GenomicRanges, IRanges, knitr,
+        mclust, MultiAssayExperiment, NMF, R.utils, RaggedExperiment,
+        rmarkdown, S4Vectors, pheatmap, curl
+LinkingTo: Rhtslib, zlibbioc
+VignetteBuilder: knitr
+biocViews: DataRepresentation, DNASeq, Visualization, DriverMutation,
+        VariantAnnotation, FeatureExtraction, Classification,
+        SomaticMutation, Sequencing, FunctionalGenomics, Survival
+Encoding: UTF-8
+NeedsCompilation: yes
+Packaged: 2023-10-24 21:47:43 UTC; biocbuild
+RoxygenNote: 7.2.3
+SystemRequirements: GNU make
+git_url: https://git.bioconductor.org/packages/maftools
+git_branch: RELEASE_3_18
+git_last_commit: b1f8625
+git_last_commit_date: 2023-10-24
+Date/Publication: 2023-10-24
+Author: Anand Mayakonda [aut, cre] (<https://orcid.org/0000-0003-1162-687X>)
