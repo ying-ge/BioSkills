@@ -1,0 +1,7 @@
+Package: ggforce
+Version: 0.5.0
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/ggforce_0.5.0.tar.gz
+Size: 0.86 MB
+Download Date: 2025-10-17
+
