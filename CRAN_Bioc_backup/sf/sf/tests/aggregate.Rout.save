@@ -1,0 +1,114 @@
+
+R version 4.4.1 (2024-06-14) -- "Race for Your Life"
+Copyright (C) 2024 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> ## IGNORE_RDIFF_BEGIN
+> library(sf)
+Linking to GEOS 3.12.1, GDAL 3.8.4, PROJ 9.4.0; sf_use_s2() is TRUE
+> ## IGNORE_RDIFF_END
+> # aggregate
+> pl1 = st_polygon(list(rbind(c(0,0),c(1,0),c(1,1),c(0,0))))
+> pl2 = st_polygon(list(rbind(c(0,0),c(1,1),c(0,1),c(0,0))))
+> s = st_sf(a = 1:2, geom = st_sfc(pl1, pl2))
+> (a = aggregate(s, list(c(1,1)), mean, do_union = FALSE))
+Simple feature collection with 1 feature and 2 fields
+Attribute-geometry relationships: aggregate (1), identity (1)
+Geometry type: MULTIPOLYGON
+Dimension:     XY
+Bounding box:  xmin: 0 ymin: 0 xmax: 1 ymax: 1
+CRS:           NA
+  Group.1   a                       geometry
+1       1 1.5 MULTIPOLYGON (((0 0, 1 0, 1...
+> (a = aggregate(s, list(c(1,1)), mean, do_union = TRUE))
+Simple feature collection with 1 feature and 2 fields
+Attribute-geometry relationships: aggregate (1), identity (1)
+Geometry type: POLYGON
+Dimension:     XY
+Bounding box:  xmin: 0 ymin: 0 xmax: 1 ymax: 1
+CRS:           NA
+  Group.1   a                       geometry
+1       1 1.5 POLYGON ((1 0, 0 0, 0 1, 1 ...
+> # expect_warning(st_cast(a, "POINT"))
+> if (suppressPackageStartupMessages(require(sp, quietly = TRUE))) {
++  demo(meuse_sf, echo = FALSE, ask = FALSE)
++  a = aggregate(meuse_sf, list(meuse_sf$soil), mean)
++  print(attributes(a)$agr)
++  a = aggregate(meuse_sf, list(soil = meuse_sf$soil), mean)
++  print(attributes(a)$agr)
++  a = aggregate(meuse_sf, list(meuse_sf$soil, meuse_sf$ffreq), mean)
++  print(attributes(a)$agr)
++  a = aggregate(meuse_sf, list(soil = meuse_sf$soil, ff = meuse_sf$ffreq), mean)
++  print(attributes(a)$agr)
++ }
+  Group.1   cadmium    copper      lead      zinc      elev      dist        om 
+ identity aggregate aggregate aggregate aggregate aggregate aggregate aggregate 
+    ffreq      soil      lime   landuse    dist.m 
+aggregate aggregate aggregate aggregate aggregate 
+Levels: constant aggregate identity
+     soil   cadmium    copper      lead      zinc      elev      dist        om 
+ identity aggregate aggregate aggregate aggregate aggregate aggregate aggregate 
+    ffreq    soil.1      lime   landuse    dist.m 
+aggregate aggregate aggregate aggregate aggregate 
+Levels: constant aggregate identity
+  Group.1   Group.2   cadmium    copper      lead      zinc      elev      dist 
+ identity  identity aggregate aggregate aggregate aggregate aggregate aggregate 
+       om     ffreq      soil      lime   landuse    dist.m 
+aggregate aggregate aggregate aggregate aggregate aggregate 
+Levels: constant aggregate identity
+     soil        ff   cadmium    copper      lead      zinc      elev      dist 
+ identity  identity aggregate aggregate aggregate aggregate aggregate aggregate 
+       om     ffreq    soil.1      lime   landuse    dist.m 
+aggregate aggregate aggregate aggregate aggregate aggregate 
+Levels: constant aggregate identity
+There were 50 or more warnings (use warnings() to see the first 50)
+> 
+> # aggregate by sf/sfc
+> a = st_polygon(list(rbind(c(0,0), c(1,0), c(1,1), c(0,1), c(0,0)))) * 2
+> b = a + 1
+> p = st_sfc(st_point(c(0.1,0.1)), st_point(c(1.5,1.5)), st_point(c(2.9,2.9)))
+> x = st_sf(count = 1:3, geom = p)
+> aggregate(x, st_sfc(a,b), mean)
+Simple feature collection with 2 features and 1 field
+Geometry type: POLYGON
+Dimension:     XY
+Bounding box:  xmin: 0 ymin: 0 xmax: 3 ymax: 3
+CRS:           NA
+  count                       geometry
+1   1.5 POLYGON ((0 0, 2 0, 2 2, 0 ...
+2   2.5 POLYGON ((1 1, 3 1, 3 3, 1 ...
+> aggregate(x, st_sf(st_sfc(a,b)), mean)
+Simple feature collection with 2 features and 1 field
+Geometry type: POLYGON
+Dimension:     XY
+Bounding box:  xmin: 0 ymin: 0 xmax: 3 ymax: 3
+CRS:           NA
+  count                       geometry
+1   1.5 POLYGON ((0 0, 2 0, 2 2, 0 ...
+2   2.5 POLYGON ((1 1, 3 1, 3 3, 1 ...
+> aggregate(x, st_sf(st_sfc(a,b,b+10)), mean)
+Simple feature collection with 3 features and 1 field
+Geometry type: POLYGON
+Dimension:     XY
+Bounding box:  xmin: 0 ymin: 0 xmax: 13 ymax: 13
+CRS:           NA
+  count                       geometry
+1   1.5 POLYGON ((0 0, 2 0, 2 2, 0 ...
+2   2.5 POLYGON ((1 1, 3 1, 3 3, 1 ...
+3    NA POLYGON ((11 11, 13 11, 13 ...
+> 
+> proc.time()
+   user  system elapsed 
+  0.603   1.335   0.528 

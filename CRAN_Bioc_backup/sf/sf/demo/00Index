@@ -1,0 +1,6 @@
+affine		demo script for affine transformations
+basic		simple feature test script
+ggplot		shows use of geom_sf
+meuse_sf	create meuse simple feature table from data.frame
+nc			load (read) North Carolina sids data set from a geopackage file
+twitter		twitter globe demo

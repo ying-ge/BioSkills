@@ -1,0 +1,170 @@
+
+R version 4.3.3 (2024-02-29) -- "Angel Food Cake"
+Copyright (C) 2024 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> suppressPackageStartupMessages(library(sf))
+> ## IGNORE_RDIFF_BEGIN
+> if (require(spatstat.random, quietly = TRUE)) {
++ 
++ data(chicago)
++ st_as_sf(chicago)
++ # ppp:
++ g = gorillas
++ st_as_sf(g)
++ marks(g) = NULL
++ st_as_sf(g)
++ 
++ # multipolygon: https://github.com/r-spatial/sf/issues/1161
++ window = read_sf(system.file("shape/nc.shp", package = "sf")) %>%
++   st_transform(32119)
++ 
++ win = spatstat.geom::as.owin(window)
++ 
++ set.seed(1331)
++ pp2a = runifpoint(n = 50, win = win)
++ print(st_as_sf(pp2a))
++ 
++ # st_sample going the spatstat way
++ x <- sf::st_sfc(sf::st_polygon(list(rbind(c(0, 0), c(10, 0), c(10, 10), c(0, 0)))))
++ try(pts <- st_sample(x, type = "thomas"))
++ try(pts <- st_sample(x, kappa = 1, mu = 10, type = "Thomas"))
++ # points expected
++ set.seed(1331)
++ pts <- st_sample(x, kappa = 1, mu = 10, scale = 0.1, type = "Thomas")
++ #plot(x)
++ #plot(pts, add = TRUE)
++ pts
++ 
++ # see https://github.com/r-spatial/sf/issues/1233
++ # png("/tmp/spa%03d.png")
++ 
++ p1 = st_point(0:1)
++ p2 = st_point(1:2)
++ p3 = st_point(c(-1,2))
++ p = st_sfc(p1, p2, p3)
++ as.ppp(p)
++ try(as.ppp(st_set_crs(p, 4326)))
++ 
++ sf = st_sf(geom = p)
++ try(as.ppp(sf))
++ sf = st_sf(a = 1:3, geom = p)
++ as.ppp(sf)
++ sf = st_sf(a = 1:3, b=3:1, geom = p)
++ as.ppp(sf) # warns
++ 
++ w = st_as_sfc(st_bbox(st_sfc(p1, p2)))
++ sf = st_sf(a = 1:3, geom = p)
++ (p0 = rbind(st_sf(a = 0, geom = w), sf))
++ suppressWarnings(try(as.ppp(p0))) # errors: one point outside window
++ 
++ w = st_as_sfc(st_bbox(p))
++ sf = st_sf(a = 1:3, geom = p)
++ (p0 = rbind(st_sf(a = 0, geom = w), sf))
++ as.ppp(p0)
++ 
++ # as.owin.sf, as.owin.sfc_*
++ nc = st_read(system.file("gpkg/nc.gpkg", package="sf"), check_ring_dir = TRUE, quiet = TRUE)
++ try(as.owin(nc)) # should be projected
++ nc = st_transform(nc, 32119)
++ plot(as.owin(nc), col = 'grey')
++ plot(as.owin(st_geometry(nc)), col = 'grey')
++ 
++ sq = rbind(c(-1,-1), c(1, -1), c(1,1), c(-1,1), c(-1,-1))
++ pol = st_polygon(list(0.5 * sq, sq[5:1,] * 0.45)) # w hole
++ plot(as.owin(pol), col = 'grey')
++ plot(as.owin(st_sfc(pol)), col = 'grey')
++ mpol = st_multipolygon(list(
++ 	list(sq, sq[5:1,] * 0.9),
++ 	list(sq * 2, sq[5:1,] * 1.8)))
++ plot(as.owin(mpol), col = 'grey')
++ plot(as.owin(st_sfc(mpol)), col = 'grey')
++ plot(as.owin(st_sfc(pol, mpol)), col = 'grey')
++ plot(as.owin(st_sf(a=1:2, st_sfc(pol, mpol))), col = 'grey')
++ (o = as.owin(st_sf(a=1:2, st_sfc(pol, mpol))))
++ st_as_sfc(o)
++ 
++ plot(st_as_sfc(o), col = 'blue', main = 'st_as_sfc(o)')
++ plot(st_as_sf(o), col = 'blue', main = 'st_as_sf(o)')
++ 
++ data(japanesepines)
++ st_as_sf(japanesepines) # warns about multiplier
++ jp = rescale(japanesepines)
++ st_as_sf(jp) # No warning
++ 
++ data(nztrees)
++ qNZ <- quadratcount(nztrees, nx=4, ny=3)
++ ts = as.tess(qNZ)
++ plot(st_as_sfc(ts))
++ 
++ ls = st_linestring(rbind(c(0,0), c(1,1), c(2,0)))
++ plot(as.psp(ls))
++ mls = st_multilinestring(list(rbind(c(0,0), c(1,1), c(2,0)), rbind(c(3,3), c(4,2))))
++ plot(as.psp(mls))
++ 
++ plot(as.psp(st_sfc(ls)))
++ plot(as.psp(st_sfc(mls)))
++ plot(as.psp(st_sfc(ls, mls)))
++ 
++ sf = st_sf(st_cast(st_sfc(ls, mls), "MULTILINESTRING"), marks = 1:2, foo = 2:1)
++ as.psp(sf) # picks marks itself
++ as.psp(sf, marks = 5:1)
++ 
++ (x = st_as_sf(as.psp(sf)))
++ (y = st_as_sfc(as.psp(sf)))
++ all.equal(st_geometry(x), y)
++ }
+spatstat.geom 3.2-9
+spatstat.random 3.2-3
+Simple feature collection with 51 features and 1 field
+Geometry type: GEOMETRY
+Dimension:     XY
+Bounding box:  xmin: 123829.8 ymin: 14740.06 xmax: 930518.6 ymax: 318255.5
+CRS:           NA
+First 10 features:
+    label                           geom
+1  window MULTIPOLYGON (((886135.8 31...
+2   point      POINT (339121.1 257811.6)
+3   point      POINT (827440.4 246568.3)
+4   point      POINT (451339.2 207943.6)
+5   point      POINT (268749.7 203323.4)
+6   point      POINT (516676.5 198556.1)
+7   point        POINT (692366 238643.1)
+8   point      POINT (843278.5 287241.6)
+9   point      POINT (648477.7 235466.6)
+10  point        POINT (852593 267248.3)
+Error in st_poly_sample(x, size = size, ..., type = type, by_polygon = by_polygon,  : 
+  rthomas is not an exported function from spatstat.random.
+Error in st_poly_sample(x, size = size, ..., type = type, by_polygon = by_polygon,  : 
+  The spatstat function rThomas did not return a valid result. Consult the help file.
+Error message from spatstat:
+Error in spatstat_fun(..., win = spatstat.geom::as.owin(x)) : 
+  argument "scale" is missing, with no default
+
+Error : Only projected coordinates may be converted to spatstat class objects
+Error in `marks<-.ppp`(`*tmp*`, value = value) : 
+  number of rows of data frame != number of points
+In addition: Warning message:
+In as.ppp.sf(sf) : only first attribute column is used for marks
+Error : Only projected coordinates may be converted to spatstat class objects
+[1] TRUE
+Warning message:
+In st_as_sfc.owin(spatstat.geom::as.owin(x)) :
+  The spatstat object has an measurement unit multiplier != 1. Consider rescaling before converting.
+> ## IGNORE_RDIFF_END
+> 
+> proc.time()
+   user  system elapsed 
+  2.074   1.308   1.918 
