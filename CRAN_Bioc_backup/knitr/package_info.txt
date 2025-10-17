@@ -1,0 +1,7 @@
+Package: knitr
+Version: 1.50
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/knitr_1.50.tar.gz
+Size: 0.51 MB
+Download Date: 2025-10-17
+
