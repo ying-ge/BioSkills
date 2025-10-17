@@ -1,0 +1,73 @@
+Package: PharmacoGx
+Type: Package
+Title: Analysis of Large-Scale Pharmacogenomic Data
+Version: 3.6.0
+Date: 2023-04-19
+Authors@R: c(
+    person(given="Petr", family="Smirnov", email="petr.smirnov@uhnresearch.ca",
+        role=c("aut")),
+    person(given="Christopher", family="Eeles",
+        email="christopher.eeles@uhnresearch.ca", role=c("aut")),
+    person(given="Zhaleh", family="Safikhani", role=c("aut")),
+    person(given="Mark", family="Freeman", role=c("aut")),
+    person(given="Feifei", family="Li", email="ff.li@mail.utoronto.ca", role=c("aut")),
+    person(given="Jermiah", family="Joseph", email="jermiah.joseph@uhn.ca", role=c("aut")),
+    person("Benjamin", "Haibe-Kains", email="benjamin.haibe.kains@utoronto.ca", role=c("aut", "cre"))
+    )
+Description: Contains a set of functions to perform large-scale analysis of
+    pharmaco-genomic data. These include the PharmacoSet object for storing
+    the results of pharmacogenomic experiments, as well as a number of functions
+    for computing common summaries of drug-dose response and correlating them
+    with the molecular features in a cancer cell-line.
+License: GPL (>= 3)
+Suggests: pander, rmarkdown, knitr, knitcitations, crayon, testthat,
+        markdown, BiocStyle, R.utils
+Encoding: UTF-8
+Imports: BiocGenerics, Biobase, S4Vectors, SummarizedExperiment,
+        MultiAssayExperiment, BiocParallel, ggplot2, magicaxis,
+        RColorBrewer, parallel, caTools, methods, downloader, stats,
+        utils, graphics, grDevices, reshape2, jsonlite, data.table,
+        checkmate, boot, coop
+Depends: R (>= 3.6), CoreGx
+LinkingTo: Rcpp
+Roxygen: list(markdown = TRUE, r6=FALSE)
+RoxygenNote: 7.2.3
+VignetteBuilder: knitr
+VignetteEngine: knitr::rmarkdown
+biocViews: GeneExpression, Pharmacogenetics, Pharmacogenomics,
+        Software, Classification
+BugReports: https://github.com/bhklab/PharmacoGx/issues
+Collate: 'GR.R' 'GWC.R' 'PharmacoSet-class.R' 'PharmacoSet-accessors.R'
+        'PharmacoSet-utils.R' 'RcppExports.R' 'adaptiveMatthewCor.R'
+        'callingWaterfall.R' 'class-SignatureClass.R' 'computeABC.R'
+        'computeAUC.R' 'computeAUC_old.R' 'computeAmax.R'
+        'computeDSS.R' 'computeDrugSensitivity.R' 'computeGR.R'
+        'computeIC50.R' 'computeICn.R' 'computeSlope.R'
+        'computeSynergy.R' 'connectivityScore.R' 'cosinePerm.R'
+        'datasets.R' 'downloadPSet.R' 'downloadSignatures.R'
+        'drugDoseResponseCurve.R' 'drugPerturbationSig.R'
+        'filterNoisyCurves.R' 'geneDrugPerturbation.R'
+        'geneDrugSensitivity.R' 'geneDrugSensitivityPBCorr.R'
+        'geneDrugSensitivityPCorr.R' 'getRawSensitivityMatrix.R'
+        'globals.R' 'intersectPSets.R' 'logLogisticRegression.R'
+        'matthewCor.R' 'mergePSets.R' 'methods-[.R'
+        'methods-drugSensitivitySig.R' 'methods-intersect.R'
+        'methods-subsetTo.R' 'methods-summarizeMolecularProfiles.R'
+        'methods-summarizeSensitivityProfiles.R' 'plotPSig.R'
+        'rankGeneDrugPerturbation.R' 'rankGeneDrugSensitivity.R'
+        'sanityCheck.R' 'updateObject-methods.R' 'zzz.R'
+git_url: https://git.bioconductor.org/packages/PharmacoGx
+git_branch: RELEASE_3_18
+git_last_commit: 449b0a6
+git_last_commit_date: 2023-10-24
+Date/Publication: 2023-10-24
+NeedsCompilation: yes
+Packaged: 2023-10-24 22:28:00 UTC; biocbuild
+Author: Petr Smirnov [aut],
+  Christopher Eeles [aut],
+  Zhaleh Safikhani [aut],
+  Mark Freeman [aut],
+  Feifei Li [aut],
+  Jermiah Joseph [aut],
+  Benjamin Haibe-Kains [aut, cre]
+Maintainer: Benjamin Haibe-Kains <benjamin.haibe.kains@utoronto.ca>
