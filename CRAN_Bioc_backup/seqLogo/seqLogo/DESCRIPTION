@@ -1,0 +1,34 @@
+Package: seqLogo
+Title: Sequence logos for DNA sequence alignments
+Version: 1.68.0
+Authors@R: 
+    c(person(given="Oliver", family="Bembom", 
+             role = c("aut"), email = "oliver.bembom@gmail.com"),
+      person(given="Robert", family="Ivanek", 
+             role=c("aut", "cre"), email="robert.ivanek@unibas.ch", 
+             comment=c(ORCID="0000-0002-8403-056X")))
+Description: seqLogo takes the position weight matrix of a DNA sequence 
+    motif and plots the corresponding sequence logo as introduced 
+    by Schneider and Stephens (1990).
+LazyLoad: yes
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.2
+Imports: stats4, grDevices
+Depends: R (>= 4.2), methods, grid
+Suggests: knitr, BiocStyle, rmarkdown, testthat
+BugReports: https://github.com/ivanek/seqLogo/issues
+VignetteBuilder: knitr
+Collate: AllClasses.R AllGenerics.R pwm.R seqLogo.R
+License: LGPL (>= 2)
+biocViews: SequenceMatching
+git_url: https://git.bioconductor.org/packages/seqLogo
+git_branch: RELEASE_3_18
+git_last_commit: 8ddda53
+git_last_commit_date: 2023-10-24
+Date/Publication: 2023-10-24
+NeedsCompilation: no
+Packaged: 2023-10-24 23:01:44 UTC; biocbuild
+Author: Oliver Bembom [aut],
+  Robert Ivanek [aut, cre] (<https://orcid.org/0000-0002-8403-056X>)
+Maintainer: Robert Ivanek <robert.ivanek@unibas.ch>
