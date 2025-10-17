@@ -1,8 +1,8 @@
-name: Unzip and Commit
-
+name: Unzip and Push with Size Check
+ 
 on:
   workflow_dispatch: # 允许手动运行 Workflow
-
+ 
 jobs:
   unzip_and_commit:
     runs-on: ubuntu-latest
@@ -13,26 +13,177 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
-
+ 
       - name: Set up Git user
         run: |
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
-
-      - name: Find and Unzip all .zip Files in Repo
+ 
+      - name: Create processed files log
         run: |
-          find . -type f -name "*.zip" | while read zip_file; do
-            unzip -o "$zip_file" -d "$(dirname "$zip_file")"
+          # 创建已处理文件的记录文件
+          if [ ! -f ".processed_zips.log" ]; then
+            echo "# Processed zip files" > .processed_zips.log
+            echo "# Format: timestamp|zip_path|extracted_files_count|skipped_files" >> .processed_zips.log
+            git add .processed_zips.log
+            git commit -m "Initialize processed files log" || true
+            git push origin main || true
+          fi
+ 
+      - name: Find and Unzip .zip Files One by One
+        run: |
+          # 设置最大文件大小 (100MB)
+          MAX_SIZE=$((100 * 1024 * 1024))
+          
+          # 找到所有zip文件并排序
+          find . -type f -name "*.zip" ! -path "./.processed_zips.log" | sort | while read zip_file; do
+            # 检查是否已经处理过
+            if grep -q "$(echo "$zip_file" | sed 's|/|\\/|g')" .processed_zips.log; then
+              echo "Already processed: $zip_file, skipping"
+              continue
+            fi
+            
+            echo "Processing: $zip_file"
+            
+            # 获取文件名（不含路径和扩展名）用于commit message
+            filename=$(basename "$zip_file" .zip)
+            
+            # 记录处理前状态
+            before_count=$(find . -type f ! -name "*.zip" ! -name ".processed_zips.log" | wc -l)
+            
+            # 解压文件（使用 -n 参数避免覆盖已存在的文件）
+            unzip -n "$zip_file" -d "$(dirname "$zip_file")"
+            
+            # 检查解压后的文件大小
+            large_files=""
+            file_count=0
+            skipped_count=0
+            
+            # 查找新解压的文件（排除zip文件和日志文件）
+            find . -type f ! -name "*.zip" ! -name ".processed_zips.log" -newer "$zip_file" | while read file; do
+              file_size=$(stat -c%s "$file")
+              file_count=$((file_count + 1))
+              
+              if [ $file_size -gt $MAX_SIZE ]; then
+                echo "Large file found: $file ($(du -h "$file" | cut -f1))"
+                large_files="$large_files$file|"
+                skipped_count=$((skipped_count + 1))
+              fi
+            done
+            
+            # 获取实际的文件计数
+            new_files=$(find . -type f ! -name "*.zip" ! -name ".processed_zips.log" -newer "$zip_file" | wc -l)
+            extracted_count=$((new_files - before_count))
+            
+            # 添加所有变更到暂存区
+            git add .
+            
+            # 如果有大文件，从暂存区移除它们
+            if [ -n "$large_files" ]; then
+              echo "Removing large files from staging area..."
+              echo "$large_files" | tr '|' '\n' | while read -r large_file; do
+                if [ -n "$large_file" ]; then
+                  echo "Skipping: $large_file"
+                  git reset HEAD "$large_file"
+                fi
+              done
+            fi
+            
+            # 检查暂存区是否有变更
+            if ! git diff --cached --quiet; then
+              echo "Committing files (skipping large ones)..."
+              
+              # 构建commit message
+              commit_msg="Unzipped: $filename"
+              if [ -n "$large_files" ]; then
+                skipped_list=$(echo "$large_files" | tr '|' '\n' | head -5 | while read -r file; do
+                  if [ -n "$file" ]; then
+                    echo "  - $(basename "$file") ($(du -h "$file" | cut -f1))"
+                  fi
+                done | tr '\n' '; ')
+                commit_msg="$commit_msg (skipped $(echo "$large_files" | tr '|' '\n' | wc -l) large files)"
+              fi
+              
+              # 提交变更
+              git commit -m "$commit_msg"
+              
+              # 推送变更，添加重试机制
+              max_retries=3
+              retry_count=0
+              
+              while [ $retry_count -lt $max_retries ]; do
+                if git push origin main; then
+                  echo "Successfully pushed $filename"
+                  break
+                else
+                  retry_count=$((retry_count + 1))
+                  echo "Push failed, retry $retry_count/$max_retries"
+                  
+                  # 拉取最新变更并重置
+                  git pull origin main --rebase
+                  
+                  # 如果是最后一次重试失败，强制推送
+                  if [ $retry_count -eq $max_retries ]; then
+                    echo "Force pushing as last resort"
+                    git push origin main --force
+                  fi
+                  
+                  # 等待一段时间再重试
+                  sleep 10
+                fi
+              done
+            else
+              echo "No new files to commit from $filename"
+            fi
+            
+            # 记录已处理的文件
+            timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+            skipped_info=$(echo "$large_files" | tr '|' '\n' | wc -l)
+            echo "$timestamp|$zip_file|$extracted_count|$skipped_info" >> .processed_zips.log
+            git add .processed_zips.log
+            git commit -m "Log: Processed $filename (extracted: $extracted_count, skipped: $skipped_info)" || true
+            git push origin main || true
+            
+            # 短暂等待，避免GitHub API限制
+            sleep 2
           done
           
-      - name: Pull latest changes
+      - name: Summary
         run: |
-          git pull origin main --rebase
+          echo "Unzip process completed!"
           
-      - name: Commit and Push Changes
+          echo "Large files skipped:"
+          find . -type f ! -name "*.zip" ! -name ".processed_zips.log" -size +100M 2>/dev/null || echo "No large files found"
+          
+          echo "Processed files log:"
+          cat .processed_zips.log
+          
+          echo "Repository status:"
+          git status
+          
+          echo "Unprocessed zip files:"
+          find . -type f -name "*.zip" | while read zip_file; do
+            if ! grep -q "$(echo "$zip_file" | sed 's|/|\\/|g')" .processed_zips.log; then
+              echo "$zip_file"
+            fi
+          done
+ 
+      - name: Generate Large Files Report
         run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add .
-          git commit -m "Unzipped .zip files and added extracted content"
-          git push
+          echo "# Large Files Report" > large_files_report.md
+          echo "Generated on: $(date)" >> large_files_report.md
+          echo "" >> large_files_report.md
+          echo "Files larger than 100MB that were skipped:" >> large_files_report.md
+          echo "" >> large_files_report.md
+          
+          find . -type f ! -name "*.zip" ! -name ".processed_zips.log" -size +100M 2>/dev/null | while read file; do
+            echo "- \`$(basename "$file")\`: $(du -h "$file" | cut -f1)" >> large_files_report.md
+          done
+          
+          if [ $(wc -l < large_files_report.md) -eq 4 ]; then
+            echo "No large files found." >> large_files_report.md
+          fi
+          
+          git add large_files_report.md
+          git commit -m "Update large files report" || true
+          git push origin main || true
