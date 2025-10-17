@@ -1,0 +1,28 @@
+Package: miRBaseConverter
+Type: Package
+Title: A comprehensive and high-efficiency tool for converting and
+        retrieving the information of miRNAs in different miRBase
+        versions
+Version: 1.26.0
+Date: 2020-12-31
+Author: Taosheng Xu<taosheng.x@gmail.com>, Thuc Le<Thuc.Le@unisa.edu.au>
+Maintainer: Taosheng Xu<taosheng.x@gmail.com>
+Imports: stats
+Depends: R (>= 3.4)
+Description: A comprehensive tool for converting and retrieving the miRNA Name, Accession, Sequence, Version, History and Family information in different miRBase versions. It can process a huge number of miRNAs in a short time without other depends.
+License: GPL (>= 2)
+LazyData: TRUE
+Suggests: BiocGenerics, RUnit, knitr, rtracklayer, utils, rmarkdown
+VignetteBuilder: knitr
+biocViews: Software, miRNA
+URL: https://github.com/taoshengxu/miRBaseConverter
+BugReports: https://github.com/taoshengxu/miRBaseConverter/issues
+RoxygenNote: 7.1.1
+git_url: https://git.bioconductor.org/packages/miRBaseConverter
+git_branch: RELEASE_3_18
+git_last_commit: e937593
+git_last_commit_date: 2023-10-24
+Repository: Bioconductor 3.18
+Date/Publication: 2024-04-08
+NeedsCompilation: no
+Packaged: 2024-04-08 21:55:03 UTC; biocbuild

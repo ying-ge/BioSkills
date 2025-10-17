@@ -1,0 +1,20 @@
+citHeader("To cite miRBaseConverter in publications use:")
+citEntry(entry = "Article",
+  title        = "miRBaseConverter: A comprehensive and high-efficiency tool for converting and retrieving the information of miRNAs in different miRBase versions",
+  author       = personList(as.person("Taosheng Xu"),
+                   as.person("Ning Su"),
+                   as.person("Lin Liu"),
+                   as.person("Junpeng Zhang"),
+                   as.person("Hongqiang Wang"),
+                   as.person("Weijia Zhang"),
+                   as.person("Jie Gui"),
+                   as.person("Kui Yu, et.al.")),
+  journal      = "BMC Bioinformatics",
+  year         = "2018",
+  volume       = "19",
+  number       = "s19",
+  pages        = "514",
+  url          = "https://doi.org/10.1186/s12859-018-2531-5",
+  textVersion  =paste("Taosheng Xu, Ning Su, Lin Liu, Junpeng Zhang, Hongqiang Wang, Weijia Zhang, Jie Gui, Kui Yu, Jiuyong Li and Thuc Duy Le. miRBaseConverter: An R/Bioconductor Package for Converting and Retrieving miRNA Name, Accession, Sequence and Family Information in Different Versions of miRBase. BMC Bioinformatics 19 (s19) :514 (2018). doi:/10.1186/s12859-018-2531-5")
+)
+
