@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>Installation</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Installation</h1>
+
+
+
+<p>After the usual R package installation, <code>torch</code> requires
+installing other 2 libraries: LibTorch and LibLantern. They are
+automatically installed by detecting information about you OS if you are
+using <code>torch</code> in interactive mode. If you are running
+<code>torch</code> in non-interactive environments you need to set the
+<code>TORCH_INSTALL</code> env var to 1, so it’s automatically installed
+or manually call <code>torch::install_torch()</code>.</p>
+<p>Starting from torch v0.9.1.9000 it’s possible to install torch from
+pre-built package binaries available in a custom CRAN-like repository.
+This binaries include all shared objects necessary to run torch, thus
+it’s not required to install any additional software. See the <a href="#pre-built"><em>Install from pre-built binaries</em></a> session
+for more information.</p>
+<p>We have provide pre-compiled binaries for all major platforms and you
+can find specific installation instructions below.</p>
+<div id="windows" class="section level2">
+<h2>Windows</h2>
+<div id="cpu" class="section level3">
+<h3>CPU</h3>
+<p>If you don’t have a GPU or want to install the CPU version of
+<code>torch</code>, you can install with:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;torch&quot;</span>)</span></code></pre></div>
+<p>Some Windows distributions don’t have the Visual Studio runtime
+pre-installed and you will observe an error like:</p>
+<pre><code>Error in cpp_lantern_init(normalizePath(install_path())): C:\Users\User\Documents\R\R-4.0.2\library\torch\deps\lantern.dll - The specified module could not be found.</code></pre>
+<p>See <a href="https://github.com/mlverse/torch/issues/246#issuecomment-695097121">here</a>
+for instructions on how to install it.</p>
+</div>
+<div id="gpu" class="section level3">
+<h3>GPU</h3>
+<p>torch has very specific requirements in terms of CUDA and CUDNN
+versions it supports. We recomment installing torch using pre-built
+binaries. See (#pre-built) for more information.</p>
+<p>Since version 0.1.1 torch supports GPU installation on Windows. In
+order to use GPU’s with torch you need to:</p>
+<ul>
+<li><p>Have a CUDA compatible NVIDIA GPU. You can find if you have a
+CUDA compatible GPU <a href="https://developer.nvidia.com/cuda-gpus#compute">here</a>.</p></li>
+<li><p>Have properly installed the NVIDIA CUDA toolkit version 12.8. For
+CUDA v12.8, follow the installation instructions <a href="https://developer.nvidia.com/cuda-12-8-1-download-archive">here</a>.
+<strong>Note</strong>: The version of the CUDA toolkit must match
+exactly what’s mentioed above.</p></li>
+<li><p>Have installed cuDNN - a version compatible with CUDA v12.8.
+Follow the installation instructions available <a href="https://developer.nvidia.com/cudnn">here</a>.</p></li>
+</ul>
+<p>Once you have installed all pre-requisites you can install
+<code>torch</code> with:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;torch&quot;</span>)</span></code></pre></div>
+<p>If you have followed default installation locations we will detect
+that you have CUDA software installed and automatically download the GPU
+enabled Lantern binaries. You can also specify the <code>CUDA</code> env
+var with something like <code>Sys.setenv(CUDA=&quot;11.7&quot;)</code> if you want
+to force an specific version of the CUDA toolkit.</p>
+</div>
+</div>
+<div id="macos" class="section level2">
+<h2>MacOS</h2>
+<div id="cpu-1" class="section level3">
+<h3>CPU</h3>
+<p>We support CPU builds of torch on MacOS. On MacOS you can install
+torch with:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;torch&quot;</span>)</span></code></pre></div>
+</div>
+<div id="gpu-1" class="section level3">
+<h3>GPU</h3>
+<p>On Apple Silicon architecture we support GPU through MPS:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;torch&quot;</span>)</span></code></pre></div>
+</div>
+</div>
+<div id="linux" class="section level2">
+<h2>Linux</h2>
+<div id="cpu-2" class="section level3">
+<h3>CPU</h3>
+<p>To install the cpu version of <code>torch</code> you can run:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;torch&quot;</span>)</span></code></pre></div>
+</div>
+<div id="gpu-2" class="section level3">
+<h3>GPU</h3>
+<p>torch has very specific requirements in terms of CUDA and CUDNN
+versions it supports. We recomment installing torch using pre-built
+binaries. See (#pre-built) for more information.</p>
+<p>To install the GPU version of <code>torch</code> on linux you must
+verify that:</p>
+<ul>
+<li><p>You have a NVIDIA CUDA compatible GPU. You can find if you have a
+CUDA compatible GPU <a href="https://developer.nvidia.com/cuda-gpus#compute">here</a>.</p></li>
+<li><p>You have correctly installed the NVIDIA CUDA Toolkit versions
+11.6 or 11.7, follow the instructions <a href="https://docs.nvidia.com/cuda/archive/11.7.0/">here</a>.</p></li>
+<li><p>You have installed cuDNN (a version compatible with your CUDA
+version). Follow the installation instructions available <a href="https://developer.nvidia.com/cudnn">here</a>.</p></li>
+</ul>
+<p>Once you have installed all pre-requisites you can install
+<code>torch</code> with:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;torch&quot;</span>)</span></code></pre></div>
+<p>If you have followed default installation locations we will detect
+that you have CUDA software installed and automatically download the GPU
+enabled Lantern binaries. You can also specify the <code>CUDA</code> env
+var with something like <code>Sys.setenv(CUDA=&quot;12.8&quot;)</code> if you want
+to force an specific version of the CUDA toolkit.</p>
+</div>
+</div>
+<div id="pre-built" class="section level2">
+<h2>Installing from pre-built binaries</h2>
+<p>As of torch v0.9.1.9000 it’s now possible to install torch from
+pre-built package binaries from a CRAN like repository hosted on Google
+Cloud Storage. We currently provide pre-built binaries for CPU (for
+macOS, Linux and Windows) and GPU (Windows and Linux).</p>
+<p>Packages provided by the CRAN-like repository bundles all necessary
+for its execution, including CUDA and CUDNN in the case of the GPU
+builds. This means that by installing it <strong>you agree</strong> with
+the included software licenses. See PyTorch’s <a href="https://github.com/pytorch/pytorch/blob/master/LICENSE">LICENSE</a>
+and <a href="https://docs.nvidia.com/cuda/eula/">CUDA libraries
+EULA</a>.</p>
+<p>When installing from the pre-built binaries, you <strong>don’t
+need</strong> to manually install CUDA or cuDNN. If you have CUDA
+installed, it doesn’t need to match the installation <em>‘kind’</em>
+chosen below.</p>
+<p>To install from the pre-built binaries, you can use the
+following:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="fu">options</span>(<span class="at">timeout =</span> <span class="dv">600</span>) <span class="co"># increasing timeout is recommended since we will be downloading a 2GB file.</span></span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a><span class="co"># For Windows and Linux: &quot;cpu&quot;, &quot;cu128&quot; are the only currently supported</span></span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a><span class="co"># For MacOS the supported are: &quot;cpu-intel&quot; or &quot;cpu-m1&quot;</span></span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a>kind <span class="ot">&lt;-</span> <span class="st">&quot;cu128&quot;</span></span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a>version <span class="ot">&lt;-</span> <span class="fu">available.packages</span>()[<span class="st">&quot;torch&quot;</span>,<span class="st">&quot;Version&quot;</span>]</span>
+<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a><span class="fu">options</span>(<span class="at">repos =</span> <span class="fu">c</span>(</span>
+<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a>  <span class="at">torch =</span> <span class="fu">sprintf</span>(<span class="st">&quot;https://torch-cdn.mlverse.org/packages/%s/%s/&quot;</span>, kind, version),</span>
+<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a>  <span class="at">CRAN =</span> <span class="st">&quot;https://cloud.r-project.org&quot;</span> <span class="co"># or any other from which you want to install the other R dependencies.</span></span>
+<span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a>))</span>
+<span id="cb8-10"><a href="#cb8-10" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;torch&quot;</span>)</span></code></pre></div>
+</div>
+<div id="troubleshooting" class="section level2">
+<h2>Troubleshooting</h2>
+<div id="large-file-download-timeout" class="section level3">
+<h3>Large file download timeout</h3>
+<p>If you encounter timeout during library download, or if after a
+while, downloads end-up with a warning such as:</p>
+<pre><code>Warning messages:
+1: In utils::download.file(library_url, temp_file) :
+  downloaded length 44901568 != reported length 141774525
+2: In utils::download.file(library_url, temp_file) :
+  URL &#39;...&#39;: Timeout of 60 seconds was reached
+3: Failed to install Torch, manually run install_torch(). download from &#39;https://download.pytorch.org/libtorch/cpu/libtorch-macos-1.7.1.zip&#39; failed</code></pre>
+<p>This means you encounter a download timeout. then, you should
+increase the timeout value in <code>install_torch()</code> like</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="fu">install_torch</span>(<span class="at">timeout =</span> <span class="dv">600</span>)</span></code></pre></div>
+</div>
+<div id="file-based-download" class="section level3">
+<h3>File based download</h3>
+<p>In cases where you cannot reach download servers from the machine you
+intend to install torch on, last resort is to install Torch and Lantern
+library from files. This is done in 3 steps :</p>
+<p>1- get the download URLs of the files.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a><span class="fu">get_install_libs_url</span>()</span></code></pre></div>
+<p>2- save those files into the machine filesystem. We will use
+<code>/tmp/</code> here as an example .</p>
+<p>3- install torch from files</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a><span class="co"># then after making both files available into /tmp/</span></span>
+<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a><span class="fu">Sys.setenv</span>(<span class="at">TORCH_URL=</span><span class="st">&quot;/tmp/libtorch-v1.13.1.zip&quot;</span>)</span>
+<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a><span class="fu">Sys.setenv</span>(<span class="at">LANTERN_URL=</span><span class="st">&quot;/tmp/lantern-0.9.1.9001+cpu+arm64-Darwin.zip&quot;</span>)</span>
+<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a>torch<span class="sc">::</span><span class="fu">install_torch</span>()</span></code></pre></div>
+</div>
+<div id="installing-older-versions" class="section level3">
+<h3>Installing older versions</h3>
+<p>As of v0.13.0 torch shifted from using Google Cloud Storage service
+to AWS S3 as the storage service for the required Lantern binaries.</p>
+<p>We will keep the files in the GCS bucket for as long as possible, but
+we might need to remove them at some point in time. Those files have
+been backed up in the new AWS S3 bucket using the same file structure,
+so if torch tries to download some from a URL starting with
+<code>https://storage.googleapis.com/torch-lantern-builds</code>, you
+should now replace it with
+<code>https://torch-cdn.mlverse.org</code>.</p>
+<p>For torch versions between v0.10.0 and v0.12.0 (both included), you
+should be able to set the environment variable
+<code>LANTERN_BASE_URL=https://torch-cdn.mlverse.org/binaries/</code> to
+point to the new address of the binaries. For older versions of torch,
+you might need to manually download the file from the new address and
+extract it to the expected <code>TORCH_HOME</code> directory. Feel free
+to open an issue on GitHub if you need help with this.</p>
+</div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
