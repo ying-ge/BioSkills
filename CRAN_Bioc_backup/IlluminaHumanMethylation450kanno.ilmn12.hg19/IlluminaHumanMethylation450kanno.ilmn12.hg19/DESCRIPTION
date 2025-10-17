@@ -1,0 +1,12 @@
+Package: IlluminaHumanMethylation450kanno.ilmn12.hg19
+Version: 0.6.1
+Title: Annotation for Illumina's 450k methylation arrays
+Description: Manifests and annotation for Illumina's 450k array data.
+Author: Kasper Daniel Hansen
+Maintainer: Kasper Daniel Hansen <kasperdanielhansen@gmail.com>
+License: Artistic-2.0
+Depends: R (>= 3.5.0), minfi (>= 1.19.15)
+LazyData: yes
+biocViews: AnnotationData, IlluminaChip, Homo_sapiens
+NeedsCompilation: no
+Packaged: 2021-12-02 03:39:08 UTC; mr148
