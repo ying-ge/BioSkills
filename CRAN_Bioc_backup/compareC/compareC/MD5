@@ -1,0 +1,10 @@
+1e14e4e4abeaaf04ab4280ca618154db *DESCRIPTION
+98d92823674ed87daa97efdc72e1aa94 *NAMESPACE
+bd99160babe80f354a1c4b504207a7b2 *R/preload.R
+01cbe52f2d9f5c5a664c05469522b34a *demo/00Index
+05a4836627c8500adabe1a0e6e4e24e1 *demo/testC.R
+23c7daddb9092d6316de4ca127fde8a5 *inst/CITATION
+780aa46f9b50b28b365304570fe3cad6 *man/compareC.Rd
+18d5696f97c76e92739a12fad4a6f9ce *man/estC.Rd
+95ed37a7d98fda5c90cb6b80b87cb960 *man/vardiffC.Rd
+7305a89ed0e3a66ef902e742a227be48 *src/survivalC.c
