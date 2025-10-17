@@ -1,0 +1,7 @@
+Package: motifStack
+Version: 1.46.0
+Source: Bioconductor BioCsoft
+URL: https://bioconductor.org/packages/3.18/bioc/src/contrib/motifStack_1.46.0.tar.gz
+Size: 1.84 MB
+Download Date: 2025-10-17
+
