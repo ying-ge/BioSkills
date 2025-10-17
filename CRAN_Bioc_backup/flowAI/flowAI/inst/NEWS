@@ -1,0 +1,29 @@
+0.99.0: 
+- This is the initial version of the package.
+
+0.99.1: 
+- Minor changes.
+
+1.2.9: 
+- 1st stable version
+
+1.4.4: 
+- 2nd stable version
+
+1.10.1: 
+- add parallel processing compatibility
+
+1.12.2:
+- fix bug with render function
+
+1.12.5:
+- increased pen_valueFS default value
+
+1.18.0:
+- add compatibility with LMD data files
+
+1.25.3:
+- Added option to use IQR to make the flow rate check less sensitive.
+
+1.26.0:
+- Added the argument deviationFR to choose between MAD and IQR in the flow rate check.

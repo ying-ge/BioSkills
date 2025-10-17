@@ -1,0 +1,153 @@
+---
+title: "flowAI report"
+author: "SIgN_GM"
+output: html_document
+---
+
+
+```{r setup, include=FALSE}
+opts_chunk$set(fig.align='center', out.width='750px', dpi=200)  # , dev = c('png', 'pdf')
+opts_knit$set( progress=FALSE ) #, base.dir = paste0(filename,.Platform$file.sep))
+#fig.path = paste0(filename, '/figures/'),
+```
+
+## FCS file information
+
+> Input file name: `r filename`    
+> Number of events: `r as.integer(dim(set[[i]])[1])`
+
+```{r, echo=FALSE, fig.height = 3}
+if(length(set) >= 3 ){
+  flow_set_plot(N_cell_set, area)
+}
+```
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, results = 'asis'}
+  if ( length(set) >= 3 ){   
+        cat("Comparison of the number of events stored in the FCS files of the entire dataset. In blue is highlighted the FCS file whose quality control analysis is described in this report. \n")
+  }
+```
+
+## Quality control analysis 
+
+### Summary
+
+> The anomalies were removed from:  `r analysis`  
+> Anomalies detected in total: **`r totalBadPerc * 100`** %  
+> Number of high quality events: `r length(goodCellIDs)`  
+
+
+### Flow rate check
+
+> **`r FlowRateQC$res_fr_QC$badPerc * 100`** % anomalies detected in the flow rate check.
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height = 4, fig.width= 10}
+  if ( is.null(TimeChCheck) ) {   
+        flow_rate_plot(FlowRateQC) 
+} 
+```
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, results = 'asis'}
+  if ( !is.null(TimeChCheck) && TimeChCheck == "NoTime" ) {   
+        cat("It was not possible to analyze the flow rate since the time channel is missing. \n")
+  }else if( !is.null(TimeChCheck) && TimeChCheck == "single_value"){
+cat("It was not possible to analyze the flow rate since the time channel contains a single value. \n")
+   }
+```
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, results = 'asis'}
+  if ( is.null(TimeChCheck) ) {   
+    cat(paste0("The plot reconstructs the flow rate with a resolution of 1/", 1/second_fractionFR, " of a second. Anomalies in the flow rate are identified with an algorithm based on the generalied ESD outlier detection method. The anomalies are circled in green. \n"))
+   }
+```
+
+### Signals acquisition check
+
+> **`r FlowSignalQC$Perc_bad_cells$badPerc_tot * 100`** % anomalies detected in the signal aquisition check. 
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, results = 'asis'}
+  if (outlier_binsFS) { 
+        cat(paste0("From the total amount of anomalies found in the signal acquisition check,  ", FlowSignalQC$Perc_bad_cells$badPerc_out * 100, "% were detected as outliers. Outliers were set to median bin values before the changepoint analysis and later flagged as anomalies. \n"))
+   }
+```
+
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height = h_FS_graph}
+flow_signal_plot(FlowSignalQC)
+```
+
+The more stable region selected consistent for all channels is highlighted in yellow. If the removal of outliers has been required before the execution of the changepoint analysis, the detected outliers are cicled in green.
+
+The FCS file was divided in `r FlowSignalData$bins` bins, hence each bin contains `r  ceiling(nrow(set[[i]])/FlowSignalData$bins)` event(s). The stable region is located between the bins `r FlowSignalQC$segm[1]` and `r FlowSignalQC$segm[2]`.
+
+##### More info on the changepoints detected
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, results = 'asis'}
+if(!is.null(FlowSignalQC$tab_cpt)){
+     cat("Changepoints detected in channels with shifts in signal acquisition:  \n")
+}else{
+  cat("No changepoints were detected.  \n")
+}
+```
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+if(!is.null(FlowSignalQC$tab_cpt)){
+   as.data.frame(FlowSignalQC$tab_cpt )
+}
+```
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, results = 'asis'}
+if(!is.null(ChExcludeFS)){
+     cat(paste0("Channels excluded from the analysis: ", paste(ChannelExcludedFS, collapse = ", "), ". \n \n"))
+}
+
+if(!is.null(FlowSignalQC$ch_no_cpt) && length(FlowSignalQC$ch_no_cpt) != 0 ){
+  cat(paste0("No changepoints were detected in the channels: ", paste(FlowSignalQC$ch_no_cpt, collapse = ", "), ". \n"))
+}
+```
+
+
+### Dynamic range check
+
+> **`r FlowMarginQC$badPerc * 100`** % anomalies detected in dynamic range check.  
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height = 4, fig.width= 10}
+flow_margin_plot(FlowMarginQC, FSbinSize)
+```
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, results = 'asis'}
+  if(length(FlowMarginQC$bad_lowerIDs) == 0 && length(FlowMarginQC$bad_upperIDs) == 0){
+      cat("")
+  }else{
+    cat("The plot shows where the anomalies occured the most. The x-axis scale is complementary to the one of the signal acquisition plot. \n")
+  }
+```
+
+
+##### More info on the anomalies detected in the dynamic range check
+
+For each channel analyzed, the table shows the number of events that did not pass the dynamic range check:
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+FlowMarginQC$margin_events
+```
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, results = 'asis'}
+if(!is.null(ChExcludeFM)){
+     cat(paste0("Channels excluded from the analysis: ", paste(ChannelExcludedFM, collapse = ", "), ". \n \n"))
+}
+```
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, results = 'asis'}
+if(!is.null(FlowMarginQC$OutOfRange)){
+     cat("Warning! Some values were found to be out of range from the upper limit!
+         Here is a summary table: ")
+}
+```
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+if(!is.null(FlowMarginQC$OutOfRange)){
+  print(FlowMarginQC$OutOfRange, row.names = FALSE) 
+}
+```
+
