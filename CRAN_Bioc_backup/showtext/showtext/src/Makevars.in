@@ -1,0 +1,14 @@
+PKG_CPPFLAGS = @SHOWTEXT_CPPFLAGS@
+PKG_LIBS = @SHOWTEXT_LIBS@
+
+
+.PHONY: all clean
+
+all: $(SHLIB)
+
+clean:
+	$(RM) *.o
+	$(RM) *.dll
+	$(RM) *.so
+	$(RM) *.dylib
+
