@@ -3,7 +3,7 @@ name: Backup GitHub R Packages (Fixed Dependencies)
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 3 10 * *"  # 每月10日凌晨3点
+    - cron: "0 3 18 * *"
  
 permissions:
   contents: write
