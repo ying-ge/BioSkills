@@ -1,0 +1,36 @@
+#' Thrombolytic Therapy after Acute Myocardial Infarction
+#' 
+#' @description
+#' Meta-analysis on Thrombolytic Therapy after Acute Myocardial Infarction
+#' 
+#' @name Olkin1995
+#' @aliases Olkin95
+#' 
+#' @docType data
+#' 
+#' @format A data frame with the following columns:
+#' \tabular{rl}{
+#' \bold{\emph{author}}\tab first author \cr
+#' \bold{\emph{year}}\tab year of publication \cr
+#' \bold{\emph{ev.exp}}\tab number of events in experimental group
+#'   \cr
+#' \bold{\emph{n.exp}}\tab number of observations in experimental group
+#'   \cr
+#' \bold{\emph{ev.cont}}\tab number of events in control group \cr
+#' \bold{\emph{n.cont}}\tab number of observations in control group
+#' }
+#' 
+#' @source
+#' Olkin I (1995):
+#' Statistical and theoretical considerations in meta-analysis.
+#' \emph{Journal of Clinical Epidemiology},
+#' \bold{48}, 133--46
+#' 
+#' @keywords datasets
+#' 
+#' @examples
+#' data(Olkin1995)
+#' metabin(ev.exp, n.exp, ev.cont, n.cont, data = Olkin1995)
+
+
+NULL
