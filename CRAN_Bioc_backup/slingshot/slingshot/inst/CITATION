@@ -1,0 +1,18 @@
+bibentry("Article",
+    title = "Slingshot: cell lineage and pseudotime inference for single-cell transcriptomics",
+    author = c(person("Kelly", "Street"),
+        person("Davide", "Risso"),
+        person("Russell B.", "Fletcher"),
+        person("Diya", "Das"),
+        person("John", "Ngai"),
+        person("Nir", "Yosef"),
+        person("Elizabeth", "Purdom"),
+        person("Sandrine", "Dudoit")),
+    year = 2018,
+    pages = 477,
+    journal = "BMC Genomics",
+    url = "https://doi.org/10.1186/s12864-018-4772-0",
+    textVersion =
+        paste("K. Street, D. Risso, RB. Fletcher, D. Das, J. Ngai, N. Yosef, E. Purdom, and S. Dudoit","(2018).",
+            "Slingshot: cell lineage and pseudotime inference for single-cell transcriptomics. BMC Genomics.")
+)

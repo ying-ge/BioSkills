@@ -1,0 +1,54 @@
+Package: slingshot
+Title: Tools for ordering single-cell sequencing
+Version: 2.10.0
+Description: Provides functions for inferring continuous, branching 
+    lineage structures in low-dimensional data. Slingshot was designed
+    to model developmental trajectories in single-cell RNA sequencing 
+    data and serve as a component in an analysis pipeline after 
+    dimensionality reduction and clustering. It is flexible enough to 
+    handle arbitrarily many branching events and allows for the 
+    incorporation of prior knowledge through supervised graph 
+    construction.
+Authors@R: c(
+  person("Kelly", "Street", email = "street.kelly@gmail.com", role = c("aut", "cre", "cph")),
+  person("Davide","Risso", role = "aut",email = "risso.davide@gmail.com"),
+  person("Diya","Das", role = "aut", email = "diyadas@berkeley.edu"),
+  person("Sandrine","Dudoit", role = "ths", email = "sandrine@stat.berkeley.edu"),
+  person("Koen","Van den Berge", role = "ctb"),
+  person(
+      "Robrecht", 
+      "Cannoodt", 
+      email = "rcannood@gmail.com", 
+      role = c("ctb"),
+      comment = c(ORCID = "0000-0003-3641-729X", github = "rcannood")
+    ))
+License: Artistic-2.0
+Depends: R (>= 4.0), princurve (>= 2.0.4), stats, TrajectoryUtils
+Imports: graphics, grDevices, igraph, matrixStats, methods, S4Vectors,
+        SingleCellExperiment, SummarizedExperiment
+Suggests: BiocGenerics, BiocStyle, clusterExperiment,
+        DelayedMatrixStats, knitr, mclust, mgcv, RColorBrewer, rgl,
+        rmarkdown, testthat, uwot, covr
+VignetteBuilder: knitr
+LazyData: false
+RoxygenNote: 7.2.0
+Encoding: UTF-8
+biocViews: Clustering, DifferentialExpression, GeneExpression, RNASeq,
+        Sequencing, Software, Sequencing, SingleCell, Transcriptomics,
+        Visualization
+BugReports: https://github.com/kstreet13/slingshot/issues
+git_url: https://git.bioconductor.org/packages/slingshot
+git_branch: RELEASE_3_18
+git_last_commit: 9166218
+git_last_commit_date: 2023-10-24
+Date/Publication: 2023-10-24
+NeedsCompilation: no
+Packaged: 2023-10-24 23:07:50 UTC; biocbuild
+Author: Kelly Street [aut, cre, cph],
+  Davide Risso [aut],
+  Diya Das [aut],
+  Sandrine Dudoit [ths],
+  Koen Van den Berge [ctb],
+  Robrecht Cannoodt [ctb] (<https://orcid.org/0000-0003-3641-729X>,
+    rcannood)
+Maintainer: Kelly Street <street.kelly@gmail.com>
