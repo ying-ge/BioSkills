@@ -1,0 +1,11 @@
+^.*\.Rproj$
+^\.Rproj\.user$
+.Rhistory
+^cran-comments\.md$
+^README\.Rmd$
+^README\.pdf$
+^README-.*\.png$
+.fuse*
+.nfs*
+^revdep$
+^tests/*
