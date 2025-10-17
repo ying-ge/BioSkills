@@ -1,0 +1,34 @@
+-- Version 3.0.15 --
+
+Update to test to clear a CRAN check
+
+-- Version 3.0.14 --
+
+Updated rg_reshuffling_w, a recent update to igraph broke the function. This has now been fixed.
+
+-- Version 3.0.10 --
+
+Updated closeness_w, the 3.0.9 updated broke the function for gconly=FALSE
+
+-- Version 3.0.9 --
+
+Updated closeness_w to deal with a change in R that does not exclude Inf when specifying na.rm in mean-functions
+
+-- Version 3.0.8 --
+
+Updated clustering_w do deal with integer matrices
+Updated as.static.tnet to check that incoming network conforms to tnet standard
+Updated closeness_w do sum farness before inverting when supplying a pre-computed distance matrix
+Updated the Facebook-like Social Network so that the first column is character and not factor
+
+-- Version 3.0.7 --
+
+Updated to use igraph (version 0.6.2)
+Updated betweenness_w to directly use igraph::betweeness as this one is now able to handle weights
+
+-- Version 3.0.6 --
+
+Included reinforcement_tm
+Updated to use igraph0 (version 0.5.x)
+Updated dichotomise_tm to return two columns only at all times
+
