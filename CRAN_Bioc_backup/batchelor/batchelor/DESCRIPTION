@@ -1,0 +1,37 @@
+Package: batchelor
+Version: 1.18.1
+Date: 2023-12-27
+Title: Single-Cell Batch Correction Methods
+Authors@R: c(person("Aaron", "Lun", role = c("aut", "cre"), email = "infinite.monkeys.with.keyboards@gmail.com"),
+    person("Laleh", "Haghverdi", role="ctb"))
+Depends: SingleCellExperiment
+Imports: SummarizedExperiment, S4Vectors, BiocGenerics, Rcpp, stats,
+        methods, utils, igraph, BiocNeighbors, BiocSingular, Matrix,
+        DelayedArray, DelayedMatrixStats, BiocParallel, scuttle,
+        ResidualMatrix, ScaledMatrix, beachmat
+Suggests: testthat, BiocStyle, knitr, rmarkdown, scran, scater,
+        bluster, scRNAseq
+biocViews: Sequencing, RNASeq, Software, GeneExpression,
+        Transcriptomics, SingleCell, BatchEffect, Normalization
+LinkingTo: Rcpp
+Description: 
+    Implements a variety of methods for batch correction of single-cell (RNA sequencing) data. 
+    This includes methods based on detecting mutually nearest neighbors,
+    as well as several efficient variants of linear regression of the log-expression values.
+    Functions are also provided to perform global rescaling to remove differences in depth between batches,
+    and to perform a principal components analysis that is robust to differences in the numbers of cells across batches.
+License: GPL-3
+NeedsCompilation: yes
+VignetteBuilder: knitr
+SystemRequirements: C++11
+RoxygenNote: 7.2.0
+git_url: https://git.bioconductor.org/packages/batchelor
+git_branch: RELEASE_3_18
+git_last_commit: c427893
+git_last_commit_date: 2023-12-27
+Repository: Bioconductor 3.18
+Date/Publication: 2023-12-27
+Packaged: 2023-12-27 21:05:40 UTC; biocbuild
+Author: Aaron Lun [aut, cre],
+  Laleh Haghverdi [ctb]
+Maintainer: Aaron Lun <infinite.monkeys.with.keyboards@gmail.com>

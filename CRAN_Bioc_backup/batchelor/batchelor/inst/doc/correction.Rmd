@@ -1,0 +1,343 @@
+---
+title: Correcting batch effects in single-cell RNA-seq data
+author: 
+- name: Aaron Lun
+  affiliation: Cancer Research UK Cambridge Institute, Cambridge, United Kingdom
+date: "Revised: 3 February 2019"
+output:
+  BiocStyle::html_document:
+    toc_float: true
+package: batchelor
+bibliography: ref.bib
+vignette: >
+  %\VignetteIndexEntry{1. Correcting batch effects}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}    
+---
+
+```{r, echo=FALSE, results="hide", message=FALSE}
+require(knitr)
+opts_chunk$set(error=FALSE, message=FALSE, warning=FALSE)
+```
+
+```{r setup, echo=FALSE, message=FALSE}
+library(batchelor)
+```
+
+# Introduction
+
+Batch effects refer to differences between data sets generated at different times or in different laboratories.
+These often occur due to uncontrolled variability in experimental factors, e.g., reagent quality, operator skill, atmospheric ozone levels.
+The presence of batch effects can interfere with downstream analyses if they are not explicitly modelled.
+For example, differential expression analyses typically use a blocking factor to absorb any batch-to-batch differences.
+
+For single-cell RNA sequencing (scRNA-seq) data analyses, explicit modelling of the batch effect is less relevant. 
+Manny common downstream procedures for exploratory data analysis are not model-based, including clustering and visualization.
+It is more generally useful to have methods that can remove batch effects to create an corrected expression matrix for further analysis. 
+This follows the same strategy as, e.g., the `removeBatchEffect()` function in the `r Biocpkg("limma")` package [@ritchie2015limma].
+
+Batch correction methods designed for bulk genomics data usually require knowledge of the other factors of variation.
+This is usually not known in scRNA-seq experiments where the aim is to explore unknown heterogeneity in cell populations.
+The `r Biocpkg("batchelor")` package implements batch correction methods that do not rely on _a priori_ knowledge about the population structure.
+
+# Setting up demonstration data
+
+To demonstrate, we will use two brain data sets [@tasic2016adult;@zeisel2015brain] from the `r Biocpkg("scRNAseq")` package.
+A more thorough explanation of each of these steps is available in the [book](http://bioconductor.org/books/devel/OSCA).
+
+```{r}
+library(scRNAseq)
+sce1 <- ZeiselBrainData()
+sce1
+sce2 <- TasicBrainData()
+sce2
+```
+
+We apply some quick-and-dirty quality control to both datasets,
+using the outlier detection strategy from the `r Biocpkg('scuttle')` package.
+
+```{r}
+library(scuttle)
+sce1 <- addPerCellQC(sce1, subsets=list(Mito=grep("mt-", rownames(sce1))))
+qc1 <- quickPerCellQC(colData(sce1), sub.fields="subsets_Mito_percent")
+sce1 <- sce1[,!qc1$discard]
+
+sce2 <- addPerCellQC(sce2, subsets=list(Mito=grep("mt_", rownames(sce2))))
+qc2 <- quickPerCellQC(colData(sce2), sub.fields="subsets_Mito_percent")
+sce2 <- sce2[,!qc2$discard]
+```
+
+Some preprocessing is required to render these two datasets comparable.
+We subset to the common subset of genes:
+
+```{r}
+universe <- intersect(rownames(sce1), rownames(sce2))
+sce1 <- sce1[universe,]
+sce2 <- sce2[universe,]
+```
+
+We compute log-normalized expression values using library size-derived size factors for simplicity.
+(More complex size factor calculation methods are available in the `r Biocpkg("scran")` package.)
+
+```{r}
+out <- multiBatchNorm(sce1, sce2)
+sce1 <- out[[1]]
+sce2 <- out[[2]]
+```
+
+Finally, we identify the top 5000 genes with the largest biological components of their variance.
+We will use these for all high-dimensional procedures such as PCA and nearest-neighbor searching.
+
+```{r}
+library(scran)
+dec1 <- modelGeneVar(sce1)
+dec2 <- modelGeneVar(sce2)
+combined.dec <- combineVar(dec1, dec2)
+chosen.hvgs <- getTopHVGs(combined.dec, n=5000)
+```
+
+As a diagnostic, we check that there actually is a batch effect across these datasets by checking that they cluster separately.
+Here, we combine the two `SingleCellExperiment` objects without any correction using the `NoCorrectParam()` flag,
+and we informally verify that cells from different batches are separated using a $t$-SNE plot.
+
+```{r}
+combined <- correctExperiments(A=sce1, B=sce2, PARAM=NoCorrectParam())
+
+library(scater)
+set.seed(100)
+combined <- runPCA(combined, subset_row=chosen.hvgs)
+combined <- runTSNE(combined, dimred="PCA")
+plotTSNE(combined, colour_by="batch")
+```
+
+# Function organization
+
+The batch correction functions in `r Biocpkg("batchelor")` are organized into three levels:
+
+- At the lowest level, we have the functions that implement a single type of correction, e.g., `fastMNN()`, `rescaleBatches()`. 
+These will return a `SummarizedExperiment` object containing the corrected values and other statistics.
+- At the next level, we have the `batchCorrect()` function that wraps the single-correction function into a common interface.
+This allows developers to switch between correction functions by simply passing a different `BatchelorParam` object.
+- At the highest level, we have the `correctExperiments()` function that wraps the `batchCorrect()` function.
+This is intended for the specific case where correction is applied on data in existing `SingleCellExperiment` objects and we wish to preserve the pre-existing data and metadata from those objects in the corrected output.
+
+For brevity, we will demonstrate the lowest-level functions in this vignette; however, it is easy to perform the exact same correction with `correctExperiments()` by switching the above call to, e.g., `PARAM=FastMnnParam()`.  
+
+# Mutual nearest neighbors
+
+## Overview
+
+Mutual nearest neighbors (MNNs) are defined as pairs of cells - one from each batch - that are within each other's set of `k` nearest neighbors.
+The idea is that MNN pairs across batches refer to the same cell type, assuming that the batch effect is orthogonal to the biological subspace [@haghverdi2018batch].
+Once MNN pairs are identified, the difference between the paired cells is used to infer the magnitude and direction of the batch effect.
+It is then straightforward to remove the batch effect and obtain a set of corrected expression values.
+
+## The new, fast method
+
+The `fastMNN()` function performs a principal components analysis (PCA) on the HVGs to obtain a low-dimensional representation of the input data.
+MNN identification and correction is performed in this low-dimensional space, which offers some advantages with respect to speed and denoising.
+This returns a `SingleCellExperiment` containing a matrix of corrected PC scores is returned, which can be used directly for downstream analyses such as clustering and visualization.
+(We set the seed as we default to a stochastic method for PCA - see comments on `multiBatchPCA()` below.)
+
+```{r}
+library(batchelor)
+set.seed(101)
+f.out <- fastMNN(A=sce1, B=sce2, subset.row=chosen.hvgs)
+str(reducedDim(f.out, "corrected"))
+```
+
+The batch of origin for each row/cell in the output matrix is also returned:
+
+```{r}
+rle(f.out$batch)
+```
+
+Another way to call `fastMNN()` is to specify the batch manually.
+This will return a corrected matrix with the cells in the same order as that in the input `combined` object.
+In this case, it doesn't matter as the two batches were concatenated to created `combined` anyway, 
+but these semantics may be useful when cells from the same batch are not contiguous.
+
+```{r}
+set.seed(101)
+f.out2 <- fastMNN(combined, batch=combined$batch, subset.row=chosen.hvgs)
+str(reducedDim(f.out2, "corrected"))
+```
+
+As we can see, cells from the batches are more intermingled in the $t$-SNE plot below.
+This suggests that the batch effect was removed - assuming, of course, that the intermingled cells represent the same population.
+
+```{r}
+set.seed(103)
+f.out <- runTSNE(f.out, dimred="corrected")
+plotTSNE(f.out, colour_by="batch")
+```
+
+We can also obtain per-gene corrected expression values by using the rotation vectors stored in the output.
+This reverses the original projection used to obtain the initial low-dimensional representation.
+There are, however, [several caveats](https://osca.bioconductor.org/integrating-datasets.html#using-corrected-values) to using these values for downstream analyses.
+
+```{r}
+cor.exp <- assay(f.out)[1,]
+hist(cor.exp, xlab="Corrected expression for gene 1", col="grey80") 
+```
+
+While the default arguments are usually satisfactory, there are many options for running `fastMNN()`, e.g., to improve speed or to achieve a particular merge order.
+Refer to the documentation at `?fastMNN` or [the book](https://osca.bioconductor.org/integrating-datasets.html#performing-mnn-correction) for more details.
+
+## The old, classic method
+
+The original method described by @haghverdi2018batch is implemented in the `mnnCorrect()` method.
+This performs the MNN identification and correction in the gene expression space, and uses a different strategy to overcome high-dimensional noise.
+`mnnCorrect()` is called with the same semantics as `fastMNN()`:
+
+```{r}
+# Using fewer genes as it is much, much slower. 
+fewer.hvgs <- head(order(combined.dec$bio, decreasing=TRUE), 100)
+classic.out <- mnnCorrect(sce1, sce2, subset.row=fewer.hvgs)
+```
+
+... but returns the corrected gene expression matrix directly, rather than using a low-dimensional representation^[Again, those readers wanting to use the corrected values for per-gene analyses should consider the caveats mentioned previously.].
+This is wrapped in a `SingleCellExperiment` object to store various batch-related metadata.
+
+```{r}
+classic.out
+```
+
+For scRNA-seq data, `fastMNN()` tends to be both faster and better at achieving a satisfactory merge.
+`mnnCorrect()` is mainly provided here for posterity's sake, though it is more robust than `fastMNN()` to certain violations of the orthogonality assumptions.
+
+## The cluster-based method
+
+In some scenarios, we have already separately characterized the heterogeneity in each batch,
+identifying clusters and annotating them with relevant biological states.
+The `clusterMNN()` function allows us to examine the relationships between clusters across batches, 
+as demonstrated below with the Tasic and Zeisel datasets using the author-provided labels.
+
+```{r}
+# Removing the 'unclassified' cluster, which makes no sense:
+not.unclass <- sce2$broad_type!="Unclassified"
+clust.out <- clusterMNN(sce1, sce2[,not.unclass],
+    subset.row=chosen.hvgs,
+    clusters=list(sce1$level1class, sce2$broad_type[not.unclass])) 
+```
+
+The most relevant output is extracted from the metadata and describes the "meta-clusters", 
+i.e., groupings of matching clusters corresponding to the same biological state across different batches.
+
+```{r}
+clust.info <- metadata(clust.out)$cluster
+split(clust.info$cluster, clust.info$meta)
+```
+
+The output object itself is a `SingleCellExperiment` that can be used for downstream processing in the same manner as the output of `fastMNN()`.
+Compared to `fastMNN()`, `clusterMNN()` is more faithful with respect to preseving the separation between clusters;
+however, it will not attempt to adjust for differences in intra-cluster structure between batches.
+This can generally be considered a more conservative strategy than `fastMNN()` for merging batches.
+
+# Batch rescaling
+
+`rescaleBatches()` effectively centers the batches in log-expression space on a per-gene basis.
+This is conceptually equivalent to running `removeBatchEffect()` with no covariates other than the batch.
+However, `rescaleBatches()` achieves this rescaling by reversing the log-transformation, 
+downscaling the counts so that the average of each batch is equal to the smallest value, and then re-transforming.
+This preserves sparsity by ensuring that zeroes remain so after correction, and mitigates differences in the variance when dealing with counts of varying size between batches^[Done by downscaling, which increases the shrinkage from the added pseudo-count.].
+
+Calling `rescaleBatches()` returns a corrected matrix of per-gene log-expression values, wrapped in a `SummarizedExperiment` containin batch-related metadata.
+This function operates on a per-gene basis so there is no need to perform subsetting (other than to improve speed).
+
+```{r}
+rescale.out <- rescaleBatches(sce1, sce2)
+rescale.out
+```
+
+While this method is fast and simple, it makes the strong assumption that the population composition of each batch is the same. 
+This is usually not the case for scRNA-seq experiments in real systems that exhibit biological variation.
+Thus, `rescaleBatches()` is best suited for merging technical replicates of the same sample, e.g., that have been sequenced separately.
+
+```{r}
+rescale.out <- runPCA(rescale.out, subset_row=chosen.hvgs,
+    exprs_values="corrected")
+plotPCA(rescale.out, colour_by="batch")
+```
+
+Alternatively, a more direct linear regression of the batch effect can be performed with `regressBatches()`.
+This does not preserve sparsity but uses a different set of tricks to avoid explicitly creating a dense matrix,
+specifically by using the `ResidualMatrix` class from the `r Biocpkg("ResidualMatrix")` package.
+
+```{r}
+regress.out <- regressBatches(sce1, sce2)
+assay(regress.out)
+```
+
+# Using data subsets
+
+## Selecting genes
+
+As shown above, the `subset.row=` argument will only perform the correction on a subset of genes in the data set.
+This is useful for focusing on highly variable or marker genes during high-dimensional procedures like PCA or neighbor searches, mitigating noise from irrelevant genes.
+For per-gene methods, this argument provides a convenient alternative to subsetting the input.
+
+For some functions, it is also possible to set `correct.all=TRUE` when `subset.row=` is specified.
+This will compute corrected values for the unselected genes as well, which is possible once the per-cell statistics are obtained with the gene subset.
+With this setting, we can guarantee that the output contains all the genes provided in the input.
+
+## Restricted correction
+
+Many functions support the `restrict=` argument whereby the correction is determined using only a restricted subset of cells in each batch.
+The effect of the correction is then - for want of a better word - "extrapolated" to all other cells in that batch.
+This is useful for experimental designs where a control set of cells from the same source population were run on different batches.
+Any difference in the controls between batches must be artificial in origin, allowing us to estimate and remove the batch effect without making further biological assumptions.
+
+```{r}
+# Pretend the first X cells in each batch are controls.
+restrict <- list(1:100, 1:200) 
+rescale.out <- rescaleBatches(sce1, sce2, restrict=restrict)
+```
+
+# Other utilities
+
+## Multi-batch normalization
+
+Differences in sequencing depth between batches are an obvious cause for batch-to-batch differences.
+These can be removed by `multiBatchNorm()`, which downscales all batches to match the coverage of the least-sequenced batch.
+This function returns a list of `SingleCellExperiment` objects with log-transformed normalized expression values that can be directly used for further correction.
+
+```{r}
+normed <- multiBatchNorm(A=sce1, B=sce2,
+    norm.args=list(use_altexps=FALSE))
+names(normed)
+```
+
+Downscaling mitigates differences in variance between batches due to the mean-variance relationship of count data. 
+It is achieved using a median-based estimator to avoid problems with composition biases between batches [@lun2016pooling].
+Note that this assumes that most genes are not DE between batches,
+which we try to avoid violating by performing the rescaling on all genes rather than just the HVGs.
+
+## Multi-batch PCA
+
+Users can perform a PCA across multiple batches using the `multiBatchPCA()` function.
+The output of this function is roughly equivalent to `cbind`ing all batches together and performing PCA on the merged matrix. 
+The main difference is that each sample is forced to contribute equally to the identification of the rotation vectors.
+This allows small batches with unique subpopulations to participate in the definition of the low-dimensional space.
+
+```{r}
+set.seed(100)
+
+# Using the same BSPARAM argument as fastMNN(), for speed.
+pca.out <- multiBatchPCA(A=sce1, B=sce2, subset.row=chosen.hvgs,
+    BSPARAM=BiocSingular::IrlbaParam(deferred=TRUE))
+names(pca.out)
+```
+
+This function is used internally in `fastMNN()` but can be explicitly called by the user.
+Reduced dimensions can be input into `reducedMNN()`, which is occasionally convenient as it allows different correction parameters to be repeated without having to repeat the time-consuming PCA step.
+We use the IRLBA algorithm by default, which means that we need to set seed to guarantee reproducible results.
+We also set `deferred=TRUE` to speed up the calculations when using a custom weighting scheme for the batches - see `?"BiocSingular-options"` for more details.
+
+# Session information {-}
+
+```{r}
+sessionInfo()
+```
+
+# References
