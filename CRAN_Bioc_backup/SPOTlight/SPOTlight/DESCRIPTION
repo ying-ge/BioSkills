@@ -1,0 +1,46 @@
+Package: SPOTlight
+Version: 1.6.7
+Type: Package
+Title: `SPOTlight`: Spatial Transcriptomics Deconvolution
+Description: `SPOTlight`provides a method to deconvolute spatial transcriptomics
+    spots using a seeded NMF approach along with visualization tools to assess
+    the results. Spatially resolved gene expression profiles are key to
+    understand tissue organization and function. However, novel spatial 
+    transcriptomics (ST) profiling techniques lack single-cell resolution and 
+    require a combination with single-cell RNA sequencing (scRNA-seq) 
+    information to deconvolute the spatially indexed datasets. Leveraging the 
+    strengths of both data types, we developed SPOTlight, a computational tool 
+    that enables the integration of ST with scRNA-seq data to infer the location
+    of cell types and states within a complex tissue. SPOTlight is centered 
+    around a seeded non-negative matrix factorization (NMF) regression, 
+    initialized using cell-type marker genes and non-negative least squares
+    (NNLS) to subsequently deconvolute ST capture locations (spots).
+Authors@R: c(
+  person("Marc", "Elosua-Bayes", email="elosua.marc@gmail.com", role=c("aut", "cre")),
+  person("Helena L.", "Crowell", email="helena@crowell.eu", role="aut"))
+Depends: R (>= 4.1)
+Imports: ggplot2, NMF, Matrix, matrixStats, nnls, SingleCellExperiment,
+        sparseMatrixStats, stats
+Suggests: BiocStyle, colorBlindness, DelayedArray, DropletUtils,
+        ExperimentHub, ggcorrplot, grDevices, grid, igraph, jpeg,
+        knitr, methods, png, rmarkdown, scater, scatterpie, scran,
+        Seurat, SeuratObject, SpatialExperiment, SummarizedExperiment,
+        S4Vectors, TabulaMurisSenisData, TENxVisiumData, testthat
+biocViews: SingleCell, Spatial, StatisticalMethod
+License: GPL-3
+Encoding: UTF-8
+RoxygenNote: 7.2.3
+VignetteBuilder: knitr
+URL: https://github.com/MarcElosua/SPOTlight
+BugReports: https://github.com/MarcElosua/SPOTlight/issues
+git_url: https://git.bioconductor.org/packages/SPOTlight
+git_branch: RELEASE_3_18
+git_last_commit: e9de3a6
+git_last_commit_date: 2024-01-15
+Repository: Bioconductor 3.18
+Date/Publication: 2024-01-15
+NeedsCompilation: no
+Packaged: 2024-01-16 00:25:02 UTC; biocbuild
+Author: Marc Elosua-Bayes [aut, cre],
+  Helena L. Crowell [aut]
+Maintainer: Marc Elosua-Bayes <elosua.marc@gmail.com>
