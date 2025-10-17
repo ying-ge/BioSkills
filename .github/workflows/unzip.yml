@@ -1,4 +1,4 @@
-name: Extract TAR.GZ Files with Enhanced Size Check
+name: Extract TAR.GZ Files Only
  
 on:
   workflow_dispatch:
@@ -19,92 +19,47 @@ jobs:
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
  
-      - name: Clean any existing large files
+      - name: Extract TAR.GZ Files One by One
         run: |
-          echo "=== Checking for existing large files ==="
+          # 设置最大文件大小 (100MB)
           MAX_SIZE=$((100 * 1024 * 1024))
           
-          # 查找并移除现有的大文件
-          find . -type f -size +${MAX_SIZE}c ! -path "./.git/*" ! -path "./.processed_archives.log" | while read file; do
-            echo "Found large file: $file ($(du -h "$file" | cut -f1))"
-            echo "Removing from Git tracking..."
-            git rm -f "$file" 2>/dev/null || true
-            rm -f "$file"
-          done
-          
-          # 提交清理
-          if ! git diff --cached --quiet; then
-            git commit -m "Remove large files before extraction"
-            git push origin main || true
-          fi
- 
-      - name: Set up log file
-        run: |
-          # 处理日志文件
-          if [ ! -f ".processed_archives.log" ]; then
-            if [ -f ".processed_zips.log" ]; then
-              mv .processed_zips.log .processed_archives.log
-              echo "Renamed log file"
-            else
-              echo "# Processed archive files" > .processed_archives.log
-              echo "# Format: timestamp|archive_path|extracted_files_count|skipped_files" >> .processed_archives.log
-            fi
-            git add .processed_archives.log
-            git commit -m "Initialize/update archives log" || true
-            git push origin main || true
-          fi
- 
-      - name: Extract TAR.GZ with Enhanced Size Control
-        run: |
-          MAX_SIZE=$((100 * 1024 * 1024))
-          
-          # 只查找tar.gz和tgz文件
-          find . -type f \( -name "*.tar.gz" -o -name "*.tgz" \) ! -path "./.processed_archives.log" | sort | while read archive_file; do
-            # 检查是否已经处理过
-            if grep -q "$(echo "$archive_file" | sed 's|/|\\/|g')" .processed_archives.log; then
-              echo "Already processed: $archive_file, skipping"
-              continue
-            fi
-            
+          # 查找所有tar.gz和tgz文件
+          find . -type f \( -name "*.tar.gz" -o -name "*.tgz" \) | sort | while read archive_file; do
             echo "=== Processing: $archive_file ==="
             
-            # 获取文件名
+            # 获取文件名（不含扩展名）
             filename=$(basename "$archive_file")
             filename_clean=$(echo "$filename" | sed 's/\.\(tar\.gz\|tgz\)$//')
             
-            # 解压到临时目录进行预处理
+            # 解压到临时目录
             temp_dir="temp_extract_$(date +%s)"
             mkdir -p "$temp_dir"
             
-            echo "Extracting to temporary directory: $temp_dir"
+            echo "Extracting TAR.GZ to temporary directory..."
             tar -xzf "$archive_file" -C "$temp_dir"
             
-            # 检查解压后的文件大小
-            large_files_in_temp=""
-            total_files=0
-            large_count=0
+            # 检查并过滤大文件
+            large_files_count=0
+            small_files_count=0
             
-            echo "=== Checking file sizes ==="
+            echo "Checking file sizes..."
             find "$temp_dir" -type f | while read file; do
               file_size=$(stat -c%s "$file")
-              total_files=$((total_files + 1))
               
               if [ $file_size -gt $MAX_SIZE ]; then
-                relative_path="${file#$temp_dir/}"
-                echo "Large file detected: $relative_path ($(du -h "$file" | cut -f1))"
-                large_files_in_temp="$large_files_in_temp$relative_path|"
-                large_count=$((large_count + 1))
-                
-                # 删除大文件
+                echo "SKIPPING large file: $(basename "$file") ($(du -h "$file" | cut -f1))"
                 rm -f "$file"
-                echo "Deleted large file from temp: $relative_path"
+                large_files_count=$((large_files_count + 1))
+              else
+                echo "KEEPING small file: $(basename "$file") ($(du -h "$file" | cut -f1))"
+                small_files_count=$((small_files_count + 1))
               fi
             done
             
-            # 移动剩余的小文件到目标位置
-            moved_files=0
+            # 移动小文件到目标位置
             if [ -d "$temp_dir" ] && [ "$(ls -A "$temp_dir" 2>/dev/null)" ]; then
-              echo "=== Moving small files to target ==="
+              echo "Moving small files to repository..."
               find "$temp_dir" -type f | while read file; do
                 relative_path="${file#$temp_dir/}"
                 target_path="$(dirname "$archive_file")/$relative_path"
@@ -114,109 +69,99 @@ jobs:
                 
                 # 移动文件
                 mv "$file" "$target_path"
-                moved_files=$((moved_files + 1))
                 echo "Moved: $relative_path"
               done
+            else
+              echo "No files to move (all were too large)"
             fi
             
             # 清理临时目录
             rm -rf "$temp_dir"
             
-            # 提交变更
+            # 添加变更到Git
             git add .
             
+            # 检查是否有变更
             if ! git diff --cached --quiet; then
-              echo "=== Committing changes ==="
+              echo "Committing changes from $filename_clean..."
               
               # 构建commit message
               commit_msg="Extracted: $filename_clean (tar.gz"
-              if [ $large_count -gt 0 ]; then
-                commit_msg="$commit_msg, skipped $large_count large files)"
+              if [ $large_files_count -gt 0 ]; then
+                commit_msg="$commit_msg, skipped $large_files_count large files)"
               else
                 commit_msg="$commit_msg)"
               fi
               
-              echo "Committing with message: $commit_msg"
+              echo "Commit message: $commit_msg"
               git commit -m "$commit_msg"
               
               # 推送变更
-              max_retries=3
-              retry_count=0
-              
-              while [ $retry_count -lt $max_retries ]; do
-                echo "Push attempt $((retry_count + 1))/$max_retries"
-                if git push origin main; then
-                  echo "Successfully pushed $filename_clean"
-                  break
-                else
-                  retry_count=$((retry_count + 1))
-                  echo "Push failed, checking for issues..."
-                  
-                  # 检查是否有大文件被意外添加
-                  large_files_staged=$(git diff --cached --name-only | xargs -I {} sh -c 'if [ -f "{}" ] && [ $(stat -c%s "{}") -gt $MAX_SIZE ]; then echo "{}"; fi')
-                  
-                  if [ -n "$large_files_staged" ]; then
-                    echo "Found large files in staging, removing:"
-                    echo "$large_files_staged" | while read file; do
-                      echo "Removing: $file"
-                      git reset HEAD "$file"
-                      rm -f "$file"
-                    done
-                    
-                    # 重新提交
-                    git commit -m "$commit_msg (fixed large files)"
+              echo "Pushing to repository..."
+              if git push origin main; then
+                echo "Successfully pushed $filename_clean"
+              else
+                echo "Push failed, trying to resolve..."
+                
+                # 检查是否有大文件被意外添加
+                git diff --cached --name-only | while read cached_file; do
+                  if [ -f "$cached_file" ]; then
+                    file_size=$(stat -c%s "$cached_file")
+                    if [ $file_size -gt $MAX_SIZE ]; then
+                      echo "ERROR: Large file found in staging: $cached_file ($(du -h "$cached_file" | cut -f1))"
+                      git reset HEAD "$cached_file"
+                      rm -f "$cached_file"
+                      echo "Removed large file from staging: $cached_file"
+                    fi
                   fi
-                  
-                  # 拉取最新变更
-                  git pull origin main --rebase
-                  
-                  # 最后一次重试时强制推送
-                  if [ $retry_count -eq $max_retries ]; then
-                    echo "Force pushing as last resort"
-                    git push origin main --force
-                  fi
-                  
-                  sleep 10
+                done
+                
+                # 重新提交（如果有剩余文件）
+                if ! git diff --cached --quiet; then
+                  git commit -m "$commit_msg (fixed large files)"
                 fi
-              done
+                
+                # 拉取并重试推送
+                git pull origin main --rebase
+                git push origin main || {
+                  echo "Final push attempt..."
+                  git push origin main --force
+                }
+              fi
             else
               echo "No new files to commit from $filename_clean"
             fi
             
-            # 记录处理结果
-            timestamp=$(date '+%Y-%m-%d %H:%M:%S')
-            echo "$timestamp|$archive_file|$moved_files|$large_count" >> .processed_archives.log
-            git add .processed_archives.log
-            git commit -m "Log: Processed $filename_clean (extracted: $moved_files, skipped: $large_count)" || true
+            # 删除已处理的压缩文件
+            echo "Removing processed archive: $archive_file"
+            rm -f "$archive_file"
+            git add "$archive_file"
+            git commit -m "Remove processed archive: $filename_clean" || true
             git push origin main || true
             
-            echo "=== Completed processing: $filename_clean ==="
+            echo "=== Completed: $filename_clean ==="
             sleep 2
           done
  
-      - name: Final Cleanup and Report
+      - name: Final Status
         run: |
-          echo "=== Final Cleanup ==="
+          echo "=== Extraction Summary ==="
+          echo "TAR.GZ files remaining: $(find . -name "*.tar.gz" | wc -l)"
+          echo "TGZ files remaining: $(find . -name "*.tgz" | wc -l)"
           
-          # 最终检查是否有大文件残留
+          echo ""
+          echo "=== Repository Status ==="
+          git status
+          
+          echo ""
+          echo "=== Check for any large files ==="
           MAX_SIZE=$((100 * 1024 * 1024))
-          large_files_final=$(find . -type f -size +${MAX_SIZE}c ! -path "./.git/*" ! -path "./.processed_archives.log")
-          
-          if [ -n "$large_files_final" ]; then
-            echo "WARNING: Found remaining large files:"
-            echo "$large_files_final" | while read file; do
+          large_files=$(find . -type f -size +${MAX_SIZE}c ! -path "./.git/*")
+          if [ -n "$large_files" ]; then
+            echo "WARNING: Found large files:"
+            echo "$large_files" | while read file; do
               echo "$file ($(du -h "$file" | cut -f1))"
-              git rm -f "$file" 2>/dev/null || true
-              rm -f "$file"
             done
-            
-            git commit -m "Emergency cleanup of large files" || true
-            git push origin main --force || true
           else
             echo "No large files found - all clear!"
           fi
-          
-          echo ""
-          echo "=== Processing Summary ==="
-          echo "TAR.GZ files remaining: $(find . -name "*.tar.gz" -o -name "*.tgz" | wc -l)"
-          echo "Files processed: $(grep -c "|" .processed_archives.log 2>/dev/null || echo "0")"
