@@ -1,0 +1,7 @@
+Package: ReactomePA
+Version: 1.46.0
+Source: Bioconductor BioCsoft
+URL: https://bioconductor.org/packages/3.18/bioc/src/contrib/ReactomePA_1.46.0.tar.gz
+Size: 0.06 MB
+Download Date: 2025-10-17
+

@@ -1,0 +1,7 @@
+Package: BoolNet
+Version: 2.1.9
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/BoolNet_2.1.9.tar.gz
+Size: 1.49 MB
+Download Date: 2025-10-17
+

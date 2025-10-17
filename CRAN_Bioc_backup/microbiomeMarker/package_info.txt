@@ -1,0 +1,7 @@
+Package: microbiomeMarker
+Version: 1.8.0
+Source: Bioconductor BioCsoft
+URL: https://bioconductor.org/packages/3.18/bioc/src/contrib/microbiomeMarker_1.8.0.tar.gz
+Size: 2.63 MB
+Download Date: 2025-10-17
+

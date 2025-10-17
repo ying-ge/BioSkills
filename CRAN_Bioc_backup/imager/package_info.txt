@@ -1,0 +1,7 @@
+Package: imager
+Version: 1.0.5
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/imager_1.0.5.tar.gz
+Size: 4.32 MB
+Download Date: 2025-10-17
+

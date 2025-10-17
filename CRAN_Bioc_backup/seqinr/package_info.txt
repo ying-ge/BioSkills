@@ -3,5 +3,5 @@ Version: 4.2-36
 Source: CRAN
 URL: https://cloud.r-project.org/src/contrib/seqinr_4.2-36.tar.gz
 Size: 3.38 MB
-Download Date: 2025-10-14
+Download Date: 2025-10-17
 

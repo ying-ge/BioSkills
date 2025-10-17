@@ -1,0 +1,7 @@
+Package: metacoder
+Version: 0.3.8
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/metacoder_0.3.8.tar.gz
+Size: 0.83 MB
+Download Date: 2025-10-17
+

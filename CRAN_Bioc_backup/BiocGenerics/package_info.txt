@@ -1,0 +1,7 @@
+Package: BiocGenerics
+Version: 0.48.1
+Source: Bioconductor BioCsoft
+URL: https://bioconductor.org/packages/3.18/bioc/src/contrib/BiocGenerics_0.48.1.tar.gz
+Size: 0.05 MB
+Download Date: 2025-10-17
+

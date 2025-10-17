@@ -1,0 +1,7 @@
+Package: Epi
+Version: 2.61
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/Epi_2.61.tar.gz
+Size: 5.70 MB
+Download Date: 2025-10-17
+

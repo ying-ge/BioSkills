@@ -1,0 +1,7 @@
+Package: surveillance
+Version: 1.25.0
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/surveillance_1.25.0.tar.gz
+Size: 3.66 MB
+Download Date: 2025-10-17
+

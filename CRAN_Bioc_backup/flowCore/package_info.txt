@@ -1,0 +1,7 @@
+Package: flowCore
+Version: 2.14.2
+Source: Bioconductor BioCsoft
+URL: https://bioconductor.org/packages/3.18/bioc/src/contrib/flowCore_2.14.2.tar.gz
+Size: 7.44 MB
+Download Date: 2025-10-17
+

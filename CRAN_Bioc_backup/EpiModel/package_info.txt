@@ -1,0 +1,7 @@
+Package: EpiModel
+Version: 2.5.0
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/EpiModel_2.5.0.tar.gz
+Size: 3.43 MB
+Download Date: 2025-10-17
+

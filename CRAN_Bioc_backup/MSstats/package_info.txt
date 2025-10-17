@@ -1,0 +1,7 @@
+Package: MSstats
+Version: 4.10.1
+Source: Bioconductor BioCsoft
+URL: https://bioconductor.org/packages/3.18/bioc/src/contrib/MSstats_4.10.1.tar.gz
+Size: 0.19 MB
+Download Date: 2025-10-17
+

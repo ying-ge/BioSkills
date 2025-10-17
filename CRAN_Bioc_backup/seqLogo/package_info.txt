@@ -1,0 +1,7 @@
+Package: seqLogo
+Version: 1.68.0
+Source: Bioconductor BioCsoft
+URL: https://bioconductor.org/packages/3.18/bioc/src/contrib/seqLogo_1.68.0.tar.gz
+Size: 0.88 MB
+Download Date: 2025-10-17
+

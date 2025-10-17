@@ -1,0 +1,7 @@
+Package: scDblFinder
+Version: 1.16.0
+Source: Bioconductor BioCsoft
+URL: https://bioconductor.org/packages/3.18/bioc/src/contrib/scDblFinder_1.16.0.tar.gz
+Size: 2.16 MB
+Download Date: 2025-10-17
+

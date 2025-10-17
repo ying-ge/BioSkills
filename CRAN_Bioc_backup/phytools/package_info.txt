@@ -1,0 +1,7 @@
+Package: phytools
+Version: 2.5-2
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/phytools_2.5-2.tar.gz
+Size: 0.50 MB
+Download Date: 2025-10-17
+

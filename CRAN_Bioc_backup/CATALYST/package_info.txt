@@ -1,0 +1,7 @@
+Package: CATALYST
+Version: 1.26.1
+Source: Bioconductor BioCsoft
+URL: https://bioconductor.org/packages/3.18/bioc/src/contrib/CATALYST_1.26.1.tar.gz
+Size: 10.28 MB
+Download Date: 2025-10-17
+

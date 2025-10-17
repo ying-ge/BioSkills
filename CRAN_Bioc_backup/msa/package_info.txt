@@ -3,5 +3,5 @@ Version: 1.34.0
 Source: Bioconductor BioCsoft
 URL: https://bioconductor.org/packages/3.18/bioc/src/contrib/msa_1.34.0.tar.gz
 Size: 4.01 MB
-Download Date: 2025-10-14
+Download Date: 2025-10-17
 

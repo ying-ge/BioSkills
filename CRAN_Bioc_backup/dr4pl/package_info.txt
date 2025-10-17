@@ -1,0 +1,7 @@
+Package: dr4pl
+Version: 2.0.0
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/dr4pl_2.0.0.tar.gz
+Size: 0.49 MB
+Download Date: 2025-10-17
+

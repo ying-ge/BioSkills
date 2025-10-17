@@ -1,0 +1,7 @@
+Package: DEP
+Version: 1.24.0
+Source: Bioconductor BioCsoft
+URL: https://bioconductor.org/packages/3.18/bioc/src/contrib/DEP_1.24.0.tar.gz
+Size: 3.00 MB
+Download Date: 2025-10-17
+

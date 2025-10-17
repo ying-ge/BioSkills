@@ -1,0 +1,7 @@
+Package: geiger
+Version: 2.0.11
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/geiger_2.0.11.tar.gz
+Size: 0.34 MB
+Download Date: 2025-10-17
+

@@ -1,0 +1,7 @@
+Package: DNAshapeR
+Version: 1.30.0
+Source: Bioconductor BioCsoft
+URL: https://bioconductor.org/packages/3.18/bioc/src/contrib/DNAshapeR_1.30.0.tar.gz
+Size: 1.08 MB
+Download Date: 2025-10-17
+

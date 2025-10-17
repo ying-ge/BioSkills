@@ -1,0 +1,7 @@
+Package: BiocManager
+Version: 1.30.26
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/BiocManager_1.30.26.tar.gz
+Size: 0.57 MB
+Download Date: 2025-10-17
+

@@ -1,0 +1,7 @@
+Package: batchelor
+Version: 1.18.1
+Source: Bioconductor BioCsoft
+URL: https://bioconductor.org/packages/3.18/bioc/src/contrib/batchelor_1.18.1.tar.gz
+Size: 1.93 MB
+Download Date: 2025-10-17
+

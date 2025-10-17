@@ -1,0 +1,7 @@
+Package: SPOTlight
+Version: 1.6.7
+Source: Bioconductor BioCsoft
+URL: https://bioconductor.org/packages/3.18/bioc/src/contrib/SPOTlight_1.6.7.tar.gz
+Size: 3.39 MB
+Download Date: 2025-10-17
+

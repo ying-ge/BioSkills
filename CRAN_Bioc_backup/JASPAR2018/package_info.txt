@@ -1,0 +1,7 @@
+Package: JASPAR2018
+Version: 1.1.1
+Source: Bioconductor BioCann
+URL: https://bioconductor.org/packages/3.18/data/annotation/src/contrib/JASPAR2018_1.1.1.tar.gz
+Size: 13.59 MB
+Download Date: 2025-10-17
+

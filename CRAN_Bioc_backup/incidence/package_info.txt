@@ -1,0 +1,7 @@
+Package: incidence
+Version: 1.7.6
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/incidence_1.7.6.tar.gz
+Size: 1.47 MB
+Download Date: 2025-10-17
+

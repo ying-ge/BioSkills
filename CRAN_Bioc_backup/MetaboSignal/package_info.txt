@@ -1,0 +1,7 @@
+Package: MetaboSignal
+Version: 1.32.1
+Source: Bioconductor BioCsoft
+URL: https://bioconductor.org/packages/3.18/bioc/src/contrib/MetaboSignal_1.32.1.tar.gz
+Size: 2.09 MB
+Download Date: 2025-10-17
+
