@@ -1,12 +1,12 @@
-name: Download Python Packages
-
+name: Download Python Packages (逐个推送版)
+ 
 on:
   workflow_dispatch:
     inputs:
       python_version:
         description: 'Python version to use'
         required: false
-        default: '3.12' # 推荐使用一个当前支持的版本，如 3.12
+        default: '3.12'
       package_file:
         description: 'Path to package list file'
         required: false
@@ -30,6 +30,9 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        fetch-depth: 0
       
     - name: Set up Python
       uses: actions/setup-python@v4
@@ -50,7 +53,12 @@ jobs:
         
     - name: Install required tools
       run: |
-        pip install wheel setuptools requests pyyaml
+        pip install wheel setuptools requests pyyaml tqdm
+        
+    - name: Configure Git
+      run: |
+        git config --global user.name "GitHub Actions Bot"
+        git config --global user.email "actions@github.com"
         
     - name: Make scripts executable
       run: |
@@ -64,14 +72,267 @@ jobs:
           "${{ github.event.inputs.package_file || '.github/docs/lib_python.txt' }}" \
           classified_packages.yml
           
-    - name: Download packages
+    - name: Download packages with incremental commits
       env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         GITHUB_RUN_STARTED_AT: ${{ github.run_started_at }}
+        PYTHON_VERSION: ${{ github.event.inputs.python_version || '3.12' }}
+        GITHUB_EVENT_NAME: ${{ github.event_name }}
+        GITHUB_RUN_ID: ${{ github.run_id }}
+        GITHUB_REPOSITORY: ${{ github.repository }}
+        PACKAGE_FILE: ${{ github.event.inputs.package_file || '.github/docs/lib_python.txt' }}
       run: |
-        python .github/scripts/download_packages.py \
-          classified_packages.yml \
-          Python_packages_backup
+        # 创建逐个下载的Python脚本
+        cat > incremental_download.py << 'EOF'
+        import os
+        sys
+        import yaml
+        json
+        import time
+        from pathlib import Path
+        from tqdm import tqdm
+        import subprocess
+        
+        def write_progress(package_name, status, size_mb=0, category=""):
+            """写入进度信息"""
+            progress_info = f"{package_name}|{status}|{size_mb}|{category}"
+            with open("download_progress.txt", "w") as f:
+                f.write(progress_info)
+            print(f"📦 进度更新: {package_name} - {status} ({size_mb}MB)")
+        
+        def get_package_size(package_dir):
+            """获取包目录大小"""
+            try:
+                result = subprocess.run(['du', '-sm', package_dir], 
+                                      capture_output=True, text=True)
+                if result.returncode == 0:
+                    return float(result.stdout.split()[0])
+            except:
+                pass
+            return 0
+        
+        def download_single_package(package_info, backup_dir):
+            """下载单个包"""
+            package_name = package_info['name']
+            category = package_info.get('category', 'uncategorized')
+            
+            # 创建包目录
+            category_dir = os.path.join(backup_dir, category)
+            os.makedirs(category_dir, exist_ok=True)
+            
+            package_dir = os.path.join(category_dir, package_name)
+            
+            # 清理已存在的目录
+            if os.path.exists(package_dir):
+                import shutil
+                shutil.rmtree(package_dir)
+            os.makedirs(package_dir)
+            
+            try:
+                # 使用pip下载包到指定目录
+                cmd = [
+                    'pip', 'download', '--no-deps', '--dest', package_dir, package_name
+                ]
+                
+                result = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
+                
+                if result.returncode == 0:
+                    # 检查下载的文件
+                    files = os.listdir(package_dir)
+                    if files:
+                        # 计算大小
+                        total_size = 0
+                        for file in files:
+                            file_path = os.path.join(package_dir, file)
+                            if os.path.isfile(file_path):
+                                total_size += os.path.getsize(file_path)
+                        
+                        size_mb = total_size / (1024 * 1024)
+                        
+                        # 创建包信息文件
+                        info = {
+                            'name': package_name,
+                            'category': category,
+                            'download_time': time.strftime('%Y-%m-%d %H:%M:%S'),
+                            'files': files,
+                            'size_mb': round(size_mb, 2),
+                            'status': 'success'
+                        }
+                        
+                        with open(os.path.join(package_dir, 'package_info.json'), 'w') as f:
+                            json.dump(info, f, indent=2)
+                        
+                        write_progress(package_name, 'success', round(size_mb, 2), category)
+                        return True, size_mb, package_dir
+                    else:
+                        write_progress(package_name, 'failed_no_files', 0, category)
+                        return False, 0, None
+                else:
+                    write_progress(package_name, f'failed_{result.returncode}', 0, category)
+                    return False, 0, None
+                    
+            except subprocess.TimeoutExpired:
+                write_progress(package_name, 'timeout', 0, category)
+                return False, 0, None
+            except Exception as e:
+                write_progress(package_name, f'error_{str(e)[:20]}', 0, category)
+                return False, 0, None
+        
+        def main():
+            if len(sys.argv) != 3:
+                print("用法: python incremental_download.py <classified_packages.yml> <backup_dir>")
+                sys.exit(1)
+            
+            packages_file = sys.argv[1]
+            backup_dir = sys.argv[2]
+            
+            # 读取包分类信息
+            with open(packages_file, 'r', encoding='utf-8') as f:
+                classified_packages = yaml.safe_load(f)
+            
+            # 收集所有包
+            all_packages = []
+            for category, packages in classified_packages.items():
+                for package in packages:
+                    all_packages.append({
+                        'name': package,
+                        'category': category
+                    })
+            
+            print(f"开始下载 {len(all_packages)} 个Python包...")
+            
+            success_count = 0
+            failed_count = 0
+            total_size = 0
+            
+            # 逐个下载包
+            for i, package_info in enumerate(tqdm(all_packages, desc="下载进度")):
+                success, size_mb, package_dir = download_single_package(package_info, backup_dir)
+                
+                if success:
+                    success_count += 1
+                    total_size += size_mb
+                else:
+                    failed_count += 1
+                
+                # 暂停一下，避免过于频繁
+                time.sleep(0.5)
+            
+            # 写入最终统计
+            summary = {
+                'total_packages': len(all_packages),
+                'success_count': success_count,
+                'failed_count': failed_count,
+                'total_size_mb': round(total_size, 2),
+                'completion_time': time.strftime('%Y-%m-%d %H:%M:%S')
+            }
+            
+            with open('download_summary.json', 'w') as f:
+                json.dump(summary, f, indent=2)
+            
+            print(f"\n=== 下载完成 ===")
+            print(f"✅ 成功: {success_count}")
+            print(f"❌ 失败: {failed_count}")
+            print(f"💾 总大小: {total_size:.2f} MB")
+            
+        if __name__ == '__main__':
+            main()
+        EOF
+        
+        # 在后台运行下载脚本
+        echo "🚀 开始逐个下载Python包..."
+        python incremental_download.py classified_packages.yml Python_packages_backup &
+        download_pid=$!
+        
+        # 监控进度并逐一提交
+        echo "🔄 监控下载进度并实时推送..."
+        last_progress=""
+        commit_count=0
+        
+        while kill -0 $download_pid 2>/dev/null; do
+          if [ -f "download_progress.txt" ]; then
+            current_progress=$(cat download_progress.txt 2>/dev/null || echo "")
+            
+            if [ "$current_progress" != "$last_progress" ] && [ -n "$current_progress" ]; then
+              package_name=$(echo "$current_progress" | cut -d'|' -f1)
+              status=$(echo "$current_progress" | cut -d'|' -f2)
+              size=$(echo "$current_progress" | cut -d'|' -f3)
+              category=$(echo "$current_progress" | cut -d'|' -f4)
+              
+              echo "📦 包处理完成: $package_name ($status, ${size}MB)"
+              
+              # 如果下载成功，立即提交并推送
+              if [ "$status" = "success" ]; then
+                package_path="Python_packages_backup/${category}/${package_name}"
+                
+                if [ -d "$package_path" ]; then
+                  echo "💾 提交并推送 $package_name..."
+                  
+                  # 添加新下载的包
+                  git add "$package_path/"
+                  
+                  # 添加进度文件
+                  git add download_progress.txt 2>/dev/null || true
+                  
+                  # 尝试提交
+                  commit_msg="📦 Add ${package_name} (${size}MB) [${category}] - $(date +'%m-%d %H:%M')"
+                  if git commit -m "$commit_msg"; then
+                    echo "🚀 推送中..."
+                    
+                    # 推送重试机制
+                    retry=0
+                    while [ $retry -lt 3 ]; do
+                      if git push origin main; then
+                        echo "✅ $package_name 推送成功"
+                        commit_count=$((commit_count + 1))
+                        break
+                      else
+                        retry=$((retry + 1))
+                        echo "⚠️ 推送失败，重试 $retry/3..."
+                        sleep $((retry * 2))
+                      fi
+                    done
+                    
+                    if [ $retry -eq 3 ]; then
+                      echo "❌ $package_name 推送失败，继续下一个..."
+                    fi
+                  else
+                    echo "❌ $package_name 提交失败，可能是空提交"
+                  fi
+                  
+                  # 推送成功后短暂暂停，避免GitHub API限制
+                  sleep 2
+                else
+                  echo "⚠️ 包目录不存在: $package_path"
+                fi
+              fi
+              
+              last_progress="$current_progress"
+            fi
+          fi
           
+          # 每30秒检查一次下载进程状态
+          sleep 3
+        done
+        
+        # 等待下载脚本完成
+        wait $download_pid
+        echo "🎉 下载脚本执行完成"
+        
+        # 最终清理和提交
+        echo "📊 执行最终提交..."
+        
+        # 添加剩余文件
+        git add Python_packages_backup/ 2>/dev/null || true
+        git add download_summary.json 2>/dev/null || true
+        
+        if ! git diff --staged --quiet; then
+          git commit -m "📊 Final backup cleanup - $(date +'%Y-%m-%d %H:%M')" 2>/dev/null || true
+          git push origin main 2>/dev/null || true
+        fi
+        
+        echo "✅ 总计提交了 $commit_count 个成功的包"
+        
     - name: Create metadata and reports
       env:
         PYTHON_VERSION: ${{ github.event.inputs.python_version || '3.12' }}
@@ -84,13 +345,52 @@ jobs:
           classified_packages.yml \
           Python_packages_backup
           
-    - name: Commit and push changes
+    - name: Show final summary
+      if: always()
       run: |
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
-        git add Python_packages_backup/
-        git diff --staged --quiet || git commit -m "Update Python packages backup - $(date +'%Y-%m-%d') [skip ci]"
-        git push
+        echo "## 📊 Python包备份结果 - $(date +'%Y-%m-%d %H:%M')" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        if [ -f "download_summary.json" ]; then
+          # 读取并显示统计信息
+          python3 << 'EOF'
+          import json
+          import sys
+          
+          try:
+              with open('download_summary.json', 'r') as f:
+                  summary = json.load(f)
+              
+              print(f"| ✅ 成功 | {summary['success_count']} | 已下载并推送 |")
+              print(f"| ❌ 失败 | {summary['failed_count']} | 下载失败 |")
+              print(f"| 📦 总数 | {summary['total_packages']} | 计划下载 |")
+              print(f"| 💾 总大小 | {summary['total_size_mb']}MB | 实际推送数据 |")
+              print(f"| ⏰ 完成时间 | {summary['completion_time']} | 备份完成时间 |")
+          except Exception as e:
+              print(f"❌ 无法读取统计信息: {e}")
+          EOF
+        else
+          echo "| 状态 | 数量 | 备注 |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|------|------|" >> $GITHUB_STEP_SUMMARY
+          echo "| ❌ 未知 | 未知 | 统计文件不存在 |" >> $GITHUB_STEP_SUMMARY
+        fi
+        
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### 🔧 技术细节" >> $GITHUB_STEP_SUMMARY
+        echo "- 逐个下载推送，避免大文件累积" >> $GITHUB_STEP_SUMMARY
+        echo "- 自动重试推送失败的情况" >> $GITHUB_STEP_SUMMARY
+        echo "- 实时监控下载进度" >> $GITHUB_STEP_SUMMARY
+        echo "- 支持包分类和元数据管理" >> $GITHUB_STEP_SUMMARY
+        
+        # 显示实际备份情况
+        if [ -d "Python_packages_backup" ]; then
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📁 备份目录状态" >> $GITHUB_STEP_SUMMARY
+          echo "- 分类目录数: $(find Python_packages_backup -maxdepth 1 -type d | wc -l)" >> $GITHUB_STEP_SUMMARY
+          echo "- 包目录数: $(find Python_packages_backup -mindepth 2 -maxdepth 2 -type d | wc -l)" >> $GITHUB_STEP_SUMMARY
+          echo "- 文件总数: $(find Python_packages_backup -type f | wc -l)" >> $GITHUB_STEP_SUMMARY
+          echo "- 磁盘使用: $(du -sh Python_packages_backup 2>/dev/null | cut -f1 || echo '未知')" >> $GITHUB_STEP_SUMMARY
+        fi
         
     - name: Create release (manual only)
       if: github.event_name == 'workflow_dispatch'
