@@ -1,0 +1,19 @@
+Package: ImmuneSubtypeClassifier
+Title: An R package for classification of immune subtypes, in cancer, using gene expression data.
+Version: 0.1.0
+Authors@R: 
+    person(given = "David",
+           family = "Gibbs",
+           role = c("aut", "cre"),
+           email = "dgibbs@systemsbiology.org",
+           comment = c(ORCID = "YOUR-ORCID-ID"))
+Description: An R package for classification of immune subtypes, in cancer, using gene expression data.
+License: Apache-2.0
+Encoding: UTF-8
+LazyData: true
+Depends:
+  xgboost,
+  plotROC,
+  stringr,
+  parallel
+RoxygenNote: 6.1.1

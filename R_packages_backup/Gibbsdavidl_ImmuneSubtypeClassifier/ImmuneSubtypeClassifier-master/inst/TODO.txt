@@ -1,0 +1,14 @@
+
+TODO
+----
+
+
+0. Parameters to optimize:
+   -- reducing number of needed genes to minimum
+   -- break points for binning genes
+   -- eta, max depth
+   -- ensemble size (want it not too big) for speed of calling
+   -- ptail -- the proportion of genes to select
+   -- allow overlapping genes across subtype models? or hard partitions?
+
+
