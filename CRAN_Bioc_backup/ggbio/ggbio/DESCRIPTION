@@ -1,0 +1,66 @@
+Package: ggbio
+Version: 1.50.0
+Title: Visualization tools for genomic data
+Description: The ggbio package extends and specializes the grammar of
+        graphics for biological data. The graphics are designed to
+        answer common scientific questions, in particular those often
+        asked of high throughput genomics data. All core Bioconductor
+        data structures are supported, where appropriate. The package
+        supports detailed views of particular genomic regions, as well
+        as genome-wide overviews. Supported overviews include ideograms
+        and grand linear views. High-level plots include sequence
+        fragment length, edge-linked interval to data view, mismatch
+        pileup, and several splicing summaries.
+Authors@R: c(person("Tengfei", "Yin", role=c("aut"),
+                 email="yintengfei@gmail.com"),
+          person("Michael", "Lawrence", role=c("aut", "ths", "cre"),
+                 email="michafla@gene.com"),
+          person("Dianne", "Cook", role=c("aut", "ths")),
+          person("Johannes", "Rainer", role="ctb"))
+Depends: methods, BiocGenerics, ggplot2 (>= 1.0.0)
+Imports: grid, grDevices, graphics, stats, utils, gridExtra, scales,
+        reshape2, gtable, Hmisc, biovizBase (>= 1.29.2), Biobase,
+        S4Vectors (>= 0.13.13), IRanges (>= 2.11.16), GenomeInfoDb (>=
+        1.1.3), GenomicRanges (>= 1.29.14), SummarizedExperiment,
+        Biostrings, Rsamtools (>= 1.17.28), GenomicAlignments (>=
+        1.1.16), BSgenome, VariantAnnotation (>= 1.11.4), rtracklayer
+        (>= 1.25.16), GenomicFeatures (>= 1.29.11), OrganismDbi,
+        GGally, ensembldb (>= 1.99.13), AnnotationDbi,
+        AnnotationFilter, rlang
+VignetteBuilder: knitr
+Suggests: vsn, BSgenome.Hsapiens.UCSC.hg19, Homo.sapiens,
+        TxDb.Hsapiens.UCSC.hg19.knownGene,
+        TxDb.Mmusculus.UCSC.mm9.knownGene, knitr, BiocStyle, testthat,
+        EnsDb.Hsapiens.v75, tinytex
+URL: https://lawremi.github.io/ggbio/
+BugReports: https://github.com/lawremi/ggbio/issues
+License: Artistic-2.0
+LazyLoad: Yes
+Collate: AllClasses.R AllGenerics.R Cache-class.R GGbio-class.R
+        Grob-class.R ideogram.R Tracked-class.R Plot-class.R
+        ggplot-method.R theme.R Tracks-class.R geom_chevron-method.R
+        geom_alignment-method.R geom_arch-method.R geom_arrow-method.R
+        geom_arrowrect-method.R geom_rect-method.R
+        geom_segment-method.R geom_bar-method.R layout_circle-method.R
+        layout_karyogram-method.R layout_linear-method.R
+        stat_aggregate-method.R stat_coverage-method.R
+        stat_identity-method.R stat_mismatch-method.R
+        stat_stepping-method.R stat_gene-method.R stat_table-method.R
+        stat_bin-method.R stat_slice-method.R stat_reduce-method.R
+        coord_genome-method.R autoplot-method.R hack.R
+        plotGrandLinear.R plotRangesLinkedToData.R
+        plotFragLength-method.R plotSpliceSum-method.R rescale-method.R
+        scales.R utils.R zzz.R
+biocViews: Infrastructure, Visualization
+git_url: https://git.bioconductor.org/packages/ggbio
+git_branch: RELEASE_3_18
+git_last_commit: ec89905
+git_last_commit_date: 2023-10-24
+Date/Publication: 2023-11-01
+NeedsCompilation: no
+Packaged: 2023-11-01 21:03:30 UTC; biocbuild
+Author: Tengfei Yin [aut],
+  Michael Lawrence [aut, ths, cre],
+  Dianne Cook [aut, ths],
+  Johannes Rainer [ctb]
+Maintainer: Michael Lawrence <michafla@gene.com>

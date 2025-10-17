@@ -1,0 +1,184 @@
+## Import
+## ============================================================
+
+import(methods)
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### base packages
+###
+
+importFrom(grid, convertUnit, editGrob, gList, gTree, gpar, grid.draw,
+           grid.newpage, grobTree, is.unit, rectGrob, textGrob, unit.c)
+importFrom(grDevices, dev.off, png)
+importFrom(graphics, par)
+importFrom(stats, approx, as.formula, df)
+importFrom(utils, capture.output, getFromNamespace)
+
+###
+importFrom(GGally, ggpairs)
+import(ggplot2, except=Position)
+import(gtable)
+### importFrom(gtable, gtable, gtable_add_grob, gtable_add_cols, gtable_add_rows, gtable_filter)
+importFrom(reshape2, melt)
+importFrom(scales, cbreaks, rescale, expand_range, math_format,
+           scientific_format, trans_breaks, trans_format)
+importFrom(gridExtra, grid.arrange, arrangeGrob)
+importFrom(Hmisc, bezier)
+importFrom(rlang, eval_tidy, is_quosure, quo_name, quo_squash)
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### Bioconductor packages
+###
+
+import(BiocGenerics)
+import(S4Vectors)
+import(IRanges)
+import(GenomeInfoDb)
+import(GenomicRanges)
+import(SummarizedExperiment)
+import(biovizBase)
+
+## Biobase
+importClassesFrom(Biobase, ExpressionSet, eSet, AssayData)
+importMethodsFrom(Biobase, exprs, pData, phenoData, varLabels)
+
+## Biostrings
+importMethodsFrom(Biostrings, getSeq)
+
+## Rsamtools
+importFrom(Rsamtools, BamFile)
+importMethodsFrom(Rsamtools, ScanBamParam, scanBamHeader)
+importClassesFrom(Rsamtools, BamFile, BamFileList)
+
+## GenomicAlignments
+importMethodsFrom(GenomicAlignments, readGAlignments)
+importClassesFrom(GenomicAlignments, GAlignments)
+
+## BSgenome
+importClassesFrom(BSgenome, BSgenome)
+
+## rtracklayer
+importMethodsFrom(rtracklayer, import)
+importClassesFrom(rtracklayer, BigWigFile, UCSCData)
+
+## GenomicFeatures
+importClassesFrom(GenomicFeatures, TxDb)
+importMethodsFrom(GenomicFeatures, exonsBy)
+
+## VariantAnnotation
+importClassesFrom(VariantAnnotation, VCF)
+importMethodsFrom(VariantAnnotation, fixed, "fixed<-", ref,
+                  alt, info, geno)
+importFrom(VariantAnnotation, readVcf)
+
+## OrganismDb
+importClassesFrom(OrganismDbi, OrganismDb)
+
+## AnnotationDbi
+importFrom(AnnotationDbi, select)
+
+## ensembldb
+importClassesFrom(ensembldb, EnsDb)
+## Filter classes...
+importMethodsFrom(ensembldb, listColumns, exons, exonsBy)
+## importFrom(ensembldb, GRangesFilter)
+
+## AnnotationFilter
+importClassesFrom(AnnotationFilter, AnnotationFilter, AnnotationFilterList,
+                  CharacterFilter, IntegerFilter, GRangesFilter, ExonIdFilter,
+                  ExonNameFilter, GeneIdFilter, GeneNameFilter, GenenameFilter,
+                  GeneBiotypeFilter, EntrezFilter, SymbolFilter, TxIdFilter,
+                  TxNameFilter, TxBiotypeFilter, ProteinIdFilter, UniprotFilter,
+                  SeqNameFilter, SeqStrandFilter, CdsStartFilter, CdsEndFilter,
+                  ExonStartFilter, ExonRankFilter, ExonEndFilter,
+                  GeneStartFilter, GeneEndFilter, TxStartFilter, TxEndFilter,
+                  DoubleFilter)
+importFrom(AnnotationFilter, GRangesFilter)
+
+## tools
+importFrom(tools, file_ext, file_path_sans_ext)
+
+## ============================================================
+## Export
+## ============================================================
+## utils
+exportMethods(autoplot, rescale, fixed, "fixed<-",
+              xlim, "xlim<-", reset, backup,
+              bgColor, "bgColor<-", labeled, "labeled<-",
+              mutable, "mutable<-", height, "height<-",
+              hasAxis, "hasAxis<-")
+
+
+export(arrangeGrobByParsingLegend, ggbio, GGbio)
+
+## scale
+export(scale_x_sequnit, scale_fill_giemsa, scale_fill_fold_change)
+
+## geom
+exportMethods(geom_chevron,
+              geom_arch,
+              geom_alignment,
+              geom_arrow,
+              geom_arrowrect,
+              geom_rect,
+              geom_bar,
+              geom_segment)
+
+## stat
+exportMethods(stat_aggregate,
+              stat_coverage,
+              stat_identity,
+              stat_mismatch,
+              stat_stepping,
+              stat_gene,
+              stat_table,
+              stat_slice,
+              stat_bin,
+              stat_reduce)
+
+## layout
+exportMethods(layout_karyogram,
+              layout_circle)
+
+export(circle)
+## coord
+## exportMethods(coord_genome)
+export(tracks,
+       align.plots,
+       alignPlots,
+       plotFragLength,
+       plotSpliceSum,
+       plotStackedOverview,
+       plotKaryogram,
+       plotIdeogram,
+       Ideogram,
+       plotGrandLinear,
+       plotRangesLinkedToData)
+
+export(theme_null, theme_alignment, theme_clear, theme_tracks_sunset,
+       theme_pack_panels, theme_noexpand, theme_genome)
+
+export(ggsave)
+exportMethods(cbind, rbind)
+exportClasses(GGbio, Ideogram, Plot, Tracked, Tracks, Grob)
+## export(btextGrob, geom_text2, zoom, zoom_in, zoom_out, nextView, prevView)
+export(zoom, zoom_in, zoom_out, nextView, prevView)
+## exportMethods(Grob, Plot, get_gtable, cached, "cached<-",
+##               cached_xlim, "cached_xlim<-",
+##               cached_ylim, "cached_ylim<-",
+##               cached_item, "cached_item<-", addItem, addWhich,
+##               cached_which, cbind, rbind)
+## export(PlotList, Tracked, Plot, Grob)
+
+
+S3method(ggplot, Vector)
+S3method(ggplot, matrix)
+S3method(ggplot, ExpressionSet)
+S3method(ggplot, RsamtoolsFile)
+S3method(ggplot, character)
+S3method(ggplot, TxDbOREnsDb)
+S3method(ggplot, BSgenome)
+S3method(ggplot, SummarizedExperiment)
+S3method(ggplot, GAlignments)
+S3method(ggplot, VCF)
+S3method(ggplot, Seqinfo)
