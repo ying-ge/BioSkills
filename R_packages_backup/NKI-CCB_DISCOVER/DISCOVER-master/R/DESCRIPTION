@@ -1,0 +1,11 @@
+Package: discover
+Version: 0.9.4
+Date: 2021-07-27
+Title: DISCOVER mutual exclusivity and co-occurrence analysis
+Author: Sander Canisius
+Maintainer: Sander Canisius <s.canisius@nki.nl>
+Description: DISCOVER method for mutual exclusivity and co-occurrence detection in genomic data.
+License: Apache License (== 2.0)
+RoxygenNote: 5.0.0
+VignetteBuilder: knitr
+Suggests: rmarkdown

@@ -1,0 +1,62 @@
+package:
+  name: discover
+  version: 0.9.6
+
+source:
+  path: ..
+
+build:
+  number: 0
+  
+  requires_features:
+    blas: {{ blas_impl }}
+  
+  features:
+    - nomkl                         # [x86 and blas_impl != 'mkl']
+
+  script_env:
+    - PKG_CONFIG_PATH=%PREFIX%\Library\lib\pkgconfig       # [win]
+
+  script: >-
+    python -m pip install
+    --config-settings setup-args="-Dstack-arrays=false"
+    --config-settings setup-args="-Darch=core2"
+    --no-deps
+    .
+
+requirements:
+  build:
+    - {{ compiler('c') }}           # [unix]
+    - {{ compiler('fortran') }}     # [unix]
+    - m2w64-toolchain               # [win]
+
+  host:
+    - python
+    - libpython                     # [win]
+    - pip >=23.1
+    - meson-python
+    - numpy
+    - mkl-devel                     # [blas_impl == 'mkl']
+    - openblas-devel                # [blas_impl == 'openblas']
+    - nomkl                         # [x86 and blas_impl != 'mkl']
+
+  run:
+    - python
+    - {{ pin_compatible('numpy') }}
+    - pandas
+    - m2w64-gcc-libs                # [win]
+    - m2w64-gcc-libgfortran         # [win]
+
+test:
+  requires:
+    - nomkl                         # [x86 and blas_impl == 'openblas']
+  imports:
+    - discover
+  commands:
+    - conda inspect linkages -p $PREFIX discover      # [not win]
+    - conda inspect objects -p $PREFIX discover       # [osx]
+
+about:
+  home: http://ccb.nki.nl/software/discover
+  license: Apache 2.0
+  summary: 'DISCOVER co-occurrence and mutual exclusivity analysis'

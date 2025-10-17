@@ -1,0 +1,9 @@
+*.o
+*.mod
+*.so
+
+*.py[cod]
+__pycache__/
+
+/python/build/
+
