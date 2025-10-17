@@ -1,0 +1,32 @@
+Package: RTN
+Type: Package
+Title: RTN: Reconstruction of Transcriptional regulatory Networks and
+        analysis of regulons
+Version: 2.26.0
+Author: Clarice Groeneveld [ctb], Gordon Robertson [ctb], Xin Wang [aut], Michael Fletcher [aut], Florian Markowetz [aut], Kerstin Meyer [aut], and Mauro Castro [aut]
+Maintainer: Mauro Castro <mauro.a.castro@gmail.com>
+Depends: R (>= 3.6.3), methods,
+Imports: RedeR, minet, viper, mixtools, snow, stats, limma, data.table,
+        IRanges, igraph, S4Vectors, SummarizedExperiment, car, pwr,
+        pheatmap, grDevices, graphics, utils
+Suggests: RUnit, BiocGenerics, BiocStyle, knitr, rmarkdown
+Description: A transcriptional regulatory network (TRN) consists of a collection of transcription factors (TFs) and the regulated target genes. TFs are regulators that recognize specific DNA sequences and guide the expression of the genome, either activating or repressing the expression the target genes. The set of genes controlled by the same TF forms a regulon. This package provides classes and methods for the reconstruction of TRNs and analysis of regulons.
+License: Artistic-2.0
+biocViews: Transcription, Network, NetworkInference, NetworkEnrichment,
+        GeneRegulation, GeneExpression, GraphAndNetwork,
+        GeneSetEnrichment, GeneticVariability
+VignetteBuilder: knitr
+URL: http://dx.doi.org/10.1038/ncomms3464
+Collate: ClassUnions.R AllChecks.R AllClasses.R AllGenerics.R
+        AllSupplementsTNA.R AllSupplementsTNI.R AllSupplementsAVS.R
+        AllPlotsTNA.R AllPlotsAVS.R AllPlotsTNI.R TNA-methods.R
+        TNI-methods.R AVS-methods.R TNI-pruning.R TNI-annotation.R
+        TNI-subgroups.R
+LazyLoad: yes
+git_url: https://git.bioconductor.org/packages/RTN
+git_branch: RELEASE_3_18
+git_last_commit: f63f748
+git_last_commit_date: 2023-10-24
+Date/Publication: 2023-10-24
+NeedsCompilation: no
+Packaged: 2023-10-24 22:51:36 UTC; biocbuild
