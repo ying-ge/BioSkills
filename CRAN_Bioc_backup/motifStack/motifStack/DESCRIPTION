@@ -1,0 +1,40 @@
+Package: motifStack
+Type: Package
+Version: 1.46.0
+Title: Plot stacked logos for single or multiple DNA, RNA and amino
+        acid sequence
+Authors@R: c(person(given="Jianhong", family="Ou", email="jianhong.ou@duke.edu", 
+        role=c("aut", "cre"), comment=c(ORCID="0000-0002-8652-2488")), 
+        person(given="Michael", family="Brodsky", role = "ctb", 
+        email = "Michael.Brodsky@umassmed.edu"), 
+        person(given="Scot", family="Wolfe", role = "ctb", 
+        email = "Scot.Wolfe@umassmed.edu"),
+        person("Lihua Julie Zhu", "Developer", role = "aut",
+        email = "Julie.Zhu@umassmed.edu"))
+Author: Jianhong Ou, Michael Brodsky, Scot Wolfe and Lihua Julie Zhu
+Maintainer: Jianhong Ou <jianhong.ou@duke.edu>
+Depends: R (>= 2.15.1), methods, grid
+Imports: ade4, Biostrings, ggplot2, grDevices, graphics, htmlwidgets,
+        stats, stats4, utils, XML, TFBSTools
+Suggests: Cairo, grImport, grImport2, BiocGenerics, MotifDb,
+        RColorBrewer, BiocStyle, knitr, RUnit, rmarkdown, JASPAR2020
+biocViews: SequenceMatching, Visualization, Sequencing, Microarray,
+        Alignment, ChIPchip, ChIPSeq, MotifAnnotation, DataImport
+Description: The motifStack package is designed for graphic 
+             representation of multiple motifs with different similarity 
+             scores. It works with both DNA/RNA sequence motif and amino 
+             acid sequence motif. In addition, it provides the flexibility 
+             for users to customize the graphic parameters such as the 
+             font type and symbol colors.
+License: GPL (>= 2)
+Lazyload: yes
+VignetteBuilder: knitr
+RoxygenNote: 7.2.3
+Encoding: UTF-8
+git_url: https://git.bioconductor.org/packages/motifStack
+git_branch: RELEASE_3_18
+git_last_commit: 80200b0
+git_last_commit_date: 2023-10-24
+Date/Publication: 2023-10-24
+NeedsCompilation: no
+Packaged: 2023-10-24 22:02:28 UTC; biocbuild
