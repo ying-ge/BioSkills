@@ -1,0 +1,45 @@
+Package: microbiomeMarker
+Title: microbiome biomarker analysis toolkit
+Version: 1.8.0
+Authors@R: 
+    person(given = "Yang",
+           family = "Cao",
+           role = c("aut", "cre"),
+           email = "caoyang.name@gmail.com")
+Description: To date, a number of methods have been developed for microbiome 
+    marker discovery based on metagenomic profiles, e.g. LEfSe. However, all of 
+    these methods have its own advantages and disadvantages, and none of them is 
+    considered standard or universal. Moreover, different programs or softwares 
+    may be development using different programming languages, even in different 
+    operating systems. Here, we have developed an all-in-one R package 
+    microbiomeMarker that integrates commonly used differential analysis 
+    methods as well as three machine learning-based approaches, including 
+    Logistic regression, Random forest, and Support vector machine, to 
+    facilitate the identification of microbiome markers.
+License: GPL-3
+biocViews: Metagenomics, Microbiome, DifferentialExpression
+URL: https://github.com/yiluheihei/microbiomeMarker
+BugReports: https://github.com/yiluheihei/microbiomeMarker/issues
+Depends: R (>= 4.1.0)
+Imports: dplyr, phyloseq, magrittr, purrr, MASS, utils, ggplot2,
+        tibble, rlang, stats, coin, ggtree, tidytree, methods, IRanges,
+        tidyr, patchwork, ggsignif, metagenomeSeq, DESeq2, edgeR,
+        BiocGenerics, Biostrings, yaml, biomformat, S4Vectors, Biobase,
+        ComplexHeatmap, ANCOMBC, caret, limma, ALDEx2, multtest,
+        plotROC, vegan, pROC, BiocParallel
+Encoding: UTF-8
+RoxygenNote: 7.2.3
+Roxygen: list(markdown = TRUE)
+Suggests: testthat, covr, glmnet, Matrix, kernlab, e1071, ranger,
+        knitr, rmarkdown, BiocStyle, withr
+VignetteBuilder: knitr
+Config/testthat/edition: 3
+git_url: https://git.bioconductor.org/packages/microbiomeMarker
+git_branch: RELEASE_3_18
+git_last_commit: 577f9da
+git_last_commit_date: 2023-11-04
+Date/Publication: 2023-11-05
+NeedsCompilation: no
+Packaged: 2023-11-05 22:36:17 UTC; biocbuild
+Author: Yang Cao [aut, cre]
+Maintainer: Yang Cao <caoyang.name@gmail.com>
