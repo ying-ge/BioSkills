@@ -1,1 +1,1 @@
-pytorch-lightning|success|0.79|deep_learning
+pysam|success|22.91|genomics
