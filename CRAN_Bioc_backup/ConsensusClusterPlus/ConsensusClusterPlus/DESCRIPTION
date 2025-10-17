@@ -1,0 +1,20 @@
+Package: ConsensusClusterPlus
+Type: Package
+Imports: Biobase, ALL, graphics, stats, utils, cluster
+Title: ConsensusClusterPlus
+Version: 1.66.0
+Date: 2020-4-24
+Author: Matt Wilkerson <mdwilkerson@outlook.com>, Peter Waltman
+        <waltman@soe.ucsc.edu>
+Maintainer: Matt Wilkerson <mdwilkerson@outlook.com>
+Description: algorithm for determining cluster count and membership by
+        stability evidence in unsupervised analysis
+License: GPL version 2
+biocViews: Software, Clustering
+git_url: https://git.bioconductor.org/packages/ConsensusClusterPlus
+git_branch: RELEASE_3_18
+git_last_commit: aa15b11
+git_last_commit_date: 2023-10-24
+Date/Publication: 2023-10-24
+NeedsCompilation: no
+Packaged: 2023-10-24 20:46:54 UTC; biocbuild
