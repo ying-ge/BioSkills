@@ -1,0 +1,37 @@
+Package: ggord
+Type: Package
+Title: Ordination Plots with ggplot2
+Version: 1.1.8
+Date: 2024-07-16
+Author: Marcus W. Beck [aut, cre]
+Maintainer: Marcus W. Beck <mbafs2012@gmail.com>
+Description: Create ordination biplots with ggplot2. Multiple methods are
+    available including principal components analysis, correspondence analysis,
+    nonmetric multidimensional scaling, multiple correspondence analysis, and linear
+    discriminant analysis.  Limited triplot methods are also available.
+BugReports: https://github.com/fawda123/ggord/issues
+License: CC0
+LazyData: true
+Imports:
+    ggplot2,
+    ggrepel,
+    grid,
+    plyr
+Depends:
+    R (>= 3.1.1)
+Suggests:
+    knitr,
+    ade4,
+    adephylo,
+    ape,
+    ca,
+    FactoMineR,
+    MASS,
+    phylobase,
+    vegan,
+    rmarkdown
+Authors@R: person(given = "Marcus W.", family = "Beck",
+    role = c("aut","cre"),
+    email = "mbafs2012@gmail.com")
+RoxygenNote: 7.2.3
+VignetteBuilder: knitr
