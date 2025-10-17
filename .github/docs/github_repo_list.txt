@@ -31,6 +31,7 @@ KrishnaswamyLab/MAGIC
 richie2019/MBpanel
 ebecht/MCPcounter
 mg14/mg14
+l-magnificence/Mime
 cole-trapnell-lab/monocle-release
 Simon-Coetzee/motifBreakR
 xlucpu/MOVICS
