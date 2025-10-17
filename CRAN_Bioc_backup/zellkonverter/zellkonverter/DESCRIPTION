@@ -1,0 +1,64 @@
+Package: zellkonverter
+Title: Conversion Between scRNA-seq Objects
+Version: 1.12.1
+Date: 2023-11-13
+Authors@R: 
+    c(person(given = "Luke",
+             family = "Zappia",
+             role = c("aut", "cre"),
+             email = "luke@lazappi.id.au",
+             comment = c(ORCID = "0000-0001-7744-8565")),
+      person(given = "Aaron",
+             family = "Lun",
+             role = c("aut"),
+             email = "infinite.monkeys.with.keyboards@gmail.com",
+             comment = c(ORCID = "0000-0002-3564-4813")),
+      person(given = "Jack",
+             family = "Kamm",
+             role = c("ctb"),
+             email = "jackkamm@gmail.com",
+             comment = c(ORCID = "0000-0003-2412-756X")),
+      person(given = "Robrecht",
+             family = "Cannoodt",
+             role = c("ctb"),
+             email = "rcannood@gmail.com",
+             comment = c(ORCID = "0000-0003-3641-729X", github = "rcannood"))
+    )
+Description: 
+    Provides methods to convert between Python AnnData objects and
+    SingleCellExperiment objects. These are primarily intended for use by
+    downstream Bioconductor packages that wrap Python methods for single-cell
+    data analysis. It also includes functions to read and write H5AD files used
+    for saving AnnData objects to disk. 
+biocViews: SingleCell, DataImport, DataRepresentation
+License: MIT + file LICENSE
+Imports: Matrix, basilisk, reticulate, SingleCellExperiment (>=
+        1.11.6), SummarizedExperiment, DelayedArray, methods,
+        S4Vectors, utils, cli
+Suggests: anndata, BiocFileCache, BiocStyle, covr, HDF5Array, knitr,
+        pkgload, rmarkdown, rhdf5 (>= 2.45.1), scRNAseq, spelling,
+        testthat, withr
+Collate: 'AnnData2SCE.R' 'SCE2AnnData.R' 'ui.R' 'basilisk.R' 'read.R'
+        'reticulate.R' 'utils.R' 'validation.R' 'write.R'
+        'zellkonverter-package.R'
+URL: https://github.com/theislab/zellkonverter
+BugReports: https://github.com/theislab/zellkonverter/issues
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.3
+Language: en-GB
+StagedInstall: no
+VignetteBuilder: knitr
+git_url: https://git.bioconductor.org/packages/zellkonverter
+git_branch: RELEASE_3_18
+git_last_commit: 4cb6fc2
+git_last_commit_date: 2023-11-13
+Date/Publication: 2023-11-14
+NeedsCompilation: no
+Packaged: 2023-11-15 00:46:06 UTC; biocbuild
+Author: Luke Zappia [aut, cre] (<https://orcid.org/0000-0001-7744-8565>),
+  Aaron Lun [aut] (<https://orcid.org/0000-0002-3564-4813>),
+  Jack Kamm [ctb] (<https://orcid.org/0000-0003-2412-756X>),
+  Robrecht Cannoodt [ctb] (<https://orcid.org/0000-0003-3641-729X>,
+    rcannood)
+Maintainer: Luke Zappia <luke@lazappi.id.au>
