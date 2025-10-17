@@ -1,0 +1,15 @@
+bibentry(
+    bibtype = "Article",
+    title = "R-chie: a web server and R package for visualizing RNA secondary
+        structures",
+    author = c(person("Daniel", "Lai"),
+            person("Jeff", "Proctor", "Ryan"),
+            person("Jing Yun", "Zhu", "Alice"),
+            person("Irmtraud", "Meyer", "Margret")),
+    journal = "Nucleic Acids Research",
+    volume = 40,
+    number = 12,
+    pages = "e95",
+    year = 2012,
+    url = "http://dx.doi.org/10.1093/nar/gks241")
+
