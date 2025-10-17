@@ -1,0 +1,12 @@
+arm_num,unique_event_name,form
+1,event_1_arm_1,record_id
+1,event_1_arm_1,randomization
+1,event_1_arm_1,text_fields
+1,event_1_arm_1,dates_and_times
+1,event_1_arm_1,numbers
+1,event_1_arm_1,slider_fields
+1,event_1_arm_1,multiple_choice
+1,event_1_arm_1,files_notes_descriptions
+1,event_1_arm_1,calculated_fields
+1,event_1_arm_1,branching_logic
+1,event_1_arm_1,repeating_instrument
