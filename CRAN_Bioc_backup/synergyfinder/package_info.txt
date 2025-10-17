@@ -1,0 +1,7 @@
+Package: synergyfinder
+Version: 3.10.3
+Source: Bioconductor BioCsoft
+URL: https://bioconductor.org/packages/3.18/bioc/src/contrib/synergyfinder_3.10.3.tar.gz
+Size: 6.37 MB
+Download Date: 2025-10-17
+
