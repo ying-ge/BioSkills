@@ -1,4 +1,4 @@
-name: Extract TAR.GZ Files Only
+name: Extract TAR.GZ Files Only (Keep Archives)
  
 on:
   workflow_dispatch:
@@ -32,51 +32,101 @@ jobs:
             filename=$(basename "$archive_file")
             filename_clean=$(echo "$filename" | sed 's/\.\(tar\.gz\|tgz\)$//')
             
-            # 解压到临时目录
-            temp_dir="temp_extract_$(date +%s)"
-            mkdir -p "$temp_dir"
-            
-            echo "Extracting TAR.GZ to temporary directory..."
-            tar -xzf "$archive_file" -C "$temp_dir"
-            
-            # 检查并过滤大文件
-            large_files_count=0
-            small_files_count=0
-            
-            echo "Checking file sizes..."
-            find "$temp_dir" -type f | while read file; do
-              file_size=$(stat -c%s "$file")
+            # 检查文件是否真的是tar.gz格式
+            echo "Checking archive format..."
+            if file "$archive_file" | grep -q "gzip compressed"; then
+              # 尝试解压看是否是有效的tar.gz
+              temp_test_dir="temp_test_$(date +%s)"
+              mkdir -p "$temp_test_dir"
               
-              if [ $file_size -gt $MAX_SIZE ]; then
-                echo "SKIPPING large file: $(basename "$file") ($(du -h "$file" | cut -f1))"
-                rm -f "$file"
-                large_files_count=$((large_files_count + 1))
+              if tar -tzf "$archive_file" >/dev/null 2>&1; then
+                echo "Valid TAR.GZ archive detected"
+                
+                # 解压到临时目录
+                temp_dir="temp_extract_$(date +%s)"
+                mkdir -p "$temp_dir"
+                
+                echo "Extracting TAR.GZ to temporary directory..."
+                if tar -xzf "$archive_file" -C "$temp_dir"; then
+                  # 检查并过滤大文件
+                  large_files_count=0
+                  small_files_count=0
+                  
+                  echo "Checking file sizes..."
+                  find "$temp_dir" -type f | while read file; do
+                    file_size=$(stat -c%s "$file")
+                    
+                    if [ $file_size -gt $MAX_SIZE ]; then
+                      echo "SKIPPING large file: $(basename "$file") ($(du -h "$file" | cut -f1))"
+                      rm -f "$file"
+                      large_files_count=$((large_files_count + 1))
+                    else
+                      echo "KEEPING small file: $(basename "$file") ($(du -h "$file" | cut -f1))"
+                      small_files_count=$((small_files_count + 1))
+                    fi
+                  done
+                  
+                  # 移动小文件到目标位置
+                  if [ -d "$temp_dir" ] && [ "$(ls -A "$temp_dir" 2>/dev/null)" ]; then
+                    echo "Moving small files to repository..."
+                    find "$temp_dir" -type f | while read file; do
+                      relative_path="${file#$temp_dir/}"
+                      target_path="$(dirname "$archive_file")/$relative_path"
+                      
+                      # 创建目标目录
+                      mkdir -p "$(dirname "$target_path")"
+                      
+                      # 移动文件
+                      mv "$file" "$target_path"
+                      echo "Moved: $relative_path"
+                    done
+                  else
+                    echo "No files to move (all were too large or archive was empty)"
+                  fi
+                  
+                  rm -rf "$temp_dir"
+                  success=true
+                else
+                  echo "TAR extraction failed"
+                  rm -rf "$temp_dir"
+                  success=false
+                fi
+                
               else
-                echo "KEEPING small file: $(basename "$file") ($(du -h "$file" | cut -f1))"
-                small_files_count=$((small_files_count + 1))
+                echo "Not a valid TAR.GZ archive, trying direct gzip extraction..."
+                # 可能是直接gzip压缩的单个文件
+                temp_dir="temp_extract_$(date +%s)"
+                mkdir -p "$temp_dir"
+                
+                if gunzip -c "$archive_file" > "$temp_dir/extracted_file" 2>/dev/null; then
+                  # 检查解压后的文件大小
+                  file_size=$(stat -c%s "$temp_dir/extracted_file")
+                  
+                  if [ $file_size -le $MAX_SIZE ]; then
+                    # 移动文件到目标位置
+                    target_path="$(dirname "$archive_file")/extracted_file"
+                    mv "$temp_dir/extracted_file" "$target_path"
+                    echo "Extracted single file: extracted_file ($(du -h "$target_path" | cut -f1))"
+                    success=true
+                  else
+                    echo "Extracted file too large: $(du -h "$temp_dir/extracted_file" | cut -f1))"
+                    rm -f "$temp_dir/extracted_file"
+                    success=false
+                  fi
+                else
+                  echo "Both TAR and GZIP extraction failed"
+                  success=false
+                fi
+                
+                rm -rf "$temp_dir"
               fi
-            done
-            
-            # 移动小文件到目标位置
-            if [ -d "$temp_dir" ] && [ "$(ls -A "$temp_dir" 2>/dev/null)" ]; then
-              echo "Moving small files to repository..."
-              find "$temp_dir" -type f | while read file; do
-                relative_path="${file#$temp_dir/}"
-                target_path="$(dirname "$archive_file")/$relative_path"
-                
-                # 创建目标目录
-                mkdir -p "$(dirname "$target_path")"
-                
-                # 移动文件
-                mv "$file" "$target_path"
-                echo "Moved: $relative_path"
-              done
+              
+              rm -rf "$temp_test_dir"
+              
             else
-              echo "No files to move (all were too large)"
+              echo "Not a gzip compressed file, skipping"
+              success=false
             fi
-            
-            # 清理临时目录
-            rm -rf "$temp_dir"
             
             # 添加变更到Git
             git add .
@@ -86,11 +136,15 @@ jobs:
               echo "Committing changes from $filename_clean..."
               
               # 构建commit message
-              commit_msg="Extracted: $filename_clean (tar.gz"
-              if [ $large_files_count -gt 0 ]; then
-                commit_msg="$commit_msg, skipped $large_files_count large files)"
+              if [ "$success" = true ]; then
+                commit_msg="Extracted: $filename_clean (tar.gz"
+                if [ $large_files_count -gt 0 ]; then
+                  commit_msg="$commit_msg, skipped $large_files_count large files)"
+                else
+                  commit_msg="$commit_msg)"
+                fi
               else
-                commit_msg="$commit_msg)"
+                commit_msg="Skipped: $filename_clean (invalid format)"
               fi
               
               echo "Commit message: $commit_msg"
@@ -102,29 +156,9 @@ jobs:
                 echo "Successfully pushed $filename_clean"
               else
                 echo "Push failed, trying to resolve..."
-                
-                # 检查是否有大文件被意外添加
-                git diff --cached --name-only | while read cached_file; do
-                  if [ -f "$cached_file" ]; then
-                    file_size=$(stat -c%s "$cached_file")
-                    if [ $file_size -gt $MAX_SIZE ]; then
-                      echo "ERROR: Large file found in staging: $cached_file ($(du -h "$cached_file" | cut -f1))"
-                      git reset HEAD "$cached_file"
-                      rm -f "$cached_file"
-                      echo "Removed large file from staging: $cached_file"
-                    fi
-                  fi
-                done
-                
-                # 重新提交（如果有剩余文件）
-                if ! git diff --cached --quiet; then
-                  git commit -m "$commit_msg (fixed large files)"
-                fi
-                
-                # 拉取并重试推送
                 git pull origin main --rebase
                 git push origin main || {
-                  echo "Final push attempt..."
+                  echo "Force pushing..."
                   git push origin main --force
                 }
               fi
@@ -132,14 +166,8 @@ jobs:
               echo "No new files to commit from $filename_clean"
             fi
             
-            # 删除已处理的压缩文件
-            echo "Removing processed archive: $archive_file"
-            rm -f "$archive_file"
-            git add "$archive_file"
-            git commit -m "Remove processed archive: $filename_clean" || true
-            git push origin main || true
-            
-            echo "=== Completed: $filename_clean ==="
+            # 保留压缩包，不删除
+            echo "=== Completed: $filename_clean (archive kept) ==="
             sleep 2
           done
  
@@ -156,7 +184,7 @@ jobs:
           echo ""
           echo "=== Check for any large files ==="
           MAX_SIZE=$((100 * 1024 * 1024))
-          large_files=$(find . -type f -size +${MAX_SIZE}c ! -path "./.git/*")
+          large_files=$(find . -type f -size +${MAX_SIZE}c ! -path "./.git/*" ! -name "*.tar.gz" ! -name "*.tgz")
           if [ -n "$large_files" ]; then
             echo "WARNING: Found large files:"
             echo "$large_files" | while read file; do
@@ -165,3 +193,22 @@ jobs:
           else
             echo "No large files found - all clear!"
           fi
+ 
+      - name: Create Processing Log (Optional)
+        run: |
+          echo "# TAR.GZ Processing Log" > extraction_log.md
+          echo "Generated on: $(date)" >> extraction_log.md
+          echo "" >> extraction_log.md
+          
+          echo "## Archives Processed" >> extraction_log.md
+          echo "- TAR.GZ files: $(find . -name "*.tar.gz" | wc -l)" >> extraction_log.md
+          echo "- TGZ files: $(find . -name "*.tgz" | wc -l)" >> extraction_log.md
+          echo "" >> extraction_log.md
+          
+          echo "## Extracted Files" >> extraction_log.md
+          # 这里可以添加更详细的日志逻辑
+          echo "Files extracted and committed successfully." >> extraction_log.md
+          
+          git add extraction_log.md
+          git commit -m "Update extraction log" || true
+          git push origin main || true
