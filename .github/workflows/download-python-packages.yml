@@ -1,0 +1,112 @@
+name: Download Python Packages
+
+on:
+  workflow_dispatch:
+    inputs:
+      package_file:
+        description: 'Path to package list file'
+        required: false
+        default: '.github/docs/python_lib.txt'
+      python_version:
+        description: 'Python version'
+        required: false
+        default: '3.9'
+        type: choice
+        options:
+          - '3.8'
+          - '3.9'
+          - '3.10'
+          - '3.11'
+  schedule:
+    # 每月9号自动更新
+    - cron: '0 0 9 * *'
+  push:
+    paths:
+      - '.github/docs/lib_python.txt'
+      - '.github/scripts/*.py'
+
+jobs:
+  download-packages:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [${{ github.event.inputs.python_version || '3.9' }}]
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+        
+    - name: Cache pip packages
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('.github/docs/python_lib.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+          
+    - name: Create Python packages directory structure
+      run: |
+        mkdir -p Python_packages_backup/{singlecell,machine_learning,core,visualization,genomics,immunology,deep_learning,data_processing,uncategorized}
+        
+    - name: Install required tools
+      run: |
+        pip install wheel setuptools requests pyyaml
+        
+    - name: Make scripts executable
+      run: |
+        chmod +x .github/scripts/*.py
+        
+    - name: Parse package list
+      env:
+        PYTHON_VERSION: ${{ matrix.python-version }}
+      run: |
+        python .github/scripts/parse_packages.py \
+          "${{ github.event.inputs.package_file || '.github/docs/python_lib.txt' }}" \
+          classified_packages.yml
+          
+    - name: Download packages
+      env:
+        GITHUB_RUN_STARTED_AT: ${{ github.run_started_at }}
+      run: |
+        python .github/scripts/download_packages.py \
+          classified_packages.yml \
+          Python_packages_backup
+          
+    - name: Create metadata and reports
+      env:
+        PYTHON_VERSION: ${{ matrix.python-version }}
+        GITHUB_EVENT_NAME: ${{ github.event_name }}
+        GITHUB_RUN_ID: ${{ github.run_id }}
+        GITHUB_REPOSITORY: ${{ github.repository }}
+        PACKAGE_FILE: ${{ github.event.inputs.package_file || '.github/docs/python_lib.txt' }}
+      run: |
+        python .github/scripts/create_metadata.py \
+          classified_packages.yml \
+          Python_packages_backup
+          
+    - name: Commit and push changes
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add Python_packages_backup/
+        git diff --staged --quiet || git commit -m "Update Python packages backup - $(date +'%Y-%m-%d') [skip ci]"
+        git push
+        
+    - name: Create release (manual only)
+      if: github.event_name == 'workflow_dispatch'
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: python-packages-$(date +'%Y%m%d-%H%M')
+        name: Python Packages Backup $(date +'%Y-%m-%d %H:%M')
+        body_path: Python_packages_backup/download_report.md
+        files: |
+          Python_packages_backup/**/*
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
