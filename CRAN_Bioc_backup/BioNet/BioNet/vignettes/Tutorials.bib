@@ -1,0 +1,464 @@
+% This file was created with JabRef 2.5.
+% Encoding: Cp1252
+
+@STRING{MPB = {Math. Program., Ser.~B}}
+
+@STRING{SPRINGER = {Springer}}
+
+@ARTICLE{Beisser2009,
+  author = {Daniela Beisser and Gunnar W. Klau and Tobias Mueller and Marcus
+	Dittrich},
+  title = {BioNet: an R-package for the Functional Analysis of Biological Networks},
+  journal = {Bioinformatics},
+  year = {submitted},
+  institution = {Department of Bioinformatics, Biocenter, University of Würzburg,
+	Am Hubland, 97074 Würzburg, Germany.},
+  language = {eng},
+  medline-pst = {ppublish},
+  pii = {btn161},
+  pmid = {18586718}
+}
+
+@MANUAL{Carey2009,
+  title = {RBGL: An interface to the BOOST graph library},
+  author = {Vince Carey and Li Long and R. Gentleman},
+  year = {2009},
+  note = {R package version 1.20.0},
+  url = {http://CRAN.R-project.org/package=RBGL}
+}
+
+@ARTICLE{Carey2005,
+  author = {Vincent J Carey and Jeff Gentry and Elizabeth Whalen and Robert Gentleman},
+  title = {{N}etwork structures and algorithms in {B}ioconductor.},
+  journal = {Bioinformatics},
+  year = {2005},
+  volume = {21},
+  pages = {135--136},
+  number = {1},
+  month = {Jan},
+  abstract = {In this paper, we review the central concepts and implementations
+	of tools for working with network structures in Bioconductor. Interfaces
+	to open source resources for visualization (AT&T Graphviz) and network
+	algorithms (Boost) have been developed to support analysis of graphical
+	structures in genomics and computational biology. AVAILABILITY: Packages
+	graph, Rgraphviz, RBGL of Bioconductor (www.bioconductor.org).},
+  keywords = {Algorithms; Computer Graphics; Computer Simulation; Gene Expression
+	Regulation; Information Storage and Retrieval; Internet; Models,
+	Biological; Signal Transduction; Transcription Factors; User-Computer
+	Interface},
+  owner = {Marcus Dittrich},
+  pii = {bth458},
+  pmid = {15297301},
+  timestamp = {2007.09.20}
+}
+
+@ARTICLE{Chiaretti2004,
+  author = {Sabina Chiaretti and Xiaochun Li and Robert Gentleman and Antonella
+	Vitale and Marco Vignetti and Franco Mandelli and Jerome Ritz and
+	Robin Foa},
+  title = {Gene expression profile of adult T-cell acute lymphocytic leukemia
+	identifies distinct subsets of patients with different response to
+	therapy and survival.},
+  journal = {Blood},
+  year = {2004},
+  volume = {103},
+  pages = {2771--2778},
+  number = {7},
+  month = {Apr},
+  abstract = {Gene expression profiles were examined in 33 adult patients with T-cell
+	acute lymphocytic leukemia (T-ALL). Nonspecific filtering criteria
+	identified 313 genes differentially expressed in the leukemic cells.
+	Hierarchical clustering of samples identified 2 groups that reflected
+	the degree of T-cell differentiation but was not associated with
+	clinical outcome. Comparison between refractory patients and those
+	who responded to induction chemotherapy identified a single gene,
+	interleukin 8 (IL-8), that was highly expressed in refractory T-ALL
+	cells and a set of 30 genes that was highly expressed in leukemic
+	cells from patients who achieved complete remission. We next identified
+	19 genes that were differentially expressed in T-ALL cells from patients
+	who either had a relapse or remained in continuous complete remission.
+	A model based on the expression of 3 of these genes was predictive
+	of duration of remission. The 3-gene model was validated on a further
+	set of T-ALL samples from 18 additional patients treated on the same
+	clinical protocol. This study demonstrates that gene expression profiling
+	can identify a limited number of genes that are predictive of response
+	to induction therapy and remission duration in adult patients with
+	T-ALL.},
+  institution = {Department of Medical Oncology, Dana-Farber Cancer Institute, Department
+	of Medicine, Brigham and Women's Hospital, Harvard Medical School,
+	Boston, MA 02115, USA.},
+  keywords = {Adult; Base Sequence; DNA Primers; Gene Expression Profiling, methods;
+	Gene Expression Regulation, Neoplastic, genetics; Humans; Leukemia-Lymphoma,
+	Adult T-Cell, genetics/mortality/therapy; Models, Genetic; Oligonucleotide
+	Array Sequence Analysis, methods; Predictive Value of Tests; Reproducibility
+	of Results; Reverse Transcriptase Polymerase Chain Reaction, methods;
+	Survival Rate; Time Factors; Tumor Cells, Cultured},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {dab60cg},
+  pii = {2003-09-3243},
+  pmid = {14684422},
+  timestamp = {2009.11.06}
+}
+
+@ARTICLE{Csardi2006,
+  author = {Gabor Csardi and Tamas Nepusz},
+  title = {The igraph software package for complex network research},
+  journal = {InterJournal},
+  year = {2006},
+  volume = {Complex Systems},
+  pages = {1695},
+  url = {http://igraph.sf.net}
+}
+
+@ARTICLE{Dittrich2008,
+  author = {Marcus T Dittrich and Gunnar W Klau and Andreas Rosenwald and Thomas
+	Dandekar and Tobias Müller},
+  title = {Identifying functional modules in protein-protein interaction networks:
+	an integrated exact approach.},
+  journal = {Bioinformatics},
+  year = {2008},
+  volume = {24},
+  pages = {i223--i231},
+  number = {13},
+  month = {Jul},
+  __markedentry = {[bi]},
+  abstract = {MOTIVATION: With the exponential growth of expression and protein-protein
+	interaction (PPI) data, the frontier of research in systems biology
+	shifts more and more to the integrated analysis of these large datasets.
+	Of particular interest is the identification of functional modules
+	in PPI networks, sharing common cellular function beyond the scope
+	of classical pathways, by means of detecting differentially expressed
+	regions in PPI networks. This requires on the one hand an adequate
+	scoring of the nodes in the network to be identified and on the other
+	hand the availability of an effective algorithm to find the maximally
+	scoring network regions. Various heuristic approaches have been proposed
+	in the literature. RESULTS: Here we present the first exact solution
+	for this problem, which is based on integer-linear programming and
+	its connection to the well-known prize-collecting Steiner tree problem
+	from Operations Research. Despite the NP-hardness of the underlying
+	combinatorial problem, our method typically computes provably optimal
+	subnetworks in large PPI networks in a few minutes. An essential
+	ingredient of our approach is a scoring function defined on network
+	nodes. We propose a new additive score with two desirable properties:
+	(i) it is scalable by a statistically interpretable parameter and
+	(ii) it allows a smooth integration of data from various sources.
+	We apply our method to a well-established lymphoma microarray dataset
+	in combination with associated survival data and the large interaction
+	network of HPRD to identify functional modules by computing optimal-scoring
+	subnetworks. In particular, we find a functional interaction module
+	associated with proliferation over-expressed in the aggressive ABC
+	subtype as well as modules derived from non-malignant by-stander
+	cells. AVAILABILITY: Our software is available freely for non-commercial
+	purposes at http://www.planet-lisa.net.},
+  institution = {Department of Bioinformatics, Biocenter, University of Würzburg,
+	Am Hubland, 97074 Würzburg, Germany.},
+  keywords = {Algorithms; Gene Expression Profiling, methods; Humans; Lymphoma,
+	metabolism; Protein Interaction Mapping, methods; Proteome, metabolism;
+	Signal Transduction; Systems Integration},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {bi},
+  pii = {btn161},
+  pmid = {18586718},
+  timestamp = {2009.06.26}
+}
+
+@MANUAL{Gentleman2009,
+  title = {graph: A package to handle graph data structures},
+  author = {R. Gentleman and Elizabeth Whalen and W. Huber and S. Falcon},
+  year = {2009},
+  note = {R package version 1.22.2},
+  url = {http://CRAN.R-project.org/package=graph}
+}
+
+@ARTICLE{Gentleman2004,
+  author = {Robert C Gentleman and Vincent J Carey and Douglas M Bates and Ben
+	Bolstad and Marcel Dettling and Sandrine Dudoit and Byron Ellis and
+	Laurent Gautier and Yongchao Ge and Jeff Gentry and Kurt Hornik and
+	Torsten Hothorn and Wolfgang Huber and Stefano Iacus and Rafael Irizarry
+	and Friedrich Leisch and Cheng Li and Martin Maechler and Anthony
+	J Rossini and Gunther Sawitzki and Colin Smith and Gordon Smyth and
+	Luke Tierney and Jean Y H Yang and Jianhua Zhang},
+  title = {{B}ioconductor: open software development for computational biology
+	and bioinformatics.},
+  journal = {Genome Biol},
+  year = {2004},
+  volume = {5},
+  pages = {R80},
+  number = {10},
+  abstract = {The Bioconductor project is an initiative for the collaborative creation
+	of extensible software for computational biology and bioinformatics.
+	The goals of the project include: fostering collaborative development
+	and widespread use of innovative software, reducing barriers to entry
+	into interdisciplinary scientific research, and promoting the achievement
+	of remote reproducibility of research results. We describe details
+	of our aims and methods, identify current challenges, compare Bioconductor
+	to other open bioinformatics projects, and provide working examples.},
+  doi = {10.1186/gb-2004-5-10-r80},
+  keywords = {Bayes Theorem, Biometry, Brain, Computational Biology, Computer Simulation,
+	Extramural, Fourier Analysis, Humans, Image Enhancement, Internet,
+	Magnetic Resonance Imaging, N.I.H., Non-P.H.S., P.H.S., Probability,
+	Reproducibility of Results, Research Support, Software, U.S. Gov't,
+	15461798},
+  owner = {Marcus Dittrich},
+  pii = {gb-2004-5-10-r80},
+  pmid = {15461798},
+  timestamp = {2007.09.20},
+  url = {http://dx.doi.org/10.1186/gb-2004-5-10-r80}
+}
+
+@MANUAL{Huber2006,
+  title = {estrogen: 2x2 factorial design exercise for the Bioconductor short
+	course},
+  author = {Wolfgang Huber and Robert Gentleman},
+  year = {2006},
+  note = {R package version 1.8.2}
+}
+
+@ARTICLE{Ideker2002,
+  author = {Trey Ideker and Owen Ozier and Benno Schwikowski and Andrew F Siegel},
+  title = {{D}iscovering regulatory and signalling circuits in molecular interaction
+	networks.},
+  journal = {Bioinformatics},
+  year = {2002},
+  volume = {18 Suppl 1},
+  pages = {S233--S240},
+  abstract = {MOTIVATION: In model organisms such as yeast, large databases of protein-protein
+	and protein-DNA interactions have become an extremely important resource
+	for the study of protein function, evolution, and gene regulatory
+	dynamics. In this paper we demonstrate that by integrating these
+	interactions with widely-available mRNA expression data, it is possible
+	to generate concrete hypotheses for the underlying mechanisms governing
+	the observed changes in gene expression. To perform this integration
+	systematically and at large scale, we introduce an approach for screening
+	a molecular interaction network to identify active subnetworks, i.e.,
+	connected regions of the network that show significant changes in
+	expression over particular subsets of conditions. The method we present
+	here combines a rigorous statistical measure for scoring subnetworks
+	with a search algorithm for identifying subnetworks with high score.
+	RESULTS: We evaluated our procedure on a small network of 332 genes
+	and 362 interactions and a large network of 4160 genes containing
+	all 7462 protein-protein and protein-DNA interactions in the yeast
+	public databases. In the case of the small network, we identified
+	five significant subnetworks that covered 41 out of 77 (53\%) of
+	all significant changes in expression. Both network analyses returned
+	several top-scoring subnetworks with good correspondence to known
+	regulatory mechanisms in the literature. These results demonstrate
+	how large-scale genomic approaches may be used to uncover signalling
+	and regulatory pathways in a systematic, integrative fashion.},
+  comment = {heinz 1.1},
+  file = {:dis_reg_networks.pdf:PDF},
+  institution = {Whitehead Institute for Biomedical Research, Cambridge, MA 02142,
+	USA Institute for Systems Biology, Seattle, WA 98103, USA. trey@wi.mit.edu},
+  keywords = {Algorithms; Computer Simulation; Gene Expression Profiling; Gene Expression
+	Regulation; Models, Biological; Proteome; Signal Transduction; Yeasts},
+  owner = {gunnar},
+  pmid = {12169552},
+  timestamp = {2007.08.31}
+}
+
+@ARTICLE{Ljubi'c2006,
+  author = {I.~Ljubi{\'c} and R. Weiskircher and U. Pferschy and G.~W. Klau and
+	P. Mutzel and M. Fischetti},
+  title = {{A}n {A}lgorithmic {F}ramework for the {E}xact {S}olution of the
+	{P}rize-{C}ollecting {S}teiner {T}ree {P}roblem},
+  journal = MPB,
+  year = {2006},
+  volume = {105},
+  pages = {427-449},
+  number = {2-3},
+  optmonth = {feb},
+  publisher = SPRINGER
+}
+
+@ARTICLE{Pounds2003,
+  author = {Stan Pounds and Stephan W Morris},
+  title = {{E}stimating the occurrence of false positives and false negatives
+	in microarray studies by approximating and partitioning the empirical
+	distribution of p-values.},
+  journal = {Bioinformatics},
+  year = {2003},
+  volume = {19},
+  pages = {1236--1242},
+  number = {10},
+  month = {Jul},
+  abstract = {MOTIVATION: The occurrence of false positives and false negatives
+	in a microarray analysis could be easily estimated if the distribution
+	of p-values were approximated and then expressed as a mixture of
+	null and alternative densities. Essentially any distribution of p-values
+	can be expressed as such a mixture by extracting a uniform density
+	from it. RESULTS: The occurrence of false positives and false negatives
+	in a microarray analysis could be easily estimated if the distribution
+	of p-values were approximated and then expressed as a mixture of
+	null and alternative densities. Essentially any distribution of p-values
+	can be expressed as such a mixture by extracting a uniform density
+	from it. AVAILABILITY: An S-plus function library is available from
+	http://www.stjuderesearch.org/statistics.},
+  keywords = {Adaptor Proteins, Signal Transducing; Algorithms; Animals; B-Lymphocytes;
+	False Negative Reactions; False Positive Reactions; Gene Expression
+	Profiling; Mice; Neoplasm Proteins; Oligonucleotide Array Sequence
+	Analysis; Quality Control; Reproducibility of Results; Sensitivity
+	and Specificity; Sequence Alignment; Sequence Analysis},
+  owner = {Marcus Dittrich},
+  pmid = {12835267},
+  timestamp = {2007.09.07}
+}
+
+@ARTICLE{Prasad2009,
+  author = {T. S Keshava Prasad and Kumaran Kandasamy and Akhilesh Pandey},
+  title = {Human Protein Reference Database and Human Proteinpedia as discovery
+	tools for systems biology.},
+  journal = {Methods Mol Biol},
+  year = {2009},
+  volume = {577},
+  pages = {67-79},
+  __markedentry = {[dab60cg]},
+  abstract = {Although high-throughput technologies used in biology have resulted
+	in the accumulation of vast amounts of data in the literature, it
+	is becoming difficult for individual investigators to directly benefit
+	from this data because they are not easily accessible. Databases
+	have assumed a crucial role in assimilating and storing information
+	that could enable future discoveries. To this end, our group has
+	developed two resources - Human Protein Reference Database (HPRD)
+	and Human Proteinpedia - that provide integrated information pertaining
+	to human proteins. These databases contain information on a number
+	of features of proteins that have been discovered using various experimental
+	methods. Human Proteinpedia was developed as a portal for community
+	participation to annotate and share proteomic data using HPRD as
+	the scaffold. It allows proteomic investigators to even share unpublished
+	data and provides an effective medium for data sharing. As proteomic
+	information reflects a direct view of cellular systems, proteomics
+	is expected to complement other areas of biology such as genomics,
+	transcriptomics, classical genetics, and chemical genetics in understanding
+	the relationships among genome, gene functions, and living systems.},
+  institution = {Institute of Bioinformatics, Bangalore, India.},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {dab60cg},
+  pmid = {19718509},
+  timestamp = {2009.12.04}
+}
+
+@ARTICLE{Rosenwald2002,
+  author = {Andreas Rosenwald and George Wright and Wing C Chan and Joseph M
+	Connors and Elias Campo and Richard I Fisher and Randy D Gascoyne
+	and H. Konrad Müller-Hermelink and Erlend B Smeland and Jena M Giltnane
+	and Elaine M Hurt and Hong Zhao and Lauren Averett and Liming Yang
+	and Wyndham H Wilson and Elaine S Jaffe and Richard Simon and Richard
+	D Klausner and John Powell and Patricia L Duffey and Dan L Longo
+	and Timothy C Greiner and Dennis D Weisenburger and Warren G Sanger
+	and Bhavana J Dave and James C Lynch and Julie Vose and James O Armitage
+	and Emilio Montserrat and Armando López-Guillermo and Thomas M Grogan
+	and Thomas P Miller and Michel LeBlanc and German Ott and Stein Kvaloy
+	and Jan Delabie and Harald Holte and Peter Krajci and Trond Stokke
+	and Louis M Staudt and Lymphoma/Leukemia Molecular Profiling Project},
+  title = {{T}he use of molecular profiling to predict survival after chemotherapy
+	for diffuse large-{B}-cell lymphoma.},
+  journal = {N Engl J Med},
+  year = {2002},
+  volume = {346},
+  pages = {1937--1947},
+  number = {25},
+  month = {Jun},
+  abstract = {BACKGROUND: The survival of patients with diffuse large-B-cell lymphoma
+	after chemotherapy is influenced by molecular features of the tumors.
+	We used the gene-expression profiles of these lymphomas to develop
+	a molecular predictor of survival. METHODS: Biopsy samples of diffuse
+	large-B-cell lymphoma from 240 patients were examined for gene expression
+	with the use of DNA microarrays and analyzed for genomic abnormalities.
+	Subgroups with distinctive gene-expression profiles were defined
+	on the basis of hierarchical clustering. A molecular predictor of
+	risk was constructed with the use of genes with expression patterns
+	that were associated with survival in a preliminary group of 160
+	patients and was then tested in a validation group of 80 patients.
+	The accuracy of this predictor was compared with that of the international
+	prognostic index. RESULTS: Three gene-expression subgroups--germinal-center
+	B-cell-like, activated B-cell-like, and type 3 diffuse large-B-cell
+	lymphoma--were identified. Two common oncogenic events in diffuse
+	large-B-cell lymphoma, bcl-2 translocation and c-rel amplification,
+	were detected only in the germinal-center B-cell-like subgroup. Patients
+	in this subgroup had the highest five-year survival rate. To identify
+	other molecular determinants of outcome, we searched for individual
+	genes with expression patterns that correlated with survival in the
+	preliminary group of patients. Most of these genes fell within four
+	gene-expression signatures characteristic of germinal-center B cells,
+	proliferating cells, reactive stromal and immune cells in the lymph
+	node, or major-histocompatibility-complex class II complex. We used
+	17 genes to construct a predictor of overall survival after chemotherapy.
+	This gene-based predictor and the international prognostic index
+	were independent prognostic indicators. CONCLUSIONS: DNA microarrays
+	can be used to formulate a molecular predictor of survival after
+	chemotherapy for diffuse large-B-cell lymphoma.},
+  keywords = {Antibiotics, Antineoplastic; Antineoplastic Combined Chemotherapy
+	Protocols; Biopsy; Female; Gene Expression Profiling; Humans; Lymphoma,
+	B-Cell; Lymphoma, Large-Cell, Diffuse; Male; Middle Aged; Oligonucleotide
+	Array Sequence Analysis; Prognosis; Proportional Hazards Models;
+	Retrospective Studies; Survival Analysis},
+  owner = {Marcus Dittrich},
+  pmid = {12075054},
+  timestamp = {2007.09.20}
+}
+
+@ARTICLE{Shannon2003,
+  author = {Paul Shannon and Andrew Markiel and Owen Ozier and Nitin S Baliga
+	and Jonathan T Wang and Daniel Ramage and Nada Amin and Benno Schwikowski
+	and Trey Ideker},
+  title = {{C}ytoscape: a software environment for integrated models of biomolecular
+	interaction networks.},
+  journal = {Genome Res},
+  year = {2003},
+  volume = {13},
+  pages = {2498--2504},
+  number = {11},
+  month = {Nov},
+  abstract = {Cytoscape is an open source software project for integrating biomolecular
+	interaction networks with high-throughput expression data and other
+	molecular states into a unified conceptual framework. Although applicable
+	to any system of molecular components and interactions, Cytoscape
+	is most powerful when used in conjunction with large databases of
+	protein-protein, protein-DNA, and genetic interactions that are increasingly
+	available for humans and model organisms. Cytoscape's software Core
+	provides basic functionality to layout and query the network; to
+	visually integrate the network with expression profiles, phenotypes,
+	and other molecular states; and to link the network to databases
+	of functional annotations. The Core is extensible through a straightforward
+	plug-in architecture, allowing rapid development of additional computational
+	analyses and features. Several case studies of Cytoscape plug-ins
+	are surveyed, including a search for interaction pathways correlating
+	with changes in gene expression, a study of protein complexes involved
+	in cellular recovery to DNA damage, inference of a combined physical/functional
+	interaction network for Halobacterium, and an interface to detailed
+	stochastic/kinetic gene regulatory models.},
+  keywords = {Algorithms; Archaeal Proteins; Bacteriophage lambda; Computational
+	Biology; Halobacterium; Internet; Models, Biological; Neural Networks
+	(Computer); Phenotype; Software; Software Design; Stochastic Processes},
+  owner = {Marcus Dittrich},
+  pii = {13/11/2498},
+  pmid = {14597658},
+  timestamp = {2007.09.20}
+}
+
+@INCOLLECTION{Smyth2005,
+  author = {Gordon K. Smyth},
+  title = {Limma: linear models for microarray data},
+  booktitle = {Bioinformatics and Computational Biology Solutions using R and Bioconductor},
+  publisher = {Springer},
+  year = {2005},
+  editor = {R. Gentleman and V. Carey and S. Dudoit and R. Irizarry, W. Huber},
+  pages = {397--420},
+  address = {New York}
+}
+
+@ARTICLE{Smyth2004,
+  author = {Gordon K Smyth},
+  title = {{L}inear models and empirical {B}ayes methods for assessing differential
+	expression in microarray experiments.},
+  journal = {Statistical Applications in Genetics and Molecular Biology},
+  year = {2004},
+  volume = {3 (1)},
+  pages = {Article 3},
+  owner = {Marcus Dittrich},
+  timestamp = {2007.09.20}
+}
+
