@@ -1,0 +1,212 @@
+# News for the SuperLearner package. #
+
+---
+Version: 2.0-30-9000
+Date: 2024-02-06
+
+---
+Version: 2.0-29
+Date: 2024-02-06
+* Added n.cores argument to SL.gbm
+* fixed formula warning in SL.loess. Note the loess() function is limited to 1-4 features
+* fixed version checks to be character instead of numeric
+* removes SL.extraTrees (no longer on CRAN, available at SuperLearnerExtra)
+
+---
+Version: 2.0-28
+Date: 2021-04-13
+* Updated maintainer email
+* SL.gam added back, but now importing gam to avoid CRAN NOTE on usage or require()
+
+---
+Version: 2.0-26
+Date: 2019-08-12
+* Added obsWeights and id arguments to the test-glmnet.R file, line 24
+
+---
+Version: 2.0-25
+Date: 2019-08-05
+* Updated listWrappers() to allow search results without SuperLearner loaded
+* Fixed error in 'predict.SL.ksvm' and 'predict.SL.glmnet' when newdata is a single row (added drop = FALSE)
+* Added control option to 'SuperLearner' to save the internal cross-validation algorithm fits as a list. default is FALSE.
+* Removed dbarts from Suggests and the associated wrapper over to SuperLearnerExtra. dbarts no longer available on CRAN
+* added prettydoc as a Depends for the vignette
+* changed VignetteBuilder to rmarkdown
+* Removed the SuperLearnerPresent.Rnw file, was a shortcut to create the SuperLearnerR vignette
+* Changed .SL.require to use 'requireNamespace()' instead of 'require()'
+* added '.SL.require("bibmemory")' to 'SL.biglasso.R'
+* allowed SL.gam to use s() instead of gam::s() and 'require' instead of 'requireNamespace`
+
+---
+Version: 2.0-24
+Date: 2018-07-10
+* remove multicore test in randomForest test. Was generating warning note on CRAN devel
+
+---
+Version: 2.0-23
+Date: 2018-03-09
+* fixed transformation of outcome in SL.dbarts for binomial family
+* SampleSplitSuperLearner(): support validation sample size of 1 when observation's row number is passed in via 'split'.
+* Fixed case where single-column X in combination with more than one screening algorithm causes failure in SuperLearner(), snowSuperLearner(), mcSuperLearner(), SampleSplitSuperLearner().
+* methods CC.* modified to handle duplicated columns better (PR #106)
+* Updated S3 class name for gam::gam() to be Gam
+
+
+---
+Version: 2.0-22
+Date: 2017-07-07
+* Added model.matrix to SL.xgboost
+* Fixed innerCvControl in CV.SuperLearner to allow multiple parameters. It must now be a list of lists.
+* create.Learner(): support character arguments.
+* Glmnet: support alternative loss functions; when predicting automatically add any missing covariates and remove covariates not in the original data.
+* Added SL.kernelKnn
+* Added SL.ksvm
+* Added SL.ranger
+* Added vignette: "Guide to SuperLearner"
+* Added SL.biglasso
+* Added SL.lm, SL.speedlm, and SL.speedglm
+* Added SL.lda and SL.qda
+* Added SL.dbarts for C++-based bayesian additive regression trees.
+* SL.lm and SL.glm now have a model argument, defaulting to TRUE (matching glm and lm), but can be changed to FALSE to conserve memory. Both wrappers also explicitly convert X matrix to a data frame.
+* Added SL.extraTrees for extremely randomized trees, a random forest variant.
+* Fixes prediction when a learner fails for methods: NNLS, NNloglik, CC_nloglik, and AUC. NNLS2 and CC_LS still have this bug. This fix required that an additional optional argument "errorsInLibrary" be passed to methods. This argument is a vector set to TRUE for learners that failed during model fitting.
+
+
+---
+Version: 2.0-21
+Date: 2016-10-03
+* Add validRows option for CV.SuperLearner. Can now pass a cvControl for the outer CV and a list of cvControls, one for each cross-validation folds SuperLearner calls. default number of folds in CV.SuperLearner is now 10, matching the default with cvControl. If the user specifies both V and number of folds in cvControl(), an error message is returned.
+
+---
+Version: 2.0-20
+Date: 2016-08-09
+* Added shrinkage parameter to SL.gbm
+* fixed mtry default in SL.randomForest
+* in CV.SuperLearner, fixed order for checking parallel options and folds argument in parLapply (thanks Chris Kennedy)
+* updated method.AUC to change defaults on the optimization and add warnings for non-convergence
+* Added wrapper for xgboost (thanks Chris Kennedy)
+* Added wrapper for bartMachine (thanks Chris Kennedy)
+* Added travis.ci checks
+* Added environments for SuperLearner() and CV.SuperLearner() wrappers search path (includes SL.*, screen.*, and method.* wrappers)
+* Added binary outcomes for SL.cforest
+
+---
+Version: 2.0-19
+Date: 2016-02-02
+* Updated contact information
+* Added additional svm() arguments for SL.svm
+
+---
+Version: 2.0-18
+Date: 2014-04-25
+* Added recombineSL and recombineCVSL functions to re-fit the ensemble using a new metalearner in a computationally efficient manner
+* For all wrappers, converted to format package::function when calling functions from other namespaces
+* Added S3 method declarations for all predict.SL.* functions
+* Added a `SL.nnls` and `predict.SL.nnls` functions
+
+---
+Version: 2.0-17
+Date: 2014-04-13
+* Moved cvAUC to imports
+
+---
+Version: 2.0-16
+Date: 2014-08-07
+* Fixed error when computeCoef was re-run because of algorithms failing on full data
+* Fixed Description field in Description file for CRAN policy
+
+---
+Version: 2.0-15
+Date: 2014-07-16
+* Fixed check for method.AUC and family
+* Moved SL.bart over to SuperLearneExtra because BayesTree package no longer on CRAN
+
+---
+Version: 2.0-14
+Date: 2014-07-14
+* Added method.AUC, contributed by Erin LeDell
+
+---
+Version: 2.0-13
+Date: 2014-04-16
+* added the SampleSplitSuperLearner function to allow sample split validation instead of V-fold cross-validation
+
+---
+Version: 2.0-11
+Date: 2013-12-31
+* fixed package requirement in CV.SuperLearner from multicore to parallel
+* Fixed a conflict with the reorder function in plot.CV.SuperLearner (between the stats and gdata namespace)
+* Fixed a bug in SL.svm when family is binomial to grab the correct predicted probabilities (thanks to Jeremy Coyle)
+* Added .Rbuildignore to not include the README.md file from GitHub on CRAN
+* Removed SuperLearner.Rnw
+* Moved vignettes to vignettes folder
+* Changed cluster example to use PSOCK instead of MPI in SuperLearner.Rd
+* removed the ":::" in plot.CV.SuperLearner
+* moved quadprog from depends to suggests as it is only called if the user uses method = "method.NNLS2" not the default.
+* Added method.CC_LS and method.CC_nloglik. These provide true convex combination optimization for the 2 loss functions. Contributed by Sam Lendle.
+
+---
+Version: 2.0-9
+Date: 2012-09-10
+* Updated help documents
+* Added links to SuperLearnerExtra on Github
+
+---
+Version: 2.0-7
+Date: 2012-04-04
+* Switched from snow and multicore to parallel package
+* fixed bug in CV.SuperLearner for leave-one-out cross-validation
+* fixed bug in snowSuperLearner when only one screening algorithm is present
+* method.NNloglik now reports the average -log likelihood instead of the sum to be consistent with NNLS
+
+---
+Version: 2.0-6
+Date: 2012-02-29
+
+* Added SL.leekasso (see http://simplystatistics.tumblr.com/post/18132467723/prediction-the-lasso-vs-just-using-the-top-10 for details)
+* fixed parallel argument in CV.SuperLearner. Now always a character variable, no longer accepts FALSE.
+* fixed SL.gam to call gam::gam.control in case the mgcv package is also loaded after gam.
+
+---
+Version: 2.0-5
+Date: 2011-10-12
+
+* Fixed bug in CV.SuperLearner not saving SuperLearner objects (watch out for ifelse() statements).
+* Added minbucket to SL.rpart.
+* Added SL.rpartPrune, a version of SL.rpart with built-in pruning.
+
+---
+Version: 2.0-4
+Date: 2011-10-01
+
+* Minor changes to Rd files to cut build and check time. Time intensive examples now wrapped in \dontrun for CRAN.
+
+---
+Version: 2.0-3
+Date: 2011-08-05
+
+* added plot.CV.SuperLearner
+
+---
+Version: 2.0-2
+Date: 2011-06-07
+
+* fixed bug when one of the algorithms in SL.library has an error.
+* fixed mcSuperLearner and snowSuperLearner not saving fitLibrary.
+* added a placeholder Sweave vignette (SuperLearnerPresent.Rnw) to contain the SuperLearner presentation so the file can be found using the vignette() and browseVignettes() functions.
+* CV.SuperLearner now outputs `LibraryNames`, `SL.library`, `method` and `Y`.
+* summary.CV.SuperLearner has returned
+
+---
+Version: 2.0-1
+Date: 2011-05-17
+
+* added predict.SuperLearner
+
+
+---
+Version: 2.0-0
+Date: 2010-12-27
+
+* Version 2.* represents a complete rewrite of the SuperLearner package.
+* Details on the changes from Version 1.* to 2.* can be found in ChangeLog.
