@@ -2,25 +2,6 @@ name: Download Python Packages
 
 on:
   workflow_dispatch:
-    inputs:
-      package_file:
-        description: 'Path to package list file'
-        required: false
-        default: '.github/docs/lib_python.txt'
-      python_version:
-        description: 'Python version'
-        required: false
-        default: '3.14'
-        type: choice
-        options:
-          - '3.8'
-          - '3.9'
-          - '3.10'
-          - '3.11'
-          - '3.12'
-          - '3.13'
-          - '3.14'
-
   schedule:
     # 每月9号自动更新
     - cron: '0 0 9 * *'
