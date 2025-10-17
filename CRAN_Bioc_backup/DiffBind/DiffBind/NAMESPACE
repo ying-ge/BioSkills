@@ -1,0 +1,192 @@
+export(dba,
+       dba.peakset,
+       dba.overlap,
+       dba.blacklist,
+       dba.count,
+       dba.contrast,
+       dba.normalize,
+       dba.analyze,
+       dba.report,
+       dba.plotHeatmap,
+       dba.plotPCA,
+       dba.plotMA,
+       dba.plotVolcano,
+       dba.plotVenn,
+       dba.plotBox,
+       dba.plotProfile,
+       dba.show,
+       dba.mask,
+       dba.save,
+       dba.load,
+       DBA_GROUP,
+       DBA_ID,
+       DBA_TISSUE,
+       DBA_FACTOR,
+       DBA_CONDITION,
+       DBA_TREATMENT,
+       DBA_CONSENSUS,
+       DBA_CALLER,
+       DBA_CONTROL,
+       DBA_REPLICATE,
+       DBA_INTERVALS,
+       DBA_FRIP,
+       DBA_ALL_ATTRIBUTES,
+       DBA_OLAP_PEAKS,
+       DBA_OLAP_ALL,
+       DBA_OLAP_RATE,
+       DBA_COR,
+       DBA_OLAP,
+       DBA_INALL,
+       DBA_SCORE_NORMALIZED,
+       DBA_SCORE_RPKM,
+       DBA_SCORE_RPKM_FOLD,
+       DBA_SCORE_RPKM_MINUS,
+       DBA_SCORE_READS,
+       DBA_SCORE_CONTROL_READS,
+       DBA_SCORE_READS_FOLD,
+       DBA_SCORE_READS_MINUS,
+       DBA_SCORE_READS_FULL,
+       DBA_SCORE_READS_MINUS_FULL,
+       DBA_SCORE_READS_EFFECTIVE, 
+       DBA_SCORE_READS_MINUS_EFFECTIVE,
+       DBA_SCORE_TMM_MINUS_FULL,
+       DBA_SCORE_TMM_MINUS_EFFECTIVE,
+       DBA_SCORE_TMM_READS_FULL,
+       DBA_SCORE_TMM_READS_EFFECTIVE,
+       DBA_SCORE_TMM_MINUS_FULL_CPM,
+       DBA_SCORE_TMM_MINUS_EFFECTIVE_CPM,
+       DBA_SCORE_TMM_READS_FULL_CPM,
+       DBA_SCORE_TMM_READS_EFFECTIVE_CPM,
+       DBA_SCORE_SUMMIT,
+       DBA_SCORE_SUMMIT_ADJ,       
+       DBA_SCORE_SUMMIT_POS,
+       DBA_READS,
+       DBA_READS_DEFAULT,
+       DBA_READS_BAM,
+       DBA_READS_BED, 
+       DBA_EDGER,
+       DBA_EDGER_BLOCK,
+       DBA_EDGER_GLM,
+       DBA_DESEQ2,
+       DBA_DESEQ2_BLOCK,
+       DBA_ALL_METHODS,
+       DBA_ALL_BLOCK,
+       DBA_ALL_METHODS_BLOCK,
+       DBA_DATA_FRAME,
+       DBA_DATA_RANGEDDATA,
+       DBA_DATA_GRANGES,
+       DBA_DATA_SUMMARIZED_EXPERIMENT,
+       DBA_DATA_DBAOBJECT,
+       DBA_BLACKLIST_HG19,
+       DBA_BLACKLIST_HG38,
+       DBA_BLACKLIST_GRCH37, 
+       DBA_BLACKLIST_GRCH38, 
+       DBA_BLACKLIST_MM9,
+       DBA_BLACKLIST_MM10, 
+       DBA_BLACKLIST_CE10,
+       DBA_BLACKLIST_CE11,
+       DBA_BLACKLIST_DM3,
+       DBA_BLACKLIST_DM6,
+       DBA_BLACKLIST,
+       DBA_GREYLIST,
+       DBA_BLACKLISTED_PEAKS,
+       DBA_LIBSIZE_DEFAULT,
+       DBA_LIBSIZE_FULL,
+       DBA_LIBSIZE_PEAKREADS,
+       DBA_LIBSIZE_BACKGROUND,
+       DBA_LIBSIZE_USER,
+       DBA_NORM_DEFAULT,
+       DBA_NORM_NATIVE,
+       DBA_NORM_LIB,
+       DBA_NORM_TMM,
+       DBA_NORM_RLE,
+       DBA_NORM_SPIKEIN,
+       DBA_NORM_USER,
+       DBA_NORM_OFFSETS,
+       DBA_NORM_OFFSETS_ADJUST,
+       DBA_OFFSETS_LOESS,
+       DBA_OFFSETS_USER,
+       DBA_SCORE_FOLD,
+       DBA_SCORE_CONCENTRATION,
+       DBA_SCORE_CONC_NUMERATOR,
+       DBA_SCORE_CONC_DENOMINATOR,
+       DBA_SCORE_PVAL,
+       DBA_SCORE_FDR)
+
+# exportClasses("DBA")
+
+S3method(print,DBA)
+S3method(plot,DBA)
+S3method(summary,DBA)
+
+useDynLib(DiffBind)
+
+importFrom(amap, Dist)
+
+importFrom(gplots, heatmap.2)
+
+importFrom(IRanges, IRanges, overlapsAny, "%over%")
+
+importFrom(GenomicRanges, GRanges, GRangesList, seqnames, width, union, mcols)
+
+importFrom(SummarizedExperiment, SummarizedExperiment, assay, "assay<-",
+           assays, "assays<-", rowData, "rowData<-", colData, "colData<-")
+
+importFrom(graphics, abline, boxplot, plot, points, smoothScatter,
+           "axis", "hist", "image", "layout", "lines",
+           "mtext", "par", "plot.new", "rect", "text", "title")
+
+importFrom(grDevices, colorRampPalette)
+
+importFrom(RColorBrewer, brewer.pal)
+
+importFrom(stats, model.matrix, p.adjust, t.test,
+           wilcox.test, dist, hclust, order.dendrogram,
+           as.dendrogram, reorder,
+           "as.formula", "density", "formula", "prcomp",
+           "weighted.mean", "cor", "median", "princomp", "sd", "update")
+
+importFrom(utils, read.table, write.csv, write.table, packageVersion,"read.csv")
+
+importFrom(limma,nonEstimable, loessFit)
+
+import(GenomicAlignments)
+
+importFrom(lattice, xyplot)
+
+import(locfit)
+
+importFrom(systemPipeR,vennPlot)
+
+importFrom(tools,file_ext)
+
+importFrom(Rcpp, evalCpp)
+
+importFrom(dplyr,bind_rows, mutate, filter, "%>%")
+
+importFrom(BiocParallel, bplapply)
+
+import(parallel)
+#importFrom(parallel, mclapply)
+#if (tools:::.OStype() == "unix") {
+#  importFrom(parallel, mcparallel, mccollect)
+#}
+
+importFrom(S4Vectors, DataFrame, SimpleList, Rle, "elementMetadata<-", 
+           mcols, "mcols<-", metadata, "metadata<-")
+
+importFrom(Rsamtools, BamFileList, ScanBamParam, scanBamFlag, 
+           countBam, scanBamHeader)
+
+importFrom(methods,as, is)
+
+importFrom(ggplot2, ggplot, aes, geom_point, scale_color_manual, 
+           labs, geom_text)
+importFrom(ggrepel,geom_text_repel)
+
+import(apeglm)
+import(ashr)
+import(GreyListChIP)
+# import(BSgenome)
+importFrom("methods", "new")
+importFrom("utils", "data")
