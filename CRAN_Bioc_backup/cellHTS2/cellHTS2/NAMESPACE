@@ -1,0 +1,92 @@
+import("methods")
+importFrom("BiocGenerics", "getObjectSlots")
+import("Biobase")
+importFrom("grDevices", "colorRampPalette", "dev.off", "dev.size",
+           "gray", "pdf", "png", "rainbow")
+importFrom("graphics", "abline", "axis", "barplot", "box", "boxplot",
+           "hist", "image", "layout", "legend", "mtext", "par",
+           "points", "rug", "segments", "text")
+importFrom("stats", "IQR", "cor", "density", "mad", "median",
+           "medpolish", "phyper", "predict", "qqline", "qqnorm",
+           "quantile", "runif", "sd")
+importFrom("utils", "combn", "modifyList", "read.table", "tail",
+           "write.table")
+importFrom("stats4", "plot")
+importFrom("vsn", "meanSdPlot")
+importFrom("graphics", "lines")
+importFrom("RColorBrewer", "brewer.pal")
+importFrom("hwriter", "hwrite", "hwriteImage")
+importFrom("locfit", "locfit", "locfit.robust")
+import("grid")
+importFrom("splots", "plotScreen")
+
+importFrom("GSEABase", "GeneSetCollection", "incidence")
+importMethodsFrom("GSEABase", "geneIds")
+
+importFrom("Category", "applyByCategory")
+
+exportClasses("cellHTS", "ROC")
+
+export("oneRowPerId", 
+       "Bscore",
+       "buildCellHTS2",
+       "configurationAsScreenPlot",
+       "convertOldCellHTS",
+       "convertWellCoordinates",
+       "getEnVisionRawData",
+       "getEnVisionCrosstalkCorrectedData",
+       "getDynamicRange",
+       "getMeasureRepAgreement",
+       "getTopTable",
+       "getSettings",
+       "getZfactor",
+       "gseaModule",
+       "imageScreen",
+       "normalizePlates",
+       "plotSpatialEffects",
+       "readPlateList",
+       "readHTAnalystData",
+       "rsa",
+       "scores2calls",
+       "scoreReplicates",
+       "setSettings",
+       "spatialNormalization",
+       "summarizeChannels",
+       "summarizeReplicates",
+       "templateDescriptionFile",
+       "updateCellHTS",
+       "writeReport",      
+       "write.tabdel")
+
+exportMethods("annotate",
+       "batch",
+       "batch<-",
+       "compare2cellHTS",
+       "coerce",
+       "configure",
+       "Data",
+       "Data<-",
+       "geneAnno",
+       "initialize",
+       "intensityFiles",
+       "lines",
+       "meanSdPlot",
+       "name",
+       "name<-",
+       "nbatch",
+       "pdim",
+       "plate",
+       "plateConf",
+       "plateEffects",
+       "plateList",
+       "plot",
+       "position",
+       "ROC",
+       "screenDesc",
+       "screenLog",
+       "show",
+       "state",
+       "well",
+       "wellAnno",
+       "writeTab")
+
