@@ -1,0 +1,89 @@
+import("graph", "RBGL", "ggplot2")
+import("XML", except="addNode") # conflict with graph::addNode; neither used
+
+useDynLib(CellNOptR)
+
+importFrom("methods","is","new")
+importFrom("RCurl", "getURL")
+importFrom("Rgraphviz", "layoutGraph", "renderGraph", "toDot","tail","lines")
+
+importFrom("stringr","str_sub","%>%")
+
+export(
+    "buildBitString",
+    "checkSignals",
+    "exhaustive",
+    "CNOdata",
+    "CNORwrap",
+    "CNORbool",
+    "CNOlist",
+    "compressModel",
+    "computeScoreT1",
+    "computeScoreTN",
+    "crossInhibitedData",
+    "cutAndPlot",
+    "cutAndPlotResultsT1",
+    "cutAndPlotResultsTN",
+    "cutCNOlist",
+    "cutNONC",
+    "cutModel",
+    "cutSimList",
+    "defaultParameters",
+    "expandGates",
+    "findNONC",
+    "gaBinaryT1",
+    "gaBinaryTN",
+    "graph2sif",
+    "getFit",
+    "indexFinder",
+    "mapBack",
+    "makeCNOlist",
+    "model2sif",
+    "model2igraph",
+    "normaliseCNOlist",
+    "plotCNOlist",
+    "plotCNOlist2",
+    "plotCNOlistLarge",
+    "plotCNOlistLargePDF",
+    "plotCNOlistPDF",
+    "plotFit",
+    "plotOptimResults",
+    "plotOptimResultsPan",
+    "plotOptimResultsPDF",
+    "prep4sim",
+    "prep4Sim",
+    "preprocessing",
+    "randomizeCNOlist",
+    "readSBMLQual",
+    "readMIDAS",
+    "readSIF",
+    "readSif",
+    "readBND",
+    "readBNET",
+    "residualError",
+    "sif2graph",
+    "simulateT1",
+    "simulateTN",
+    "simulatorT0",
+    "simulatorT1",
+    "simulatorTN",
+    "toSBML",
+    "writeDot",
+    "writeMIDAS",
+    "writeSIF",
+    "writeNetwork",
+    "writeReport",
+    "writeScaffold",
+    "plotModel",
+    "ilpBinaryTN",
+    "ilpBinaryT2",
+    "ilpBinaryT1",
+    "crossvalidateBoolean")
+
+# CNOlist class
+exportClasses(CNOlist)
+
+# CNOlist class methods:
+exportMethods("plot", "randomize", "length", "compatCNOlist",  "readErrors", "writeErrors")
+exportMethods("getCues", "getSignals", "getStimuli", "getInhibitors", "getVariances", "getTimepoints")
+exportMethods("setSignals<-")

@@ -1,0 +1,60 @@
+Package: CellNOptR
+Type: Package
+Title: Training of boolean logic models of signalling networks using
+        prior knowledge networks and perturbation data
+Version: 1.48.0
+Date: 2022-03-16
+Authors@R: c(
+    person(given = "Thomas",
+           family = "Cokelaer",
+           role = c("aut")),
+    person(given = "Federica",
+           family = "Eduati",
+           role = "aut"),
+    person(given = "Aidan",
+           family = "MacNamara",
+           role = "aut"),
+    person(given = "S",
+           family = "Schrier",
+           role = "ctb"),
+    person(given = "Camille",
+           family = "Terfve",
+           role = "aut"),
+    person(given = "Enio",
+           family = "Gjerga",
+           role = "ctb"),
+    person(given = "Attila",
+           family = "Gabor",
+           role = "cre",
+           email = "attila.gabor@uni-heidelberg.de")
+           )
+Depends: R (>= 4.0.0), RBGL, graph, methods, RCurl, Rgraphviz, XML,
+        ggplot2, rmarkdown
+Imports: igraph, stringi, stringr
+Suggests: data.table, dplyr, tidyr, readr, knitr, RUnit, BiocGenerics,
+Enhances: doParallel, foreach
+VignetteBuilder: knitr
+biocViews: CellBasedAssays, CellBiology, Proteomics, Pathways, Network,
+        TimeCourse, ImmunoOncology
+Description: This package does optimisation of boolean logic networks of
+    signalling pathways based on a previous knowledge network and a set of data upon
+    perturbation of the nodes in the network.
+License: GPL-3
+LazyLoad: yes
+SystemRequirements: Graphviz version >= 2.2
+RoxygenNote: 7.1.2
+git_url: https://git.bioconductor.org/packages/CellNOptR
+git_branch: RELEASE_3_18
+git_last_commit: 0a9b488
+git_last_commit_date: 2023-10-24
+Date/Publication: 2023-10-24
+NeedsCompilation: yes
+Packaged: 2023-10-24 20:36:28 UTC; biocbuild
+Author: Thomas Cokelaer [aut],
+  Federica Eduati [aut],
+  Aidan MacNamara [aut],
+  S Schrier [ctb],
+  Camille Terfve [aut],
+  Enio Gjerga [ctb],
+  Attila Gabor [cre]
+Maintainer: Attila Gabor <attila.gabor@uni-heidelberg.de>
