@@ -1,0 +1,131 @@
+changes in version 1.11.2 (2023-09-01)
++ move DropletUtils package to Suggests
+
+changes in version 1.11.1 (2023-08-21)
++ add methods to rotate/mirror spatial coordinates and objects
+
+changes in version 1.9.5 (2023-03-02)
++ bugfix for tissue positions read in incorrect order with read10xVisium() in 
+  datasets with multiple samples (bug introduced in version 1.7.1)
+
+changes in version 1.7.2 (2022-10-07)
++ support for seeing colData names with $ in RStudio
+
+changes in version 1.7.1 (2022-07-29)
++ support for reading Space Ranger V2 outputs with read10xVisium()
+
+changes in version 1.5.3 (2022-02-28)
++ rename SpatialImage class to VirtualSpatialImage
+
+changes in version 1.5.2 (2022-01-09)
++ relocate and deprecate spatialData/Names
+
+changes in version 1.5.1 (2021-12-15)
++ improved coercion methods from SingleCellExperiment to SpatialExperiment
++ add new methods for image rotation/mirroring
++ add path argument to imgSource()
++ user flexibility whether to provide outs/ directory in read10xVisium()
++ documentation updates in show methods
++ additional documentation updates
++ update title and description in DESCRIPTION
+
+changes in version 1.3.2 (2021-07-27)
++ spatialData moved from colData to int_colData
++ restructuring of vignette and added imgData section
+
+changes in version 1.1.700 (2021-05-05)
++ updating roles in DESCRIPTION file
++ adding GeneExpression biocVie
++ switching LazyData to false
++ fixing return value in show method documentation
+
+changes in version 1.1.6 (2021-02-04)
++ removed additional slots in the SPE class definition 
+  (i.e. spatialData and spatialCoordsNames)
++ spatialCoords stored in int_colData() = numeric matrix
++ spatialDataNames stored in int_metadata() 
+  = character vector specifying a subset of colData()
++ the SPE show method does not include spatialData in colData;
+  instead, spatialData/CoordNames are printed separately
++ the SPE constructor now allows specification of spatialData/Coords/-Names
+  where -Names can be a subset of the supplied colData();
+  spatialData/Coords are thus optional
++ cbind() now allows duplicated sample_ids, 
+  which are made unique with a message
++ consistent usage of "spe" for SpatialExperiment objects across 
+  all examples (previously, both ve and se were used as well)
++ fixed cache/path-related error on windows in SpatialImage unit tests
++ added unit-tests of SpatialExperiment class validity
++ imgData field in int_metadata is now required 
+  to exist (but can be an empty DFrame)
++ colData<- protects sample_id & spatialDataNames 
+  fields; spatialData<- protects colData
+
+changes in version 1.1.5 (2021-31-03)
++ version bump to x.y.z format with .z increment
++ general code-style revision to keep to Bioc guidelines including, e.g.
+  + usage of accessors (and not @)
+  + keeping to a 80-character limit
+  + spaces around logical operators (but not function arguments)
+  + in-line { for function definitions, if-else statements etc. 
+  + re-ordering of roxygen2 documentation to be consistent across scripts
+
+changes in version 1.1.434 (2021-26-02)
++ fixing subset method according to SummarizedExperiment generic definition
+
+changes in version 1.1.432 (2021-15-02)
++ fixing documentation on latex errors
+
+changes in version 1.1.430-1.1.431 (2021-12-02)
++ adding BumpyMatrix as suggests
++ update documentation
+
+changes in version 1.1.429 (2021-12-02)
++ adding cd_keep = TRUE binds all the colData to the spatialData 
++ fixing bug for cd_keep with multiple elements
+
+changes in version 1.1.428 (2021-12-02)
++ adding itemize to assays vignette item
++ correcting typo cd_keep->cd_bind in spatialData documentation
+
+changes in version 1.1.427 (2021-09-02)
++ fixing tenx vignette
+
+changes in version 1.1.426 (2021-09-02)
++ fixing read10xVisium example with data parameter
+
+changes in version 1.1.425 (2021-08-02)
++ restoring data parameter in read10xVisium
++ missing itemize in combine documentation
+
+changes in version 1.1.424 (2021-07-02)
++ cleaning documentation
++ removing spatialImage-methods.R file
+
+changes in version 1.1.423 (2021-02-02)
++ fixing documentation issues on imgData
+
+changes in version 1.1.422 (2021-29-01)
++ removing ve data because of local image problem
+  (using example(read10xVisium) instead)
+
+changes in version 1.1.421 (2021-28-01)
++ fixing ve data local image problem
+
+changes in version 1.1.42 (2021-21-01)
++ implementing new SpatialExperiment class
++ spatialData slot 
++ imgData and image handling methods (HLC)
+
+changes in version 0.99.4 (2020-24-07)
++ implementing bioconductor revisions first round
+
+changes in versionn 0.99.3 (2020-21-07)
++ implementing imagePaths in VisiumExperiment class
++ SpatialExperiment can now be created also without spatial coordinates
+
+changes in versionn 0.99.2 (2020-17-07)
++ adding version 0.99.2
+
+changes in versionn 0.99.1 (2020-09-07)
++ adding version 0.99.1

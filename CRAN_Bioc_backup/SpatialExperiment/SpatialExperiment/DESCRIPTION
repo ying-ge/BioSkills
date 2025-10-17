@@ -1,0 +1,47 @@
+Package: SpatialExperiment
+Version: 1.12.0
+Title: S4 Class for Spatially Resolved -omics Data
+Description: Defines an S4 class for storing data from spatial -omics experiments. 
+    The class extends SingleCellExperiment to 
+    support storage and retrieval of additional information from spot-based and 
+    molecule-based platforms, including spatial coordinates, images, and 
+    image metadata. A specialized constructor function is included for data 
+    from the 10x Genomics Visium platform.
+Authors@R: c(
+    person("Dario", "Righelli", role=c("aut", "cre"), 
+        email="dario.righelli@gmail.com"), 
+    person("Davide", "Risso", role=c("aut"), 
+        email="risso.davide@gmail.com"), 
+    person("Helena L.", "Crowell", role=c("aut"), 
+        email="helena.crowell@uzh.ch"), 
+    person("Lukas M.", "Weber", role=c("aut"), 
+        email="lukas.weber.edu@gmail.com"),
+    person("Nicholas J.", "Eagles", role=c("ctb"),
+        email="nickeagles77@gmail.com"))
+URL: https://github.com/drighelli/SpatialExperiment
+BugReports: https://github.com/drighelli/SpatialExperiment/issues
+License: GPL-3
+Encoding: UTF-8
+biocViews: DataRepresentation, DataImport, Infrastructure,
+        ImmunoOncology, GeneExpression, Transcriptomics, SingleCell,
+        Spatial
+Depends: methods, SingleCellExperiment
+Imports: rjson, grDevices, magick, utils, S4Vectors,
+        SummarizedExperiment, BiocGenerics, BiocFileCache
+Suggests: knitr, rmarkdown, testthat, BiocStyle, BumpyMatrix,
+        DropletUtils
+VignetteBuilder: knitr
+RoxygenNote: 7.2.3
+git_url: https://git.bioconductor.org/packages/SpatialExperiment
+git_branch: RELEASE_3_18
+git_last_commit: 46a1748
+git_last_commit_date: 2023-10-24
+Date/Publication: 2023-10-24
+NeedsCompilation: no
+Packaged: 2023-10-24 23:10:08 UTC; biocbuild
+Author: Dario Righelli [aut, cre],
+  Davide Risso [aut],
+  Helena L. Crowell [aut],
+  Lukas M. Weber [aut],
+  Nicholas J. Eagles [ctb]
+Maintainer: Dario Righelli <dario.righelli@gmail.com>
