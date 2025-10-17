@@ -1,0 +1,46 @@
+o Functions defined in base R that would need to be explicitly promoted
+  to generics in the BiocGenerics package (currently they are implicitly
+  made generics by the IRanges package):
+
+  From package base:
+    - split(): implicit generic dispatches on (x, f, drop).
+      Explicit generic should dispatch on (x, f) only.
+    - which(): implicit generic dispatches on (x, arr.ind, useNames).
+      Explicit generic should dispatch on (x) only.
+    - ifelse(): implicit generic dispatches on (test, yes, no).
+      Explicit generic should dispatch on (test) only.
+    - nchar(): implicit generic dispatches on (x, type, allowNA).
+      Explicit generic should dispatch on (x) only.
+    - substr(): implicit generic dispatches on (x, start, stop).
+      Explicit generic should dispatch on (x) only.
+    - substring(): implicit generic dispatches on (text, first, last).
+      Explicit generic should dispatch on (text) only.
+    - chartr(): implicit generic dispatches on (old, new, x).
+      Explicit generic should dispatch on (x) only.
+    - sub(), gsub(): implicit generics dispatch on (pattern, replacement, x,
+      ignore.case, perl, fixed, useBytes). Explicit generics should dispatch
+      on (x) only.
+    - range():
+    - by(): 
+
+  From package stats:
+    - var(): implicit generic dispatches on (x, y, na.rm, use).
+      Explicit generic should dispatch on (x, y) only.
+    - cov(): implicit generic dispatches on (x, y, use, method).
+      Explicit generic should dispatch on (x, y) only.
+    - cor(): implicit generic dispatches on (x, y, use, method).
+      Explicit generic should dispatch on (x, y) only.
+    - sd(): implicit generic dispatches on (x, na.rm).
+      Explicit generic should dispatch on (x) only.
+    - median(): implicit generic dispatches on (x, na.rm).
+      Explicit generic should dispatch on (x) only.
+    - mad(): implicit generic dispatches on (x, center, constant, na.rm,
+      low, high). Explicit generic should dispatch on (x) only.
+    - IQR(): implicit generic dispatches on (x, na.rm, type).
+      Explicit generic should dispatch on (x) only.
+    - smoothEnds(): implicit generic dispatches on (y, k).
+      Explicit generic should dispatch on (y) only.
+    - runmed(): implicit generic dispatches on (x, k, endrule, algorithm,
+      print.level). Explicit generic should dispatch on (x) only.
+
+
