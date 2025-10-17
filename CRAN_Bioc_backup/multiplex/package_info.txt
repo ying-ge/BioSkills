@@ -1,0 +1,7 @@
+Package: multiplex
+Version: 3.9
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/multiplex_3.9.tar.gz
+Size: 0.34 MB
+Download Date: 2025-10-17
+
