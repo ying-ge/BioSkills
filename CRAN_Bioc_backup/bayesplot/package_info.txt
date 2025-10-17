@@ -1,0 +1,7 @@
+Package: bayesplot
+Version: 1.14.0
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/bayesplot_1.14.0.tar.gz
+Size: 4.88 MB
+Download Date: 2025-10-17
+
