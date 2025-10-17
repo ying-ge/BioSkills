@@ -1,0 +1,10 @@
+protVizref <- bibentry(
+  bibtype      = "Manual",
+  title        = "{protViz}: Visualizing and Analyzing Mass Spectrometry Related Data in Proteomics",
+  author       = c(person("Christian", "Panse", email="cp@fgcz.ethz.ch"),
+                   person("Jonas", "Grossmann", email="jg@fgcz.ethz.ch")),
+  year         = "2023",
+  note         = "R package version 0.7.7",
+  url          = "https://CRAN.R-project.org/package=protViz",
+)
+

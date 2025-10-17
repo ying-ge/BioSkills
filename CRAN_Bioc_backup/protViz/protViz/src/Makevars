@@ -1,0 +1,2 @@
+OBJECTS=protViz_init.o deisotoper.o aa2mass.o findNN_.o computeFragmentIons.o computeParentIonMass.o findNN.o RcppExports.o fasta.o
+PKG_CPPFLAGS=-I.
