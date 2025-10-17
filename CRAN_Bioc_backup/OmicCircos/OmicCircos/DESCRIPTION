@@ -1,0 +1,17 @@
+Package: OmicCircos
+Version: 1.40.0
+Date: 2015-02-23
+Title: High-quality circular visualization of omics data
+Author: Ying Hu <yhu@mail.nih.gov> Chunhua Yan <yanch@mail.nih.gov>
+Maintainer: Ying Hu <yhu@mail.nih.gov>
+biocViews: Visualization,Statistics,Annotation
+Depends: R (>= 2.14.0), methods,GenomicRanges
+Description: OmicCircos is an R application and package for generating high-quality circular plots for omics data.
+License: GPL-2
+Packaged: 2023-10-24 22:12:18 UTC; biocbuild
+git_url: https://git.bioconductor.org/packages/OmicCircos
+git_branch: RELEASE_3_18
+git_last_commit: 9e358a5
+git_last_commit_date: 2023-10-24
+Date/Publication: 2023-10-24
+NeedsCompilation: no

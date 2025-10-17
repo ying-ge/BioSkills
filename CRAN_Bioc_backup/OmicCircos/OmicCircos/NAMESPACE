@@ -1,0 +1,6 @@
+export (circos)
+export (segAnglePo)
+export (sim.circos)
+import(methods)
+importFrom (GenomicRanges, seqnames)
+importFrom (GenomicRanges, mcols)
