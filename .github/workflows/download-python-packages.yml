@@ -6,7 +6,7 @@ on:
       package_file:
         description: 'Path to package list file'
         required: false
-        default: '.github/docs/python_lib.txt'
+        default: '.github/docs/lib_python.txt'
       python_version:
         description: 'Python version'
         required: false
@@ -45,7 +45,7 @@ jobs:
       uses: actions/cache@v3
       with:
         path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('.github/docs/python_lib.txt') }}
+        key: ${{ runner.os }}-pip-${{ hashFiles('.github/docs/lib_python.txt') }}
         restore-keys: |
           ${{ runner.os }}-pip-
           
@@ -66,7 +66,7 @@ jobs:
         PYTHON_VERSION: ${{ matrix.python-version }}
       run: |
         python .github/scripts/parse_packages.py \
-          "${{ github.event.inputs.package_file || '.github/docs/python_lib.txt' }}" \
+          "${{ github.event.inputs.package_file || '.github/docs/lib_python.txt' }}" \
           classified_packages.yml
           
     - name: Download packages
@@ -83,7 +83,7 @@ jobs:
         GITHUB_EVENT_NAME: ${{ github.event_name }}
         GITHUB_RUN_ID: ${{ github.run_id }}
         GITHUB_REPOSITORY: ${{ github.repository }}
-        PACKAGE_FILE: ${{ github.event.inputs.package_file || '.github/docs/python_lib.txt' }}
+        PACKAGE_FILE: ${{ github.event.inputs.package_file || '.github/docs/lib_python.txt' }}
       run: |
         python .github/scripts/create_metadata.py \
           classified_packages.yml \
