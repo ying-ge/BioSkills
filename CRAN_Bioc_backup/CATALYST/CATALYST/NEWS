@@ -1,0 +1,212 @@
+changes in version 1.26.1
+
++ fixed typoes in man pages and vignette
++ fixed unit test failures due to 'ggplot2'-updates etc.
++ omit usage of ':::' operator throughout the package
+
+changes in version 1.26.0
+
++ Bioc 3.18 release
+
+changes in version 1.25.1
+
++ fixed unit tests for differential plotting
+  (expecting silence, but 'scater::calculateX' is
+  throwing warnings related to argument 'useNames')
+
+changes in version 1.25.0
+
++ Bioconductor release 3.18
+
+changes in version 1.23.5
+
++ bug fix in 'ComplexHeatmap's: assure annotation
+colors show when 'sample_id's are not factors.
+
+changes in version 1.23.5
+
++ fixed unit tests & examples
++ added utility function to construct experimental design table
+  from current SCE and avoid out-of-synch, e.g., after filtering
++ comment: it took v1.23.3-.4 to pass builds & checks successfully 
+
+changes in version 1.23.2
+
++ fixed typos in vignette & documentation
++ fixed bug in 'plotDiffHeatmap' examples & differential vignette
+
+changes in version 1.23.1
+
++ updated 'ggplot2' syntax according to depracation
++ fixed unit testing via 'set.seed' to avoid edge cases
+
+changes in version 1.20.1
+
++ added argument 'dna' in normCytof() 
+  to allow specifying custom DNA channels
+
++ prepData() now checks for & fixes panel discrepancies 
+  keeping the intersection/untion of channels
+  according to 'fix_chs = "common / all"'
+  
++ in prepData(), exposed '...' arguments 
+  to be used by flowCore::read.FCS()
+
++ added argument 'fix_chs'
+
+changes in version 1.18.1
+
++ bug fix in plotPbExprs(): added 'drop = FALSE' in "DataFrame' subsetting
+
+changes in version 1.18.0
+
++ Bioconductor 3.14 release
+
+changes in version 1.14.1 (2021-28-04)
+
+preprocessing
+
++ bug fix in computeSpillmat() when 'interactions = "all"'
++ added unit tests for all combinations of 'interactions' and 'method'
+
+changes in version 1.12.2                   
+
+preprocessing
+
++ added argument 'FACS' to prepData(); dropping of non-mass channels
+  can now be ommitted explicitly via setting FACS = TRUE
+
++ allow coloring by clustering in plotScatter()
+
+differential
+
++ added new visualization clrDR() to plot low-dimensional embedding
+  of centered log-ratios (CLR) on cluster-compositions across samples
+  
++ added argument 'assay' in plotExprs(), plotNRS() 
+  to allow specification of which assay data to use
+  
++ depracated plotMedExprs() in favor of plotPbExprs() to allow flexibilty 
+  in input data and summary statistic, aggregating by cluster-sample 
+  (instead of by sample only), sizing by sample(-cluster) cell counts, 
+  and to specify whether to include (jittered) points, boxplots or both 
+  
++ but fix in plotAbundances(); plotting failed 
+  when colData()$sample_id was not of type factor or character
+  
++ changed behavior of 'group_by' in plotAbundances(); 
+  not facetting the plot was previously impossible
+  
++ added arguments 'col_clust,distance,linkage' in plotAbundances()
+  to allow sorting of samples according to hierarchical clustering
+  on cluster compositions when by = "sample_id"
+
+changes in version 1.12.1
+
+preprocessing
+
++ bug fix in prepData(): by default, non-mass channels (time, event length etc.) 
+  are moved to the SCE's int_colData; forr FACS data, these are now kept inside
+  the assay data (since FACS channels d+ not contain masses)
+
+differential
+
++ bug fix in plotFreqHeatmap(): frequencies were previously computed for 
+  the wrong margin (across clusters instead of samples); this has been fixed
+
++ added checks in prepData() for the existence of md_/panel_cols to give a more   
+  intuitive error message when columns cannot be matched to the input md/panel
+
++ added flexibility for pbMDS() to allow specification of
+  - which assay data and summary statistic to use for aggregation
+  - the level at which to aggregate (cluster, sample, cluster-sample)
+  
++ added vignette section "More - Exporting FCS files" on 
+  how to write FCS files from a SCE using sce2fcs()
+  
+changes in version 1.12.0
+
+preprocessing
+
++ The daFrame class been removed and the preprocessing pipeline 
+  rewritten to use the SingleCellExperiment class instead. 
+  This greatly improves runtimes of debarcoding and normalization,
+  and affects all functions associated with preprocessing:
+  - normalization: normCytof()
+  - debarcoding: assignPrelim(), est/applyCutoffs(), plotEvents/Yields()
+  - compensation: computeSpillmat(), compCytof(), plotSpillmat()
+
++ concatFCS() has been replaced by prepData(), which is used during 
+  differential analysis and already provided most of concatFCS()'s 
+  functionality. It has been adapted to 
+  - not require input panel and metadata tables (arguments 'panel' and 'md')
+  - fix event times in the Time channel as was done previously by concatFCS() 
+  - reorder samples according to their acquisiton time when 'md' is unspecified
+  
++ sce2fcs() has been added to allow for easy conversion from SCE 
+  to flowFrame/Set, which can inturn be written to FCS file(s)
+  - the SCE can be split into separate frames by a cell metadata variable 
+    (argument 'split_by') to, e.g., write debarcoded samples to separate files
+  - any cell metadata and dimensionality reductions stored in the SCE can be 
+    optionally included in the output (arguments 'keep_cd' and 'keep_dr')
+    
++ plotScatter() has been added to support basic visualization of biscatters,
+  but is not meant to compete with other tools available that were designed
+  specifically for this task (namely, ggcyto)
+  - cells my be colored by 
+    - density, in which case cells are binned via geom_hex()
+    - a continuous or categorical cell metadata variable
+  - facetting is flexible and allows to plot 
+    - one channel against a set of others
+    - a pair of channels split by tw+ variables
+    - one channel against others split by one variable
+    
++ plotYields() & plotSpillmat no-longer support interactive plotting with 
+  'plotly'; this did not seem necessary and avoids additional dependencies
+  
++ plotEvents() & plotYields() now support specification of both,
+  output directory and file name, via arguments 'out_path/name'
+
+differential
+
++ The metadata()$experiment_inf+ slot is constructed by prepData() and 
+  subsetted by filterSCE() as before. However, it is n+ longer required 
+  for any of the plotting functions associate with differential analysis. 
+  Instead, these rely only on the existence of the colData()$sample_id
+  (and, for some, colData()$cluster_id) slot(s)
+  
++ Throughout all plotting functions, options for customizing visualizations 
+  (e.g., providing custom color palettes for heatmaps and clusters, 
+  turning on/off row/column clustering and dendrograms in heatmaps etc.)
+  have been added
+  
++ plotCounts() previously only supported plotting absolute cell counts by 
+  sample and now allows to i) plot relative abundances (frequencies) instead;
+  and, ii) group cell counts/frequencies by an addition cell metadata variable 
+  (e.g., to plot abundances split by both sample and patient ID)
+
++ plotMDS() has been replaced by pbMDS() to avoid 
+  Namespace clash with scater::plotMDS()
+  
++ plotDR() failed to visualize PCA results; this has been fixed
+
++ plotDR() now allows to visualize dimension reductions 
+  colored by an arbitrary number of markers with a single command
+  
++ plotClusterHeatmap() has been deprecated and replaced by 
+  - plotExprHeatmap() for pseudobulk expression heatmaps 
+    (by sample, cluster, cluster-sample)
+  - plotFreqHeatmap() for relative cluster abundance heatmaps
+  - plotMultiHeatmap() to combine pseudobulk expression 
+    & cluster frequency heatmaps side-by-side
+  
++ The vignette has been extended to include sections on how
+  - ggplot2 & ComplexHeatmap visualizations 
+    can be customized or modified in retrospect
+  - any clustering algorithms other than FlowSOM can be applied and 
+    incorporated to make use of the visualizations available in CATALYST
+  - arbitrary ComplexHeatmap outputs from plotExprs/FreqHeatmap() 
+    can be combined manually, when not plotMultiHeatmap()
+    
++ An additional vignette has been added demonstrating how CATALYST's 
+  visualizations can be used with other data types from, e.g., scRNA-seq

@@ -1,0 +1,57 @@
+Package: CATALYST
+Type: Package
+Title: Cytometry dATa anALYSis Tools
+Version: 1.26.1
+Depends: R (>= 4.2), SingleCellExperiment
+Authors@R: c(
+	person("Helena L.", "Crowell", 
+	    role=c("aut", "cre"),
+	    email="helena.crowell@uzh.ch", 
+	    comment=c(ORCID="0000-0002-4801-1767")),  
+	person("Vito R.T.", "Zanotelli", role="aut", email="vito.zanotelli@uzh.ch"), 
+	person("Stéphane", "Chevrier", role=c("aut", "dtc")),
+	person("Mark D.", "Robinson", role=c("aut", "fnd"), email="mark.robinson@imls.uzh.ch"),
+	person("Bernd", "Bodenmiller", role="fnd"))
+biocViews: Clustering, DataImport, DifferentialExpression,
+        ExperimentalDesign, FlowCytometry, ImmunoOncology,
+        MassSpectrometry,Normalization, Preprocessing, SingleCell,
+        Software, StatisticalMethod, Visualization
+Description: 
+	CATALYST provides tools for preprocessing of and differential discovery
+	in cytometry data such as FACS, CyTOF, and IMC. Preprocessing includes
+	i) normalization using bead standards, ii) single-cell deconvolution,
+	and iii) bead-based compensation.
+	For differential discovery, the package provides a number of convenient
+	functions for data processing (e.g., clustering, dimension reduction),
+	as well as a suite of visualizations for exploratory data analysis and
+	exploration of results from differential abundance (DA) and state (DS)
+	analysis in order to identify differences in composition and expression
+	profiles at the subpopulation-level, respectively.
+Imports: circlize, ComplexHeatmap, ConsensusClusterPlus, cowplot,
+        data.table, dplyr, drc, flowCore, FlowSOM, ggplot2, ggrepel,
+        ggridges, graphics, grDevices, grid, gridExtra, Matrix,
+        matrixStats, methods, nnls, purrr, RColorBrewer, reshape2,
+        Rtsne, SummarizedExperiment, S4Vectors, scales, scater, stats
+Suggests: BiocStyle, diffcyt, flowWorkspace, ggcyto, knitr, openCyto,
+        rmarkdown, testthat, uwot
+URL: https://github.com/HelenaLC/CATALYST
+BugReports: https://github.com/HelenaLC/CATALYST/issues
+VignetteBuilder: knitr
+RoxygenNote: 7.3.1
+License: GPL (>=2)
+Encoding: UTF-8
+LazyData: true
+git_url: https://git.bioconductor.org/packages/CATALYST
+git_branch: RELEASE_3_18
+git_last_commit: bca4eb0
+git_last_commit_date: 2024-03-27
+Repository: Bioconductor 3.18
+Date/Publication: 2024-03-27
+NeedsCompilation: no
+Packaged: 2024-03-27 20:23:57 UTC; biocbuild
+Author: Helena L. Crowell [aut, cre] (<https://orcid.org/0000-0002-4801-1767>),
+  Vito R.T. Zanotelli [aut],
+  Stéphane Chevrier [aut, dtc],
+  Mark D. Robinson [aut, fnd],
+  Bernd Bodenmiller [fnd]
+Maintainer: Helena L. Crowell <helena.crowell@uzh.ch>
