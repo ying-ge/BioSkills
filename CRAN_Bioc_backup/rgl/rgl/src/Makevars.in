@@ -1,0 +1,43 @@
+#
+# R Makevars file auto-generated using template Makevars.in 
+# AUTO-GENERATED from Makevars.in (using configure or configure.win)
+# This file is part of the RGL project.
+#
+# Makevars will be called in two different circumstances:
+# 
+# When HIDE_IF_NO_OPENGL="":
+# 
+# Trying to make $(SHLIB)=rgl.so with full OpenGL support, then
+# making it again by building it in useNULL,
+# using the Makevars file there.
+# 
+# When HIDE_IF_NO_OPENGL="#":
+# 
+# Trying to make $(SHLIB)=rgl.so with no OpenGL.
+
+@HIDE_IF_R42PLUS@ CXX_STD = CXX11
+
+PKG_CFLAGS=$(C_VISIBILITY)
+
+PKG_CPPFLAGS=@NULL_CPPFLAGS@ -DR_NO_REMAP -Iext/earcut
+
+PKG_LIBS=@NULL_LIBS@
+
+# These lines are only used if configure found OpenGL support
+
+@HIDE_IF_NO_OPENGL@ PKG_CPPFLAGS=@CPPFLAGS@ -DR_NO_REMAP -Iext -Iext/glad/include -Iext/earcut
+@HIDE_IF_NO_OPENGL@ PKG_LIBS=@LIBS@
+
+all: $(SHLIB) @HIDE_IF_NO_OPENGL@ ../inst/useNULL$(R_ARCH)/$(SHLIB) 
+
+../inst/useNULL$(R_ARCH)/$(SHLIB): $(SHLIB)
+	cp -Rp OpenGL useNULL && \
+	mkdir -p useNULL/ext && \
+	cp -Rp ext/earcut useNULL/ext/earcut && \
+	cp -p *.c *.h *.cpp useNULL/ && \
+	cd useNULL && \
+	$(R_HOME)/bin/R CMD SHLIB -o useNULL.so *.cpp *.c && \
+	cd .. && \
+	mkdir -p ../inst/useNULL$(R_ARCH) && \
+	mv useNULL/useNULL.so ../inst/useNULL$(R_ARCH)/$(SHLIB) && \
+	rm useNULL/*.cpp useNULL/*.c useNULL/*.h useNULL/OpenGL/*

@@ -1,0 +1,12 @@
+#
+# R Makevars file auto-generated using template Makevars.in 
+# AUTO-GENERATED from Makevars.in (using configure or configure.win)
+# This file is part of the RGL project.
+#
+
+@HIDE_IF_R42PLUS@ CXX_STD = CXX11
+PKG_CFLAGS=$(C_VISIBILITY)
+
+PKG_CPPFLAGS=@NULL_CPPFLAGS@ -DR_NO_REMAP -Iext/earcut
+PKG_LIBS=@NULL_LIBS@
+

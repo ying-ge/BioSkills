@@ -1,0 +1,9 @@
+rgl           RGL Interactive Demonstration
+flag	      play3d() function that waves a flag
+mouseCallbacks	Standard mouse handlers implemented in R, for a stereo view
+stereo	      Stereo views using a random dot stereogram & an anaglyph
+simpleShinyRgl  Shiny demo with checkbox
+shinyToggle	Shiny with togglewidget
+shinyTabs  Shiny with tabs
+shinyDemo    rglwidget in Shiny:  Nelder-Mead demonstration
+shinyMouse    Mouse selection in Shiny
