@@ -1,0 +1,33 @@
+# R project files
+
+.Rproj.user
+*.Rproj
+.Rhistory
+.RData
+.Ruserdata
+
+# R installation files
+
+build
+dist
+
+# Python installation files
+
+python/*.o
+python/*.so
+python/*.dll
+python/*.egg-info
+python/magic/__pycache__
+python/magic/*.pyc
+python/tutorial_notebooks/.ipynb_checkpoints
+__pycache__
+.eggs
+
+
+matlab/EMT.csv
+
+# Mac detritus
+
+*~
+~$*
+.DS_Store
