@@ -1,0 +1,15 @@
+fbe2be274f3e22d1f9b0a83060374dd5 *DESCRIPTION
+ce00bd8cb4f85cb693764f3f21e2b216 *NAMESPACE
+af51e317555b13102e2bed8ed12d756a *R/createVennData.R
+6cdc8e6fb66f11a725e35915f58940b6 *R/plotVenn.R
+7036c00210deccf2c98752b082a7eaa8 *R/plotVenn2d.R
+c75642fd4b52c0999c9adb75ad727fbe *R/plotVenn3d.R
+4fdb026f2493ef9ec7ff91d677fc90a4 *R/plotVenn4d.R
+ad6c7d641ae5fca971e81cffef70fb8e *R/resizeCircles.R
+5eee2c97772655bc8e5ce078f0339477 *man/colorfulVennPlot-package.Rd
+543c457e1ec86a84d8a29df75f03f5ae *man/createVennData.Rd
+fd52f01e14962bae59ca7c1ef8ec71b3 *man/plotVenn.Rd
+e2895b9399bf073ff335537fee5901f2 *man/plotVenn2d.Rd
+ca906621777357f726f75106c77c88b4 *man/plotVenn3d.Rd
+5aea7fbd015a56d0f425a927da54e1f9 *man/plotVenn4d.Rd
+410d38d8f7ae632a8d2e644aef6308d4 *man/resizeCircles.Rd
