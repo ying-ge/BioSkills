@@ -1,0 +1,45 @@
+Package: FlowSOM
+Version: 2.10.0
+Date: 2023-04-21
+Title: Using self-organizing maps for visualization and interpretation
+        of cytometry data
+Authors@R: c(person("Sofie", "Van Gassen", role = c("aut", "cre"),
+            email = "sofie.vangassen@ugent.be"),
+            person("Artuur", "Couckuyt", role = c("aut"),
+            email = "artuur.couckuyt@ugent.be"),
+            person("Katrien", "Quintelier", role = c("aut"),
+            email = "katrienL.Quintelier@ugent.be"),
+            person("Annelies", "Emmaneel", role = c("aut"),
+            email = "annelies.emmaneel@ugent.be"),
+            person("Britt","Callebaut",role="aut",
+            email="britt.callebaut@ugent.be"),
+            person("Yvan", "Saeys", role = "aut", 
+            email="yvan.saeys@ugent.be"))
+Depends: R (>= 4.0), igraph
+Imports: stats, utils, colorRamps, ConsensusClusterPlus, dplyr,
+        flowCore, ggforce, ggnewscale, ggplot2, ggpubr, grDevices,
+        magrittr, methods, rlang, Rtsne, tidyr, BiocGenerics, XML
+Suggests: BiocStyle, testthat, CytoML, flowWorkspace, ggrepel,
+        scattermore, pheatmap, ggpointdensity
+Description: FlowSOM offers visualization options for cytometry data,
+    by using Self-Organizing Map clustering and Minimal Spanning Trees.
+License: GPL (>= 2)
+URL: http://www.r-project.org, http://dambi.ugent.be
+biocViews: CellBiology, FlowCytometry, Clustering, Visualization,
+        Software, CellBasedAssays
+Packaged: 2023-10-24 21:15:51 UTC; biocbuild
+RoxygenNote: 7.2.3
+Encoding: UTF-8
+git_url: https://git.bioconductor.org/packages/FlowSOM
+git_branch: RELEASE_3_18
+git_last_commit: 36b3305
+git_last_commit_date: 2023-10-24
+Date/Publication: 2023-10-24
+NeedsCompilation: yes
+Author: Sofie Van Gassen [aut, cre],
+  Artuur Couckuyt [aut],
+  Katrien Quintelier [aut],
+  Annelies Emmaneel [aut],
+  Britt Callebaut [aut],
+  Yvan Saeys [aut]
+Maintainer: Sofie Van Gassen <sofie.vangassen@ugent.be>

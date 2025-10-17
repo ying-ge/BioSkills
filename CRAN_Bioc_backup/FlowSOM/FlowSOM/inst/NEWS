@@ -1,0 +1,374 @@
+CHANGES IN VERSION 2.7.10 (2023/04/21)
+--------------------------------------
+o Fixed colored metacluster centers when using Plot2DScatters
+  
+CHANGES IN VERSION 2.7.9 (2023/03/28)
+--------------------------------------
+o Adapted documentation of readInput and FlowSOM. It can also use a matrix with 
+  column names
+
+CHANGES IN VERSION 2.7.8 (2023/03/23)
+--------------------------------------
+o Added PlotOutliers and documentation
+
+CHANGES IN VERSION 2.7.7 (2023/02/09)
+--------------------------------------
+o Updates to TestOutliers
+  
+  CHANGES IN VERSION 2.7.5 (2023/01/11)
+--------------------------------------
+o Edited PlotManualBars so that it shows percentages of cells
+o Edited PlotDimRed so that it optionally uses scattermore if it installed
+  
+CHANGES IN VERSION 2.7.4 (2023/01/05)
+--------------------------------------
+o AggregateFlowFrames can now also resample if more cells are asked for than
+  available in the fcs files. Default stays FALSE, taking at most the number
+  of cells in the fcs file
+
+CHANGES IN VERSION 2.7.2 (2022/11/11)
+--------------------------------------
+o Version bump to align with Bioconductor
+o Update for aggregateFlowFrames for nices handling of iterative aggregation 
+(+ according visualisation in FlowSOMmary). AggregateFlowFrames will now introduce 
+0 values if a channel is not present in one of the fcs files. If channels is not 
+provided as an argument, the channels of the first file are used.
+o Added support for abbrevations in PlotDimRed "colorBy".
+o Return 0 instead of NA in case of an empty cluster in GetCounts/GetPercentages
+
+CHANGES IN VERSION 2.5.6 (2022/07/29s)
+--------------------------------------
+o Reversed PlotDimred back to scattermore instead of geom_hex. Uses geom_point
+  if scattermore is not available.
+o Added support for custom colors and limits in PlotDimRed
+
+CHANGES IN VERSION 2.5.5 (2022/06/30)
+--------------------------------------
+o AddAnnotation now works correctly after using UpdateMetaclusters. The function
+  also works slightly different. See examples.
+o Fixed issue with wrong coloring in PlotDimRed
+  
+CHANGES IN VERSION 2.5.4 (2022/06/29)
+--------------------------------------
+o percentage_positives in GetFeatures now works with a FlowSOM with 
+  updated metacluster labels
+
+CHANGES IN VERSION 2.5.3 (2022/06/16)
+--------------------------------------
+o Bugfix in GetChannels
+  
+CHANGES IN VERSION 2.5.2 (2022/05/13)
+--------------------------------------
+o Bugfixes to pass BioConductor check
+o Bugfixes in Plot2DScatters: when ggpointdensity is not installed, normal
+  ggplot colors are used
+o ParseNodeSize is now exported
+
+CHANGES IN VERSION 2.5.1 (2022/05/06)
+--------------------------------------
+o Version bump to get the same version as on BioConductor
+o Changed yMargin parameter in PlotFileScatters to yLim for consistency
+o Added possibility to use abbrevations in GetFeatures, GetCounts, GetPercentages, 
+  PlotFileScatters, PlotDimRed, ParseQuery, Plot2DScatters and PlotNumbers
+o Moved UpdateFlowSOM to 0_FlowSOM.R
+o Changed examples in PlotFlowSOM, PlotVariable and PlotStars
+o Fixed issues from check: deleted examples with GetFlowJoLabels and used a csv 
+  instead, changed geom_scattermore to geom_hex for less dependencies. 
+  Moved packages to Suggest instead of Import.
+o ParseNodeSize is now exported
+
+CHANGES IN VERSION 2.1.38 (2022/02/24)
+--------------------------------------
+o Added possibility to provide a seed when using metaClustering_hclust,
+  metaClustering_kmeans or metaClustering_som
+
+CHANGES IN VERSION 2.1.37 (2022/02/22)
+--------------------------------------
+o Added possibility to provide additional arguments to the read.FCS function in 
+  SaveClustersToFCS() function
+o PlotFileScatters now accepts other File ID columns, not anymore stricted to 
+  "File" 
+
+CHANGES IN VERSION 2.1.36 (2022/01/13)
+--------------------------------------
+o Added a warning when using "backgroundColor" instead of "backgroundColors"
+  in PlotStars
+o Clusters centers in Plot2DScatters is now colored the same as the cluster 
+  cells when using manual colors
+
+CHANGES IN VERSION 2.1.35 (2022/01/13)
+--------------------------------------
+o Added a warning in UpdateDerivedValue when using FlowSOM on an FCS with NA value
+
+CHANGES IN VERSION 2.1.34 (2021/12/14)
+--------------------------------------
+o Happy Holidays!
+o Edited documentation of Plot2DScatters ("indices of clusters/metaclusters")
+o Outlier counts are also returned as attributes when extracting percentages
+  with GetFeatures
+
+CHANGES IN VERSION 2.1.33 (2021/10/27)
+--------------------------------------
+o Title of Plot2DScatters now gives all the (meta)clusters instead of just one
+o Added warning when wrong manual colors are used in Plot2DScatters
+o Added the ability to use markers and/or channels in Plot2DScatters
+o Added GetClusterPercentagesPositives and GetMetaclusterPercentagesPositives to
+  FlowSOM CheatSheet 
+o Edited text from GetFeatures on cheatsheet
+
+CHANGES IN VERSION 2.1.32 (2021/10/22)
+--------------------------------------
+o Add marker outliers in TestOUtliers function
+o Add mad calculation in UpdateDerivedValues function
+
+CHANGES IN VERSION 2.1.31 (2021/10/05)
+--------------------------------------
+o In NewData, the new FlowSOM object gets prettyColnames from the old one
+
+CHANGES IN VERSION 2.1.30 (2021/10/04)
+--------------------------------------
+o GetFeatures can now return % of positive cells per channel for each cluster
+  or metacluster, see parameters type and positives_cutoff
+o New exported function GetClusterPercentagesPositive
+o New exported function GetMetaclusterPercentagesPositive
+
+CHANGES IN VERSION 2.1.29 (2021/07/30)
+--------------------------------------
+o Update documentation 
+
+CHANGES IN VERSION 2.1.28 (2021/07/30)
+--------------------------------------
+o Added height and width parameter to PlotFileScatters
+o Fixed bug in PlotFileScatters
+
+CHANGES IN VERSION 2.1.27 (2021/07/27)
+--------------------------------------
+o Fixed typos and more consistent spelling
+
+CHANGES IN VERSION 2.1.26 (2021/07/13)
+--------------------------------------
+o Adapted GetMetaclusterCVs function so that it works after using 
+  UpdateMetaclusters
+o Fixed typos
+
+CHANGES IN VERSION 2.1.25 (2021/07/09)
+--------------------------------------
+o Adapted PlotManualBars function so that it works after using UpdateMetaclusters
+
+CHANGES IN VERSION 2.1.24 (2021/07/02)
+--------------------------------------
+o Added UpdateMetaclusters function, removed RelabelMetaclusters, 
+  ReassignMetaclusters and Reordermetaclusters functions.
+o Updated CheatSheet
+o Added code from UpdateDerivedValues for metaclustersMFIs to UpdateFlowSOM
+
+CHANGES IN VERSION 2.1.23 (2021/06/30)
+--------------------------------------
+o Added checkNames = FALSE in MetaclusterMFIs
+
+CHANGES IN VERSION 2.1.22 (2021/06/30)
+--------------------------------------
+o Reordered code in UpdateDerivedValues, RelabelMetaclusters, 
+  ReorderMetaclusters and ReassignMetaclusters.
+
+CHANGES IN VERSION 2.1.21 (2021/06/15)
+--------------------------------------
+o Added ReorderMetaclusters, to reorder the metacluster levels.
+  
+CHANGES IN VERSION 2.1.20 (2021/06/07)
+--------------------------------------
+o Updated PlotManualBars, Plot2DScatters and FlowSOMmary so that it works 
+  with relabeled metaclusters.
+
+CHANGES IN VERSION 2.1.19 (2021/05/21)
+--------------------------------------
+o AggregateFlowFrames accepts channels and markers
+o AggregateFlowFrames now gives a warning when files do not contain the same 
+  number of channels
+o AggregateFlowFrames now gives warnings when files do not contain the same 
+  markers
+o Bugfix in AggregateFlowFrames now works when one channel is given
+o Bugfix in PlotFileScatters now works when one channel is given
+o Added silent parameter in PlotFileScatters to stop messages
+o PlotFileScatters supports channels and markers now
+o Add info to FlowSOM object: date when flowSOM object is made, FlowSOM verion 
+  and arguments given to FlowSOM call
+o Fixed bug in PlotManualBars
+o Added silent parameter in NewData. GetFeatures' silent parameter now also
+  surpresses message from NewData (more concrete: ReadInput)
+
+CHANGES IN VERSION 2.1.17 (2021/04/16)
+--------------------------------------
+o Added ReassignMetaclusters, to rename or split metaclusters
+o Fixed issue where a lot of warnings were printed in FlowSOMmary
+o PlotFilescatters now makes filenames unique if they are not and the 
+  function now works with output of AggregateFlowFrames
+
+CHANGES IN VERSION 2.1.16 (2021/04/13)
+--------------------------------------
+o PlotManualBars allows input of NewData function
+
+CHANGES IN VERSION 2.1.15 (2021/04/13)
+--------------------------------------
+o Fixed warnings with ggtexttable in FlowSOMmary
+
+CHANGES IN VERSION 2.1.13 (2021/04/06)
+--------------------------------------
+o Added RelabelMetaclusters 
+o PlotFileScatters now has a parameter to change the y-axis label to markers 
+  and/or channels (yLabel)
+o Now TRUE/FALSE vector is accepted as input in GetMarkers/GetChannels
+
+CHANGES IN VERSION 2.1.11 (2021/03/03)
+--------------------------------------
+o Added example to AddAnnotation
+o Added example to NClusters, NMetaclusters
+o Changed examples that used fsom to flowSOM.res
+o Added textColor and textSize to AddLabels and PlotNumbers, PlotLabels
+o PlotNumbers can plot clusters and metaclusters with parameter "level"
+o In GetFeatures, the population parameter is changed to level
+o Added GetCounts and GetPercentages to get counts or percentages respectively 
+  per cluster or metacluster
+o FlowSOMmary doesn't crash anymore with a column with the same values in 
+  heatmap
+o Included a print function for FlowSOM class
+o Fixed bug in PlotManualBars
+o PlotMarker also accept multiple markers now
+
+CHANGES IN VERSION 2.1.8 (2020/11/19)
+--------------------------------------
+o Solved issue when matrix with no column was given to the SOM function
+
+
+CHANGES IN VERSION 2.1.5 (2020/11/19)
+--------------------------------------
+o Scale parameter in FlowSOM function defaults to FALSE.
+o FlowSOM wrapper function now returns the FlowSOM object instead of a list 
+  containing the FlowSOM object and a metaclustering
+o The metaclustering is now found as an element in the flowSOM object. Also the 
+  number of metaclusters and the MFI values are stored and can be accessed by
+  the NMetaclusters() and GetMetaclusterMFIs() functions.
+o If you want to reuse FlowSOM objects generated by previous versions,
+  you can use the UpdateFlowSOM function.
+o FlowSOM now uses nClus = 10 as default instead of maxMeta = 10
+o FlowSOM now makes use of ggplot2 for plotting. PlotFlowSOM provides the 
+  main structure, and has parameters to adapt nodeSize, view (grid, MST or some
+  own layout matrix), ... PlotStars etc build on this by adding additional
+  layers to the ggplot object. This also allows to easily incorporate multiple
+  plots in all layout-tools such as ggarrange, cowplot, patchwork, ...
+o GetChannels/GetMarkers can now also take a FlowSOM object as input instead of
+  a flowFrame.
+New functions:
+o To easily generate a clear summary of the model with multiple plots, you
+  can now use the FlowSOMmary function, which creates a pdf file.
+o GetFeatures allows to map new files (internally using the NewData function) 
+  and can return cluster counts, percentages and MFI values for each individual
+  sample.
+o PlotFileScatters can be useful to get an overview of potential batch effects
+  before running the FlowSOM algorithm
+
+CHANGES IN VERSION 1.15.5 (2019/06/11)
+--------------------------------------
+o Removed dependency on flowUtils, replaced by flowWorkspace. 
+  This also included a filename change of lymphocytes.fcs to 68983.fcs
+o Included 
+
+CHANGES IN VERSION 1.15.4 (2019/05/17)
+--------------------------------------
+o Fix bug when aggregating files with different column orders
+o Fix bug in PlotNode which failed when there were any clusters with no cells 
+  assigned.
+
+CHANGES IN VERSION 1.15.3 (2019/04/08)
+--------------------------------------
+o Fix bug when mapping an fcs file with different columns (eg. no "File" columns
+  as in the aggregated file used for training)
+o Allow multiple repeated aggregations with the AggregateFlowframe function
+
+CHANGES IN VERSION 1.13.11 (2018/09/26)
+--------------------------------------
+o The ReadInput function can now also take a matrix as input.
+o Made input of the NewData function more general (can now take any input of the
+ReadInput function). 
+o Included a TestOutliers function which checks the average distance of the cells
+to the cluster centers (using the median and MAD measures) and returns how many
+cells seem to be further then expected from the cluster center.
+o Fixed the bug that only the first file-specific compensation matrix was taken
+into account in the ReadInput function.
+
+CHANGES IN VERSION 1.13.10 (2018/09/18)
+--------------------------------------
+Add rownames to the MFI results
+
+CHANGES IN VERSION 1.13.9 (2018/09/13)
+--------------------------------------
+ Added a keepOrder parameter to the AggregateFlowFrames function. If TRUE, the 
+ cells of the random subsample will be ordered in the same way as they were 
+ originally ordered in the file. Default = FALSE for backwards compatability.
+ This will be especially useful if the whole file is selected in the subsample,
+ in which case indices keep corresponding to the original ones.
+ 
+ Also included the bugfix by Stu Blair to propagate the main parameter of the
+ plotnumbers function to igraph.
+
+CHANGES IN VERSION 1.13.8 (2018/08/29)
+--------------------------------------
+o added get_markers and get_channels functions for easier access
+o added PlotOverview2D function, which gives an overview of multiple
+  PlotCluster2D plots.
+
+CHANGES IN VERSION 1.13.7 (2018/08/23)
+--------------------------------------
+o Background circles scale with the actual node size
+o Possible to choose at which level warnings for bad mappings to cluster are 
+generated (mean + x * sd), default changed from 3 to 4
+o If more than 10 background values, split legend in multiple columns
+
+CHANGES IN VERSION 1.13.6 (2018/08/21)
+--------------------------------------
+o Transposed the metaclusterMFI result!!
+
+
+CHANGES IN VERSION 1.13.2 (2018/08/20)
+--------------------------------------
+o Added a MetaclusterCVs function to get coefficient of variation for the metaclusters
+
+CHANGES IN VERSION 1.13.1 (2018/04/09)
+--------------------------------------
+o Added a warning when cells mapped with the NewData function seem
+   further away from their cluster center then normal
+
+
+CHANGES IN VERSION 1.10.3 (2018/04/09)
+--------------------------------------
+o Bugfix in PlotGroups
+
+CHANGES IN VERSION 1.10.1 (2017/01/03)
+--------------------------------------
+
+o Updates to the PlotGroups function:
+  - Changed the default from fold change (tresh) to p-value (p_tresh)
+  - Make use of adjusted p-values
+  
+o Added a check on the input format of the codes parameter in the SOM function
+
+CHANGES IN VERSION 1.1.0 (2015/07/06)
+--------------------------------------
+
+NEW FEATURES
+
+    o Cleaned up some code
+
+CHANGES IN VERSION 0.99.4 (2015/03/17)
+--------------------------------------
+
+NEW FEATURES
+
+    o Extra functionality to differentiate between groups of samples
+
+CHANGES IN VERSION 0.99.0 (2014/10/15)
+--------------------------------------
+
+NEW FEATURES
+
+    o First version of the package
