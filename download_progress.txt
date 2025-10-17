@@ -1,1 +1,1 @@
-scikit-learn|success|9.04|machine_learning
+catboost|success|94.57|machine_learning
