@@ -1,0 +1,8 @@
+PKG_CPPFLAGS=@cflags@
+PKG_CXXFLAGS=$(C_VISIBILITY)
+PKG_LIBS=@libs@
+
+all: $(SHLIB) cleanup
+
+cleanup: $(SHLIB)
+	@rm -Rf ../.deps

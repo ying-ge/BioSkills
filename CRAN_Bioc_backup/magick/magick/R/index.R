@@ -1,0 +1,31 @@
+#' Magick Image Processing
+#'
+#' The `magick` package for graphics and image processing in R. Important resources:
+#' - [R introduction vignette](https://docs.ropensci.org/magick/articles/intro.html): getting started
+#' - [Magick++ API](https://imagemagick.org/Magick++/Image++.html) and
+#'     [Magick++ STL](https://imagemagick.org/Magick++/STL.html) detailed descriptions of methods and parameters
+#'
+#' Documentation is split into the following pages:
+#' - [analysis] - metrics and calculations: `compare`, `fft`
+#' - [animation] - manipulate or combine multiple frames: `animate`,
+#'  `morph`, `mosaic`, `montage`, `average`, `append`, `apply`
+#' - [attributes] - image properties: `comment`, `info`
+#' - [color] - contrast, brightness, colors: `modulate`, `quantize`, `map`, `transparent`,
+#'  `background`, `colorize`, `contrast`, `normalize`, `enhance`, `equalize`, `median`
+#' - [composite] - advanced joining: `composite`, `border`, `frame`
+#' - [device] - creating graphics and drawing on images
+#' - [editing] - basic image IO: `read`, `write`, `convert`, `join`, `display`, `brose`
+#' - [effects] - fun effects: `despecle`, `reducenoise`, `noise`, `blur`, `charcoal`,
+#'   `edge`, `oilpaint`, `emboss`, `implode`, `negate`
+#' - [geometry] - specify points, areas and sizes using geometry syntax
+#' - [ocr] - extract text from image using [tesseract][tesseract::tesseract] package
+#' - [options] - list option types and values supported in your version of ImageMagick
+#' - [painting] - flood fill and annotating text
+#' - [transform] - shape operations: `trim`, `chop`, `rotate`, `resize`, `scale`, `sample`
+#'   `crop`, `flip`, `flop`, `deskew`, `page`
+#'
+#' @name _index_
+#' @rdname magick
+#' @family image
+#' @aliases magick magick-package imagemagick
+NULL
