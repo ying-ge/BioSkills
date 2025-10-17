@@ -1,0 +1,115 @@
+\newcommand{\minitab}[2][l]{\begin{tabular}{#1}#2\end{tabular}}
+\newcommand{\minipagec}[2][l]{\begin{minipage}{#1}#2\end{minipage}}
+\newcommand{\uniprotlink}[1]{\href{http://www.uniprot.org/uniprot/#1}{#1}}
+
+\newcommand{\rr}{\raggedright}
+\newcommand{\tn}{\tabularnewline}
+\newcommand{\rh}[1]{\begin{rotate}{65}\textbf{#1}\end{rotate}}
+\newcommand{\rth}[1]{\begin{turn}{65}\textbf{#1}\end{turn}}
+\newcommand{\secsubtitle}[1]{\textit{#1}}
+
+\newcommand{\boxplot}[6]{
+  \begin{tikzpicture}[x=2cm,line width=0.5pt,node distance=0.1,baseline=3.8ex]
+      \tikzboxplot{#1}{#2}{#3}{#4}{#5}{#6}{black!60}
+  \end{tikzpicture}
+}
+
+% parameters:
+%  #1: protein position
+%  #2: protein AC
+\newcommand{\proteincol}[5]{
+  \node [anchor=east,draw,minimum size=0.2cm] (prot#1) at (-3,#1) {#2};
+  \node [minimum size=0.2cm] at (-2,#1) {#3};
+  \node [minimum size=0.2cm] at (-1,#1) {#4};
+  \node [minimum size=0.2cm] at (0,#1) {#5};
+}
+
+% parameters:
+%  #1: protein position
+%  #2: style / parameters for node
+%  #3: peptide numbers
+%  #4: node text
+\newcommand{\proteinrow}[3]{
+    \foreach \x/\style in {#2}{
+    \node (prot#1 pep\x) at (\x+1,#1*0.75+0.75) [\style] {#3};
+  }
+}
+
+\renewcommand{\ll}{0.25}
+\newcounter{nplot}
+
+
+\tikzset{
+  rect/.style = {
+    regular polygon,regular polygon sides=4
+  },
+  rs/.style={ thick,circle,draw,draw=black!80,fill=black!20 },
+  gs/.style={ thick,rect,draw,draw=#1!50,fill=#1!20 },
+  us/.style={ thick,circle,draw,draw=black!30,fill=black!10 },
+  gs/.default=black,
+  gs blue/.style=   { thick,rect,draw,draw=blue!50,fill=blue!20 },
+  gs red/.style=    { thick,rect,draw,draw=red!50,fill=red!20 },
+  gs green/.style=  { thick,rect,draw,draw=green!50,fill=green!20 },
+  gs cyan/.style=   { thick,rect,draw,draw=cyan!50,fill=cyan!20 },
+  gs magenta/.style={ thick,rect,draw,draw=magenta!50,fill=magenta!20 },
+  gs yellow/.style= { thick,rect,draw,draw=yellow!50,fill=yellow!20 }
+}
+
+\newcommand{\pgfbndset}[2]
+{
+  \pgfmathparse{max(-\bnd,#2)}
+  \pgfmathparse{min(\bnd,\pgfmathresult)}
+  \pgfmathsetmacro{#1}{\pgfmathresult}
+}
+
+\newcommand{\tikzboxplot}[7]
+{
+  \pgfmathsetmacro{\median}{#1}
+  \pgfmathsetmacro{\sd}{#2}
+  \pgfbndset{\ql}{\median-\sd}      % first quartile 
+  \pgfbndset{\cl}{\median-1.96*\sd} % lower border of CI
+  \pgfbndset{\qh}{\median+\sd}      % third quartile 
+  \pgfbndset{\ch}{\median+1.96*\sd} % upper border of CI
+  \pgfbndset{\median}{\median}
+
+  \pgfmathsetmacro{\hh}{0+2*\ll}
+  \def\divcol{#3}
+  \draw[#7] [lightgray] (-\bnd,\hh+\ll/2) -- (\bnd,\hh+\ll/2); % Axis
+  \foreach \x in {-\bnd,0,\bnd}
+    \draw[#7] [color=black!20] (\x,\hh) -- (\x,\hh+\ll); %                                                                    
+  \filldraw[color=#7,fill=#3] (\ql,\hh) rectangle (\qh,\hh+\ll);% draw the box
+  \draw[#7] (\median,\hh) -- (\median,\hh+\ll) ;% draw the median
+  \draw[#7] (\qh,\hh+\ll/2) -- (\ch,\hh+\ll/2);% draw right whisker
+  \draw[#7] (\ql,\hh+\ll/2) -- (\cl,\hh+\ll/2);% draw left whisker
+  \draw[#7] (\ch,\hh+\ll/2-\ll/4) -- (\ch,\hh+\ll/2+\ll/4);% draw vertical tab
+  \draw[#7] (\cl,\hh+\ll/2-\ll/4) -- (\cl,\hh+\ll/2+\ll/4);% draw vertical tab
+  \node[#4] (bdr) at (-\bnd-0.1,\hh+\ll/2) {\tt{<}} ;
+  \node[#5] at (\bnd+0.1,\hh+\ll/2) {\tt{>}};
+}
+
+%% draw boxplot axis
+\newcommand{\drawaxis}[2]{
+\scriptsize
+\begin{tikzpicture}[ x=2cm,font=\sffamily,color=black!60]
+  \draw (-\bnd,0) -- coordinate (x axis mid) (\bnd,0);
+  \draw (-\bnd,0pt) -- (-\bnd,#1) node[anchor=#2] {-\bndt};
+  \draw (0,0pt) -- (0,#1) node[anchor=#2] {1};
+  \draw (\bnd,0pt) -- (\bnd,#1) node[anchor=#2] {\bndt};
+  \node[black!1] (bdr) at (-\bnd-0.1,\ll/2) {\tt{ }} ;
+  \node[black!1] at (\bnd+0.1,\ll/2) {\tt{ }};
+\end{tikzpicture}
+\normalsize
+}
+
+\newcommand{\grpdescriptionstbl}{
+\begin{tabular}{rp{8.5cm}}
+\multicolumn{2}{c}{Column Descriptions} \\ \hline \bigstrut[t]
+\emph{protein} & Protein name, accession code, and description.  \\
+\emph{group}   & Protein group size, only displayed if it is not '1/1'. First number: Number of group reporters; second number: group size. See \hyperref[sec:proteingroups]{Protein Group Details} for details. \\
+\emph{peptides} & Number of peptides for protein. \\
+\emph{spectra} & Number of idenfitied spectra  for protein. \\
+\emph{quant} & Number of spectra with quantitative information for \textit{ch2} versus \textit{ch1}. \\
+\emph{ratio} & Ratio of protein in channel \textit{ch2} relative to \textit{ch1}. \\
+\emph{*} & Significance of protein ratio in sample. \\
+\end{tabular}
+}

@@ -1,0 +1,271 @@
+CHANGES IN VERSION 1.19.1
+-------------------------
+ - Fix error in subsetIBSpectra and exclude and namespace imports
+  (Laurent Gatto <2016-10-07 Fri>)
+
+CHANGES IN VERSION 1.17.1
+-------------------------
+ - Fixed critical bug in isotope impurity correction method. 
+   Isobar used a transposed matrix for isotope impurity correction prior to this fix.
+   Quantification results will change when isotope impurity correction is performed
+   Bug discovered by Dario Strbenac https://support.bioconductor.org/p/74301/#79900).
+
+CHANGES IN VERSION 1.16.0
+-------------------------
+ - Bioconductor release 3.2
+
+ CHANGES IN VERSION 1.14.0
+ -------------------------
+  - Bioconductor release 3.1
+
+CHANGES IN VERSION 1.13.0
+-------------------------
+ - calcCumulativeProbXGreaterThanY() contributed by A. Stukalov, for calculating cummulative p-values with replicates
+ - Bioconductor version increment
+
+CHANGES IN VERSION 1.12.0
+-------------------------
+ - Bioconductor release 3.0
+
+ CHANGES IN VERSION 1.10.0
+ -------------------------
+  - Bioconductor release 2.9
+
+CHANGES IN VERSION 1.9.5
+------------------------
+ - FIX FOR TMT-10plex tags: previous version had wrong annotation of N and C for 127,128,129,130
+ - Speed improvements for p-value calculation by vectorization, contributed by A. Stukalov
+
+CHANGES IN VERSION 1.9.3
+------------------------
+ - allow the use of a combination matrix in NoiseModel reporterTagNames
+ - added function getProteinInfoFromTheInternet which automatically recognizes Uniprot and Entrez ACs. Set now as default 'protein.info.f' in the report configuration.
+ - Overhauled isobar-analysis.Rnw
+   - use of ltxtables to allow optimal column widths (longer runtime, however)
+   - use [[ instead of $  for accession of lists
+   - better column and grouping description
+ - allow report generation without a proteinInfo object
+ - set report cache directory to 'cache' (instead of '.') by default
+ - 1.9.3.2:
+   - mascotParser2.pl: allow to skip modif-conversion with -no-modiconv
+   - mascotParser2.pl: set --lightXML as default
+   - report generation: set combn.method="versus.channel", which computes the ratios against the first channel
+   - various PDF report improvements
+ - 1.9.3.3:
+   - report tables are written into tables which are loaded with LTxtable
+      report generation takes longer now
+   - fixes in correct.peptide.ratios
+     - use combined protein group for peptide-protein mapping
+     - use only reporter proteins for mapping
+   - fix in creation of protein groups from template,
+      subset by peptide _and_ modif
+
+CHANGES IN VERSION 1.9.2
+------------------------
+ - fix issue of NA in 'n.spectra' when calculating summarized ratios
+ - various report improvements:
+   - use column of variable width to display class labels
+   - add attributes of quant table to summarized result table
+   - improved placement of tikz peptide group pictures
+
+CHANGES IN VERSION 1.7.6
+------------------------
+ - added TMT 10plex (contribution from Florent Gluck)
+ - fixed bugs with system.file not working on R < 2.11 (contribution from Florent Gluck)
+ - fixed bug in isobar-qc which was not working without normalize=TRUE
+ - added writeHscoreData for usage with Hscorer.py (MM Savitski, 2010)
+ - shQuote commands correctly - should fix issues running report generation on Windows
+ - added calculations and XLS tab for peptides with unsure localization of the modification site
+ - updated scripts for creating multi-sample reports (create.meta.reports)
+
+CHANGES IN VERSION 1.7.5
+------------------------
+ - fixed critical bugs: Excel report output had wrong ordering, ie ratios did
+   not correspond to the meta information [introduced in version 1.7.3].
+ - fix of real peptide names: Reexport I/L peptides in reports
+
+CHANGES IN VERSION 1.7.4
+------------------------
+ - improved MSGF+ search result import
+ - refactored report properties: all properties can now be defined in 
+    in the properties.R
+ - speed and memory usage improvements when creating wide XLS report
+ - ratio p-value adjustment now works per comparision instead of globally
+
+CHANGES IN VERSION 1.7.3
+------------------------
+ - fix wide XLS report format
+ - novel plot for ratio combinations in QC report
+    showing individual ratio distributions and 
+    significant ratios
+
+CHANGES IN VERSION 1.7.2
+------------------------
+ - added TMT 6plex masses to phosphoRS export script
+ - fixed mascot parsers
+ - MzIdentML version  1.1.0 support implemented [not fully tested]
+
+CHANGES IN VERSION 1.7.1
+------------------------
+ - fixed import of MzIdentML files from Mascot and ProteomeDiscoverer
+
+CHANGES IN VERSION 1.6.0
+------------------------
+ - added modules and functions for PTM quantification
+
+CHANGES IN VERSION 1.5.3
+------------------------
+ - parallelization support! Set options(isobar.parallel=TRUE) and 
+   register a cluster using registerDoMC or registerDoSNOW.
+   Used when creating ratio tables.
+
+
+CHANGES IN VERSION 1.5.2
+------------------------
+ - added MSGF+ tsv import [one-line-per-psm format]
+ - refactored various parts of the code (proteinRatios, report-utils, isobar-import)
+ - PTM XLS report: report significance for protein ratio, and peptide ratio
+
+CHANGES IN VERSION 1.5.1
+------------------------
+ - added molecular weight correction to emPAI and dNSAF
+ - added property 'ratiodistr.class.labels': biological variability can be 
+   calculated in the report with other labels
+ - improved PDF analysis report: added number of proteins in each section
+ - added location scale family T distribution as biological variability
+   distribution (distr class) and fitTlsd.
+ - better protein PDF analysis report layout.
+
+CHANGES IN VERSION 1.5
+------------------------
+ - Added modules for PTM validation and quantification
+   - Validation
+     - PhosphoRS XML import writers and outpout readers
+     - DeltaScore calculation when the data is provided
+   - Quantification
+     - All quantifications can be done now either on the protein level,
+       peptide level, or modified peptide level. For modified peptide level,
+       supply a matrix with a 'peptide' and 'modif' column to the 
+       appropriate functions.
+     - Correction of peptide ratios with protein ratios is possible. Also
+       the variance can be adjusted (assuming no or full correlation)
+   - Report generation
+     - Import PhosphoSitePlus or neXtProt information on modification sites
+
+CHANGES IN VERSION 1.3.0
+------------------------
+ - Rockerbox import (just define the XXX.dat.peptides.csv as identifications)
+ - possibility to define columns for XLS report in properties.R. e.g.
+   xls.report.columns <- c("ratio","is.significant",
+                           "ratio.minus.sd","ratio.plus.sd",
+                           "p.value.ratio","p.value.sample",
+                           "log2.ratio","log2.variance")
+
+CHANGES IN VERSION 1.1.3
+------------------------
+ - better matching of file patterns of peaklist and id in report
+ - tab2xls improvements: 
+   - fix when there are cells with preceeding colons - would think they are cell properties
+   - fix row limitation of 65536 - add new worksheet with remaining lines
+ - re-added ibspiked_set2 dataset as the xz requirement allows for additional data
+
+CHANGES IN VERSION 1.1.2
+------------------------
+
+ - fixed handling of divergent identifications in one search engine
+ - fixed number of spectra in isobar-analysis report
+ - fixed recently introduced error when reading mgf file
+ - identifications tab in XLS report is now in concise format
+   - shared peptides are colored in gray
+ - added xls report format = wide
+
+CHANGES IN VERSION 1.1.1
+------------------------
+
+NEW FEATURES:
+
+ - normalization can now be performed on individual channels (and channel pairs)
+ - added semi-quantitative Quantitation with emPAI, dNSAF and spectral count
+ - proteinInfo can now be gathered from Uniprot directly
+ - added reporter intensity plot shpwing effect of normalization
+ - added linear regression as ratio estimator
+ - improved MA plot: added 'Infinity' on the axis
+
+CHANGES IN VERSION 1.0.0
+------------------------
+
+ - first Bioconductor version (version bump to 1.0.0)!
+ - slot name reporterMasses is renamed to reporterTagMasses
+    to fix clash with method reporterMasses which fetches assayData(ibspectra)[["mass"]]
+ - slot name reporterNames is renamed to reporterTagNames
+    to distinguish from deprecated Biobase::reporterNames
+ - added option 'scan.lines' to readIBSpectra: read mgf files in parts
+    for large MGF files
+ - use a function for protein reporting: create.reports.R
+    properties.conf will be replaced by properties.R
+
+CHANGES IN VERSION 0.2.5
+------------------------
+
+ - MSnbase support: Added functions to coerce from MSnSet to IBSpectra and vice versa.
+   Added Msnbase to Suggests.
+ - support for multiple classes added
+ - updated Perl parsers: mascotParser2.pl and pidresParser2.pl instead of isobarXParser.pl
+   resulting XML files can be converted to id.csv using psx2tab2.pl
+ - prob otion for readIBSpectra worked errornous - fixed (thanks to Xavier Robin)
+ - added property use.na: Use NA values for quantification
+ - various Analysis Report beautifications (thanks to Xavier Robin)
+ - varous bug fixes
+
+
+CHANGES IN VERSION 0.2.4
+------------------------
+
+ - improved Vignette descriptions, added CITATION (still UTF-8 error)
+ - added possibility to revert Mascot escaped TITLEs
+ - if proteins are excluded w/ subsetIBSpectra, exclude all
+   it's peptides, not only reporter-specific ones
+ - fix error introduced in 0.2.3: When multiple MGFs were read,
+   an false error occured that not all id spectra could be matched
+ - add property 'author' for LaTeX reports
+ - section 'Significantly regulated proteins' not shown anymore by default
+   added property show.significant.proteins to reenable
+ - added properties isotope.impurities and fragment.outlier.prob
+ - bug fixes: 
+   - naming not correct when class labels contain NAs
+   - numeric class labels are not handled correctly
+ - added naRegion to noise model
+ - data is now stored before normalization. Those values are then used to normalize.
+   (Thanks to observation of Chris Bielow)
+
+CHANGES IN VERSION 0.2.3
+------------------------
+
+ - specify combination matrix for proteinRatios and in properties.conf
+ - improved logging of IBSpectra creation and normalization
+ - fix: maplot crashed on all NA channels
+ - NA names in PDF report section 'Not quantified proteins' removed
+ - allow for NA class labels - they are ignored in the comuptation of ratios
+
+CHANGES IN VERSION 0.2.2
+------------------------
+
+ - re-added ratio vs intensity plot in QC report
+ - issue warning when summarize property is incorrectly defined
+ - create cachedir if it does not exist 
+ - estimateRatio.group_specific_proteins renamed to quant.w.grouppeptides 
+ - sanitize analysisname, uniprotlink, and subsection names for LaTeX
+ - use fancyhdr instead of fanctheadings
+ - added argument require.reporter.specific to reporterProteins
+
+
+CHANGES IN VERSION 0.2.1
+------------------------
+
+ - Bug fix: as.data.frame generated ions/mass colnames with a 'X' in front
+
+
+CHANGES IN VERSION 0.2
+----------------------
+
+ - Published online with JPR Publication

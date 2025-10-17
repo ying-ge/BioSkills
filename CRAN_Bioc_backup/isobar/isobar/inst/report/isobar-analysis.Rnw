@@ -1,0 +1,209 @@
+% vim: set expandtab ts=2 sw=2:
+\SweaveOpts{eps=FALSE}
+\SweaveOpts{strip.white=false}
+<<initialization,echo=FALSE,results=hide>>=
+# this Rnw file should be called by create_reports.R. create_reports 
+# initializes the correct data objects to be used in the report.
+options(SweaveHooks=list(fig=function()
+         par(mar=c(5.1, 4.1, 1.1, 2.1))))
+suppressPackageStartupMessages(library(isobar))
+options(encoding="UTF-8")  
+
+load.tex.properties(.GlobalEnv) # loads environments 
+
+@
+\documentclass[10pt,oneside]{article}
+\usepackage[margin=2cm]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{verbatim}
+\usepackage{array}
+\usepackage{rotating}
+\usepackage{tikz}
+\usetikzlibrary{arrows,backgrounds,positioning,matrix,shapes.geometric}
+\tikzstyle{every picture}+=[remember picture]
+
+% hyper reference
+\usepackage{hyperref}
+\definecolor{darkblue}{rgb}{0,0,.35}
+\definecolor{darkred}{rgb}{0.25,0,0}
+\definecolor{darkgreen}{rgb}{0,0.25,0}
+\hypersetup{pdftex=true, colorlinks=true, breaklinks=true, linkcolor=darkblue, menucolor=darkblue, pagecolor=darkblue, urlcolor=darkblue}
+
+% tables
+\usepackage{ltxtable}
+\usepackage{bigstrut}
+\usepackage{multirow}
+\usepackage{ctable} % for midrule, etc
+%\setlength{\tabcolsep}{5pt} %default value: 6pt
+%\usepackage{varwidth} %for the varwidth minipage environment
+\newcolumntype{x}[1]{>{\raggedright}p{#1}}
+\newcolumntype{f}{>{\footnotesize}r} 
+
+<<echo=FALSE,results=tex,strip.white=FALSE>>=
+write.tex.commands() # prints analysisname, analysisauthor, and isobarthanks commands
+my.file <- system.file("report","report-utils.tex",package="isobar")
+if (my.file == "")
+ stop("Could not find file ISOBARDIR/report/report-utils.tex")
+
+cat(readLines(my.file),sep="\n")
+@
+
+<<definitions,echo=FALSE,results=tex>>=
+protein.group <- proteinGroup(ibspectra)
+protein.info <- proteinInfo(protein.group)
+isoforms <- protein.group@isoformToGeneProduct
+
+bndt <- 5
+bnd <- round(log10(bndt),1)
+cat(sprintf("\\newcommand{\\bnd}{%s}",bnd),"\n")
+cat(sprintf("\\newcommand{\\bndt}{%s}\n",bndt),"\n")
+
+if (!"class1" %in% colnames(quant.tbl)) quant.tbl[["class1"]] <- quant.tbl[["r1"]]
+if (!"class2" %in% colnames(quant.tbl)) quant.tbl[["class2"]] <- quant.tbl[["r2"]]
+cmbn <- t(unique(quant.tbl[,c("r1","r2")]))
+cmbn.class <- sanitize(t(unique(quant.tbl[,c("class1","class2")])))
+is.single.comparision <- ncol(cmbn) ==1
+
+cat(sprintf("\\newcommand{\\mr}[1]{\\multirow{%s}{*}{#1}}\n",ncol(cmbn)))
+cat(sprintf("\\newcommand{\\mrp}[1]{\\multirow{%s}{*}{\\parbox{\\linewidth}{#1}}}\n",ncol(cmbn)))
+@
+
+\makeatletter
+\renewcommand\paragraph{%
+   \@startsection{paragraph}{4}{0mm}%
+      {-\baselineskip}%
+      {.5\baselineskip}%
+      {\normalfont\normalsize\bfseries}}
+\makeatother
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\lfoot{\today}
+\cfoot{\thepage}
+\rfoot{\analysisname}
+
+\setlongtables
+\setlength\LTleft{0pt}
+\setlength\LTright{0pt}
+\renewcommand*{\arraystretch}{1.25}
+
+\title{Isobaric Tag Quantification Report\\ \analysisname\isobarthanks}
+\author{\analysisauthor}
+\date{\today}
+\raggedbottom
+\setcounter{tocdepth}{1}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% BEGIN DOCUMENT
+
+\begin{document}
+\maketitle
+
+%% Print class labels table, and column descriptions table
+<<echo=FALSE,results=tex>>=
+print_classlabels_tbl(classLabels(ibspectra),reporterTagNames(ibspectra))
+@
+\quad
+\grpdescriptionstbl{}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% SIGNIFICANT PROTEINS TABLE
+<<significantly.dfferent.proteins,echo=FALSE,results=tex>>=
+if (is.single.comparision) {
+  title.comp <- paste(cmbn.class[2,1],"/",cmbn.class[1,1])
+} else {
+  title.comp <- NULL
+}
+
+if (properties.env[["show.significant.proteins"]]) { 
+ 
+  cat("\\section{Significantly Regulated Proteins",title.comp,"}\n\n")
+  cat("\\secsubtitle{Number of significant proteins: ",
+      get_n_proteins(quant.tbl,sign=TRUE),"}\\vspace{.5cm}\n" )
+  
+  if (any(quant.tbl[["is.significant"]] == 1,na.rm=TRUE)) { 
+    print_sign_proteins_tbl(file="sign-proteins.tex",
+                        cmbn,protein.group,
+                        quant.tbl,
+                        my.protein.infos,bnd)
+  
+    cat("\\small\n")
+    cat("\\noindent\\LTXtable{\\textwidth}{sign-proteins.tex}\n")
+    cat("\\normalsize\n")
+    
+  } else {
+    cat ("No significantly regulated proteins present in sample.")
+  }
+}
+@
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% PROTEIN QUANTIFICATION TABLE
+<<echo=FALSE,results=tex>>=
+cat("\\section{Protein Relative Quantitation",title.comp,"}")
+cat("\\secsubtitle{Number of quantified proteins: ",
+    get_n_proteins(quant.tbl),"}\\vspace{.5cm}\n")
+@
+
+\subsection{Quantified Proteins}
+{
+ \setlength{\extrarowheight}{1.5pt}
+
+<<proteintbl,echo=FALSE,results=tex>>=
+
+print_protein_quant_tbl(file="protein-quant.tex",
+                    cmbn,protein.group,
+                    quant.tbl,
+                    my.protein.infos,bnd)
+
+cat("\\small\n")
+cat("\\noindent\\LTXtable{\\textwidth}{protein-quant.tex}\n")
+cat("\\normalsize\n")
+
+@
+}
+
+<<not.quantified,echo=FALSE,results=tex>>=
+tt <- table(quant.tbl[is.na(quant.tbl[["lratio"]]),"ac"])
+proteins.notquantified <- names(tt)[tt==ncol(cmbn)]
+
+if (length(proteins.notquantified) > 0) {
+cat("\\subsection{Not Quantified Proteins}\n")
+n.quant <- ddply(quant.tbl,c("class1","class2"),function(x) sum(is.na(x[["lratio"]])))
+cat("\\secsubtitle{Number of identified but not quantified proteins: ",
+    get_n_proteins(quant.tbl,is.na=TRUE),"}\\vspace{.5cm}")
+
+print_protein_notquant_tbl(file="protein-notquant.tex",
+                    cmbn,protein.group,
+                    quant.tbl,
+                    my.protein.infos)
+
+cat("\\small\n")
+cat("\\LTXtable{\\textwidth}{protein-notquant.tex}\n")
+cat("\\normalsize\n")
+}
+@
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% PROTEIN GROUP TABLE
+<<proteindetails,echo=FALSE,results=tex>>=
+if (properties.env[["show.protein.details"]]) {
+
+message("Writing protein group details ")
+print_protein_grp_info()
+
+proteins.n.group <- unique(quant.tbl[,c('ac','group')])
+proteins <- proteins.n.group[order(proteins.n.group[["group"]]),"ac"]
+print_protein_grp_tbl("protein-groups.tex",proteins,protein.group)
+
+cat("\\small\n")
+cat("\\LTXtable{\\textwidth}{protein-groups.tex}\n")
+cat("\\normalsize\n")
+
+}
+@
+
+\end{document}
