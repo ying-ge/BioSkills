@@ -1,0 +1,687 @@
+### =========================================================================
+### TxDb objects
+### -------------------------------------------------------------------------
+
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### TxDb class definition
+###
+
+## This is to try and tidy up before setRefClass()
+gc()
+
+### Concrete GenomicFeatures types
+.TxDb <-
+    setRefClass("TxDb", contains="AnnotationDb",
+        fields=list(user2seqlevels0="integer",
+                    user_seqlevels="character",
+                    user_genome="character",
+                    isActiveSeq="logical"),
+        methods=list(
+          initialize=function(...) {
+              callSuper(...)
+              if (length(dbListTables(conn) != 0L)) {
+                  chrominfo <- load_chrominfo(.self, set.col.class=TRUE)
+                  nseq <- length(chrominfo$chrom)
+                  .self$user2seqlevels0 <- seq_len(nseq)
+                  .self$user_seqlevels <- chrominfo$chrom
+                  .self$user_genome <- rep.int(load_genome(.self), nseq)
+                  ## deprecate isActiveSeq
+                  .self$isActiveSeq <- !logical(length(.self$user_seqlevels))
+              }
+          .self
+      }))
+
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### Low-level data loaders
+###
+### For internal use only (i.e. NOT exported)
+###
+
+load_genome <- function(txdb)
+{
+    SQL <- "SELECT value FROM metadata WHERE name='Genome'"
+    genome <- unlist(queryAnnotationDb(txdb, SQL), use.names=FALSE)
+    if (length(genome) == 0L)
+        genome <- NA_character_
+    genome
+}
+
+.format_chrominfo <- function(chrominfo, set.col.class=FALSE)
+{
+    COL2CLASS <- c(
+        chrom="character",
+        length="integer",
+        is_circular="logical"
+    )
+    if (is.null(chrominfo)) {
+        chrominfo <- makeZeroRowDataFrame(COL2CLASS)
+    } else {
+        if (!is.data.frame(chrominfo))
+            stop("'chrominfo' must be a data frame")
+        if (!identical(names(chrominfo), names(COL2CLASS)))
+            chrominfo <- chrominfo[names(COL2CLASS)]
+        if (set.col.class)
+            chrominfo <- setDataFrameColClass(chrominfo, COL2CLASS)
+    }
+    chrominfo
+}
+
+load_chrominfo <- function(txdb, set.col.class=FALSE)
+{
+    chrominfo <- TxDb_SELECT_from_chrominfo(txdb)
+    colnames(chrominfo) <- sub("^_", "", colnames(chrominfo))
+    .format_chrominfo(chrominfo, set.col.class=set.col.class)
+}
+
+.format_transcripts <- function(transcripts, drop.tx_name=FALSE,
+                                             drop.tx_type=FALSE,
+                                             set.col.class=FALSE)
+{
+    COL2CLASS <- c(
+        tx_id="integer",
+        tx_name="character",
+        tx_type="character",
+        tx_chrom="factor",
+        tx_strand="factor",
+        tx_start="integer",
+        tx_end="integer"
+    )
+    if (is.null(transcripts)) {
+        transcripts <- makeZeroRowDataFrame(COL2CLASS)
+    } else {
+        if (!is.data.frame(transcripts))
+            stop("'transcripts' must be a data frame")
+        if (!has_col(transcripts, "tx_name"))
+            COL2CLASS <- COL2CLASS[names(COL2CLASS) != "tx_name"]
+        if (!has_col(transcripts, "tx_type"))
+            COL2CLASS <- COL2CLASS[names(COL2CLASS) != "tx_type"]
+        if (!identical(names(transcripts), names(COL2CLASS)))
+            transcripts <- transcripts[names(COL2CLASS)]
+        if (set.col.class)
+            transcripts <- setDataFrameColClass(transcripts, COL2CLASS)
+    }
+    if (drop.tx_name && has_col(transcripts, "tx_name") &&
+                        all(is.na(transcripts$tx_name)))
+        transcripts$tx_name <- NULL
+    if (drop.tx_type && has_col(transcripts, "tx_type") &&
+                        all(is.na(transcripts$tx_type)))
+        transcripts$tx_type <- NULL
+    transcripts
+}
+
+load_transcripts <- function(txdb, drop.tx_name=FALSE,
+                                   drop.tx_type=FALSE,
+                                   set.col.class=FALSE)
+{
+    transcripts <- TxDb_SELECT_from_transcript(txdb)
+    colnames(transcripts) <- sub("^_", "", colnames(transcripts))
+    .format_transcripts(transcripts, drop.tx_name=drop.tx_name,
+                                     drop.tx_type=drop.tx_type,
+                                     set.col.class=set.col.class)
+}
+
+.format_splicings <- function(splicings, drop.exon_name=FALSE,
+                                         drop.cds_name=FALSE,
+                                         drop.cds_phase=FALSE,
+                                         set.col.class=FALSE)
+{
+    COL2CLASS <- c(
+        tx_id="integer",
+        exon_rank="integer",
+        exon_id="integer",
+        exon_name="character",
+        exon_chrom="factor",
+        exon_strand="factor",
+        exon_start="integer",
+        exon_end="integer",
+        cds_id="integer",
+        cds_name="character",
+        cds_start="integer",
+        cds_end="integer",
+        cds_phase="integer"
+    )
+    if (is.null(splicings)) {
+        splicings <- makeZeroRowDataFrame(COL2CLASS)
+    } else {
+        if (!is.data.frame(splicings))
+            stop("'splicings' must be a data frame")
+        if (!has_col(splicings, "cds_id"))
+            splicings$cds_id <- NA
+        if (!has_col(splicings, "cds_start"))
+            splicings$cds_start <- NA
+        if (!has_col(splicings, "cds_end"))
+            splicings$cds_end <- NA
+        if (!has_col(splicings, "exon_name"))
+            COL2CLASS <- COL2CLASS[names(COL2CLASS) != "exon_name"]
+        if (!has_col(splicings, "cds_name"))
+            COL2CLASS <- COL2CLASS[names(COL2CLASS) != "cds_name"]
+        if (!has_col(splicings, "cds_phase"))
+            COL2CLASS <- COL2CLASS[names(COL2CLASS) != "cds_phase"]
+        if (!identical(names(splicings), names(COL2CLASS)))
+            splicings <- splicings[names(COL2CLASS)]
+        if (set.col.class)
+            splicings <- setDataFrameColClass(splicings, COL2CLASS)
+    }
+    if (drop.exon_name && has_col(splicings, "exon_name") &&
+                          all(is.na(splicings$exon_name)))
+        splicings$exon_name <- NULL
+    if (drop.cds_name && has_col(splicings, "cds_name") &&
+                         all(is.na(splicings$cds_name)))
+        splicings$cds_name <- NULL
+    if (drop.cds_phase && has_col(splicings, "cds_phase") &&
+                         all(is.na(splicings$cds_phase)))
+        splicings$cds_phase <- NULL
+    splicings
+}
+
+load_splicings <- function(txdb, drop.exon_name=FALSE,
+                                 drop.cds_name=FALSE,
+                                 drop.cds_phase=FALSE,
+                                 set.col.class=FALSE)
+{
+    splicings <- TxDb_SELECT_from_splicings(txdb)
+    colnames(splicings) <- sub("^_", "", colnames(splicings))
+    .format_splicings(splicings, drop.exon_name=drop.exon_name,
+                                 drop.cds_name=drop.cds_name,
+                                 drop.cds_phase=drop.cds_phase,
+                                 set.col.class=set.col.class)
+}
+
+.format_genes <- function(genes, set.col.class=FALSE)
+{
+    COL2CLASS <- c(
+        tx_id="integer",
+        gene_id="character"
+    )
+    if (is.null(genes)) {
+        genes <- makeZeroRowDataFrame(COL2CLASS)
+    } else {
+        if (!is.data.frame(genes))
+            stop("'genes' must be a data frame")
+        if (!identical(names(genes), names(COL2CLASS)))
+            genes <- genes[names(COL2CLASS)]
+        if (set.col.class)
+            genes <- setDataFrameColClass(genes, COL2CLASS)
+    }
+    genes
+}
+
+load_genes <- function(txdb, set.col.class=FALSE)
+{
+    genes <- TxDb_SELECT_from_gene(txdb)
+    colnames(genes) <- sub("^_", "", colnames(genes))
+    .format_genes(genes, set.col.class=set.col.class)
+}
+
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### Validity of a TxDb object
+###
+
+### The table specified in a call to .valid.table.colnames() must have at
+### least the cols specified in 'colnames'. It's OK if it has more cols or
+### if it has them in a different order.
+
+### TODO: Add more checks!
+.valid.transcript.table <- function(conn)
+{
+    schema_version <- TxDb_schema_version(conn)
+    colnames <- TXDB_table_columns("transcript", schema_version=schema_version)
+    msg <- AnnotationDbi:::.valid.table.colnames(conn, "transcript", colnames)
+    if (!is.null(msg))
+        return(msg)
+    NULL
+}
+
+### TODO: Add more checks!
+.valid.exon.table <- function(conn)
+{
+    schema_version <- TxDb_schema_version(conn)
+    colnames <- TXDB_table_columns("exon", schema_version=schema_version)
+    msg <- AnnotationDbi:::.valid.table.colnames(conn, "exon", colnames)
+    if (!is.null(msg))
+        return(msg)
+    NULL
+}
+
+### TODO: Add more checks!
+.valid.cds.table <- function(conn)
+{
+    schema_version <- TxDb_schema_version(conn)
+    colnames <- TXDB_table_columns("cds", schema_version=schema_version)
+    msg <- AnnotationDbi:::.valid.table.colnames(conn, "cds", colnames)
+    if (!is.null(msg))
+        return(msg)
+    NULL
+}
+
+### TODO: Add more checks!
+.valid.splicing.table <- function(conn)
+{
+    schema_version <- TxDb_schema_version(conn)
+    colnames <- TXDB_table_columns("splicing", schema_version=schema_version)
+    msg <- AnnotationDbi:::.valid.table.colnames(conn, "splicing", colnames)
+    if (!is.null(msg))
+        return(msg)
+    NULL
+}
+
+### TODO: Add more checks!
+.valid.gene.table <- function(conn)
+{
+    colnames <- c("gene_id", "_tx_id")
+    msg <- AnnotationDbi:::.valid.table.colnames(conn, "gene", colnames)
+    if (!is.null(msg))
+        return(msg)
+    NULL
+}
+
+### TODO: Add more checks!
+.valid.chrominfo.table <- function(conn)
+{
+    colnames <- c("_chrom_id", "chrom", "length", "is_circular")
+    msg <- AnnotationDbi:::.valid.table.colnames(conn, "chrominfo", colnames)
+    if (!is.null(msg))
+        return(msg)
+    NULL
+}
+
+.valid.TxDb <- function(x)
+{
+    conn <- dbconn(x)
+
+    c(AnnotationDbi:::.valid.metadata.table(conn, DB_TYPE_NAME, DB_TYPE_VALUE),
+      .valid.transcript.table(conn),
+      .valid.exon.table(conn),
+      .valid.cds.table(conn),
+      .valid.splicing.table(conn),
+      .valid.gene.table(conn),
+      .valid.chrominfo.table(conn))
+}
+
+setValidity2("TxDb", .valid.TxDb)
+
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### Low-level constructor (not exported)
+###
+
+### Only used in makeTxDb().
+TxDb <- function(conn) .TxDb$new(conn=conn)
+
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### organism() getter
+###
+
+setMethod("organism", "TxDb",
+    function(object)
+    {
+        metadata <- metadata(object)
+        metadata <- setNames(metadata[ , "value"],
+                             tolower(metadata[ , "name"]))
+        unname(metadata["organism"])
+    }
+)
+
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### seqinfo() getter and setter
+###
+
+### Get the original seqlevels (i.e. extract them directly from the db).
+setMethod("seqlevels0", "TxDb",
+    function(x)
+    {
+        sql <- "SELECT chrom FROM chrominfo ORDER BY _chrom_id"
+        ans <- queryAnnotationDb(x, sql)[[1L]]
+        attr(ans, "seqlevels0") <- TRUE
+        ans
+    }
+)
+
+### Adapted from default "seqlevels<-" method defined in GenomeInfoDb.
+### We only support "renaming" and "strict subsetting" modes.
+.set_TxDb_seqlevels <-
+    function(x,
+             pruning.mode=c("error", "coarse", "fine", "tidy"),
+             value)
+{
+    x_seqlevels0 <- seqlevels0(x)  # "real" seqlevels (from the db)
+    if (identical(value, x_seqlevels0))
+        return(x$initialize())
+    x_seqlevels <- seqlevels(x)
+    ## First we compare the user-supplied seqlevels with 'x_seqlevels0' to
+    ## detect the situation where the user intention is to subset the "real"
+    ## seqlevels.
+    mode <- GenomeInfoDb:::getSeqlevelsReplacementMode(value, x_seqlevels0)
+    if (identical(mode, -2L)) {
+        ## "subsetting of the real seqlevels" mode
+        x$user2seqlevels0 <- match(value, x_seqlevels0)
+        x$user_seqlevels <- value
+        x$user_genome <- rep.int(load_genome(x), length(value))
+        return(x)
+    }
+    ## Then we compare the user-supplied seqlevels with the current user-
+    ## defined seqlevels.
+    new2old <- GenomeInfoDb:::getSeqlevelsReplacementMode(value, x_seqlevels)
+    if (identical(new2old, -3L)) {
+        ## "renaming of user-defined seqlevels" mode
+        x$user_seqlevels <- value
+        return(x)
+    }
+    if (identical(new2old, -2L) || identical(new2old, -1L)) {
+        ## "subsetting of user-defined seqlevels" mode
+        new2old <- match(value, x_seqlevels)
+    }
+    user2seqlevels0 <- x$user2seqlevels0[new2old]
+    user_genome <- x$user_genome[new2old]
+    na_idx <- which(is.na(user2seqlevels0))
+    if (length(na_idx) != 0L) {
+        user2seqlevels0[na_idx] <- match(value[na_idx], x_seqlevels0)
+        if (anyNA(user2seqlevels0))
+            stop(wmsg("adding seqlevels to a TxDb object is not supported"))
+        any_dup <- anyDuplicated(user2seqlevels0)
+        if (any_dup) {
+            idx0 <- user2seqlevels0[any_dup]
+            in1string <- paste(value[user2seqlevels0 == idx0], collapse=", ")
+            seqlevel0 <- x_seqlevels0[idx0]
+            stop(wmsg("more than one user-supplied seqlevels ",
+                      "(", in1string, ") refer to the same seqlevel ",
+                      "stored in the db (", seqlevel0, ")"))
+        }
+    }
+    x$user2seqlevels0 <- user2seqlevels0
+    x$user_seqlevels <- unname(value)
+    x$user_genome <- user_genome
+    x
+}
+
+setReplaceMethod("seqlevels", "TxDb", .set_TxDb_seqlevels)
+
+get_TxDb_seqinfo0 <- function(x)
+{
+    chrominfo <- load_chrominfo(x, set.col.class=TRUE)
+    genome <- load_genome(x)
+    Seqinfo(seqnames=chrominfo[ , "chrom"],
+            seqlengths=chrominfo[ , "length"],
+            isCircular=chrominfo[ , "is_circular"],
+            genome=genome)
+}
+
+.get_TxDb_seqinfo <- function(x)
+{
+    seqinfo0 <- get_TxDb_seqinfo0(x)
+    ans <- seqinfo0[seqlevels(seqinfo0)[x$user2seqlevels0]]
+    seqnames(ans) <- x$user_seqlevels
+    genome(ans) <- x$user_genome
+    ans
+}
+
+setMethod("seqinfo", "TxDb", .get_TxDb_seqinfo)
+
+### We implement a restricted seqinfo() setter for TxDb object 'x' that
+### supports altering **only** the seqlevels and/or genome of 'seqinfo(x)',
+### possibly in addition to subsetting 'seqinfo(x)' by dropping/reordering
+### some of its seqlevels. It does NOT allow altering the seqlengths or
+### circularity flags!
+### This is all we need to make the seqlevelsStyle() setter work on a
+### TxDb object.
+.normarg_new2old_and_check_new_seqinfo <-
+    function(new2old, new_seqinfo, old_seqinfo, context="")
+{
+    new_seqlevels <- seqlevels(new_seqinfo)
+    old_seqlevels <- seqlevels(old_seqinfo)
+    if (is.null(new2old)) {
+        if (!identical(new_seqlevels, old_seqlevels))
+            stop(wmsg("'new2old' must be specified when the supplied ",
+                      "'seqlevels' are not identical to the current ",
+                      "'seqlevels'"))
+        new2old <- seq_along(new_seqlevels)
+    } else {
+        new2old <- GenomeInfoDb:::normarg_new2old(new2old,
+                                                  length(new_seqlevels),
+                                                  length(old_seqlevels))
+        if (anyNA(new2old))
+            stop(wmsg("'new2old' cannot contain NAs", context))
+        old_seqinfo <- old_seqinfo[old_seqlevels[new2old]]
+        seqnames(old_seqinfo) <- new_seqlevels
+    }
+    genome(old_seqinfo) <- genome(new_seqinfo)
+    if (!identical(new_seqinfo, old_seqinfo))
+        stop(wmsg("seqlengths() and isCircular() of the supplied 'seqinfo' ",
+                  "must be identical to seqlengths() and isCircular() of ",
+                  "the current 'seqinfo'", context))
+    new2old
+}
+
+.set_TxDb_seqinfo <-
+    function(x, new2old=NULL,
+                pruning.mode=c("error", "coarse", "fine", "tidy"),
+                value)
+{
+    if (!is(value, "Seqinfo"))
+        stop(wmsg("the supplied 'seqinfo' must be a Seqinfo object"))
+    context <- paste0(" when replacing the 'seqinfo' of a ",
+                      classNameForDisplay(x), " object")
+    pruning.mode <- match.arg(pruning.mode)
+    if (pruning.mode != "error")
+        stop(wmsg("'pruning.mode' is not supported", context))
+    new2old <- .normarg_new2old_and_check_new_seqinfo(new2old,
+                                                      value, seqinfo(x),
+                                                      context)
+    x$user2seqlevels0 <- x$user2seqlevels0[new2old]
+    x$user_seqlevels <- seqlevels(value)
+    x$user_genome <- unname(genome(value))
+    x
+}
+
+setReplaceMethod("seqinfo", "TxDb", .set_TxDb_seqinfo)
+
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### isActiveSeq() getter and setter
+###
+
+setGeneric("isActiveSeq", function(x) standardGeneric("isActiveSeq"))
+
+## , msg="isActiveSeq is deprecated for Bioc 2.13 and above. Please see help(seqinfo) for an alternative approach."
+
+.isActiveSeq <- function(x){
+    ans <- x$isActiveSeq[x$user2seqlevels0]
+    names(ans) <- x$user_seqlevels
+    ans
+}
+setMethod("isActiveSeq", "TxDb",
+          function(x){
+              #.Deprecated("seqlevels", package="GenomicFeatures")
+              .isActiveSeq(x)
+          })
+
+setGeneric("isActiveSeq<-",
+    function(x, value) standardGeneric("isActiveSeq<-")
+)
+
+.mk_isActiveSeqReplacementValue <- function(x, value)
+{
+    if (!is.logical(value) || any(is.na(value)))
+        stop("the supplied 'isActiveSeq' must be a logical vector with no NAs")
+    x_isActiveSeq <- .isActiveSeq(x)
+    current_names <- names(x_isActiveSeq)
+    supplied_names <- names(value)
+    if (is.null(supplied_names)) {
+        if (length(value) != length(x_isActiveSeq))
+            stop("when unnamed, the supplied 'isActiveSeq' must ",
+                 "have the same length as the current 'isActiveSeq'")
+        names(value) <- current_names
+        return(value)
+    }
+    if (any(duplicated(supplied_names)))
+        stop("the supplied 'isActiveSeq' has duplicated names")
+    idx <- match(supplied_names, current_names)
+    if (any(is.na(idx)))
+        stop("the names of the supplied 'isActiveSeq' must ",
+             "match the names of the current 'isActiveSeq'")
+    x_isActiveSeq[idx] <- value
+    x_isActiveSeq
+}
+
+setReplaceMethod("isActiveSeq","TxDb",
+    function(x, value)
+    {
+        #.Deprecated("seqlevels", package="GenomicFeatures")
+        value <- .mk_isActiveSeqReplacementValue(x, value)
+        x$isActiveSeq[x$user2seqlevels0] <- unname(value)
+        x
+    }
+)
+
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### set_user_seqlevels_and_genome()
+###
+### Used by the TxDb extractors to correct the seqlevels of GRanges or
+### GRangesList object 'x' before it's returned to the user. The correction
+### is made according to the "user defined" and "active" seqlevels that are
+### currently set on TxDb object 'txdb'.
+### 'x' is assumed to have the original TxDb seqlevels on it.
+
+set_user_seqlevels_and_genome <- function(x, txdb)
+{
+    txdb_seqlevels0 <- seqlevels0(txdb)
+    stopifnot(setequal(txdb_seqlevels0, seqlevels(x)))
+    from_seqlevels <- txdb_seqlevels0[txdb$user2seqlevels0]
+    to_seqlevels <- txdb$user_seqlevels
+    new_seqlevels <- setNames(to_seqlevels, from_seqlevels)
+    new_seqlevels <- new_seqlevels[txdb$isActiveSeq[txdb$user2seqlevels0]]
+    seqlevels(x, pruning.mode="coarse") <- new_seqlevels
+    genome(x) <- genome(txdb)
+    x
+}
+
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### Comparing 2 TxDb objects
+###
+
+### Used in unit tests for makeTxDbFromGRanges().
+.format_txdb_dump <- function(transcripts=NULL,
+                              splicings=NULL,
+                              genes=NULL,
+                              chrominfo=NULL)
+{
+    transcripts <- .format_transcripts(transcripts, drop.tx_name=TRUE,
+                                                    drop.tx_type=TRUE,
+                                                    set.col.class=TRUE)
+    splicings <- .format_splicings(splicings, drop.exon_name=TRUE,
+                                              drop.cds_name=TRUE,
+                                              drop.cds_phase=TRUE,
+                                              set.col.class=TRUE)
+    genes <- .format_genes(genes, set.col.class=TRUE)
+    chrominfo <- .format_chrominfo(chrominfo, set.col.class=TRUE)
+    list(transcripts=transcripts, splicings=splicings,
+         genes=genes, chrominfo=chrominfo)
+}
+
+### Dump the entire db into a list of data frames, say 'txdb_dump', that can
+### then be used to recreate the original db with 'do.call(makeTxDb, txdb_dump)'
+### with no loss of information (except possibly for some of the metadata).
+### Note that the transcripts are dumped in the same order in all the
+### data frames.
+setMethod("as.list", "TxDb",
+    function(x, ...)
+    {
+        transcripts <- load_transcripts(x)
+        splicings <- load_splicings(x)
+        genes <- load_genes(x)
+        chrominfo <- load_chrominfo(x)
+        .format_txdb_dump(transcripts, splicings, genes, chrominfo)
+    }
+)
+
+compareTxDbs <- function(txdb1, txdb2)
+{
+    if (!is(txdb1, "TxDb") || !is(txdb2, "TxDb"))
+        stop("'txdb1' and 'txdb2' must be TxDb objects")
+    txdb1_dump <- as.list(txdb1)
+    txdb2_dump <- as.list(txdb2)
+    identical(txdb1_dump, txdb2_dump)
+}
+
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### Coercion
+###
+
+setMethod("asBED", "TxDb", function(x) {
+  exons_tx <- exonsBy(x)
+  cds_tx <- range(cdsBy(x))
+  exons_tx <- exons_tx[names(cds_tx)]
+  bed <- asBED(exons_tx)
+  mcols(bed)$thick <- unlist(ranges(cds_tx), use.names=FALSE)
+  bed
+})
+
+### This conversion to GFF doesn't handle the CDS phase information.
+### This will cause rtracklayer::export() to produce a GFF or GTF file where
+### the CDS phase information is missing. Even though rtracklayer::export()
+### can handle this (with a warning), this is invalid GFF!
+setMethod("asGFF", "TxDb", function(x) {
+  addPrefix <- function(ids, prefix) {
+    if (is(ids, "List"))
+      ids <- as(ids, "CharacterList")
+    prefix <- paste(prefix, ":", sep = "")
+    sub(paste("^|^", prefix, sep = ""), prefix, ids)
+  }
+
+  ## Make 'gene' GRanges.
+  tx_gene <- transcriptsBy(x)
+  gene <- unlist(range(tx_gene))
+  mcols(gene)$Parent <- CharacterList(character())
+  mcols(gene)$ID <- addPrefix(names(gene), "GeneID")
+  mcols(gene)$Name <- names(gene)
+  mcols(gene)$type <- "gene"
+
+  ## Make 'tx' GRanges.
+  tx <- transcripts(x, columns = c(Parent = "gene_id", ID = "tx_id",
+                         Name = "tx_name"))
+  mcols(tx)$Parent <- addPrefix(mcols(tx)$Parent, "GeneID")
+  mcols(tx)$ID <- addPrefix(mcols(tx)$ID, "TxID")
+  mcols(tx)$type <- "mRNA"
+
+  ## Make 'exon' GRanges.
+  exon <- exons(x, columns = c(Parent = "tx_id", Name = "exon_name"))
+  mcols(exon)$Parent <- addPrefix(mcols(exon)$Parent, "TxID")
+  mcols(exon)$ID <- NA
+  mcols(exon)$type <- "exon"
+  mcols(exon)$Parent <- as(mcols(exon)$Parent, "CharacterList")
+  mcols(exon) <- mcols(exon)[ , colnames(mcols(gene))]
+
+  ## Make 'cds' GRanges.
+  cds <- cds(x, columns = c(Parent = "tx_id", Name = "cds_name"))
+  mcols(cds)$Parent <- addPrefix(mcols(cds)$Parent, "TxID")
+  mcols(cds)$ID <- rep(NA, length(cds))
+  mcols(cds)$type <- rep("CDS", length(cds))
+  mcols(cds) <- mcols(cds)[ , colnames(mcols(gene))]
+
+  gff <- c(gene, tx, exon, cds)
+  names(gff) <- NULL
+  gff
+})
+
+setMethod(rtracklayer:::bestFileFormat, "TxDb", function(x) "gff3")
+
+setMethod("show", "TxDb",
+    function(object)
+    {
+        cat(class(object), "object:\n")
+        metadata <- metadata(object)
+        for (i in seq_len(nrow(metadata))) {
+            cat("# ", metadata[i, "name"], ": ", metadata[i, "value"],
+                "\n", sep="")
+        }
+    }
+)
+
