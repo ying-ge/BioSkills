@@ -18,6 +18,7 @@ fawda123/ggord
 IndrajeetPatil/ggstatsplot
 nicholasehamilton/ggtern
 gaospecial/ggVennDiagram
+lydiaMyr/ImmuCellAI@main
 Gibbsdavidl/Immune-Subtype-Clustering
 Gibbsdavidl/ImmuneSubtypeClassifier
 icbi-lab/Immunophenogram
