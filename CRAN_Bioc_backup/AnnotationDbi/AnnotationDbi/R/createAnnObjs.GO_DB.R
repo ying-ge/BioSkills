@@ -1,0 +1,310 @@
+### =========================================================================
+### An SQLite-based ann data package (AnnDbPkg) provides a set of pre-defined
+### AnnObj objects that are created at load-time. This set depends only on
+### the underlying db schema i.e. all the SQLite-based ann data packages that
+### share the same underlying db schema will provide the same set of AnnObj
+### objects.
+###
+### This file describes the set of AnnObj objects provided by any
+### GO_DB-based package i.e. any SQLite-based ann data package based
+### on the GO_DB schema.
+### The createAnnObjs.GO_DB() function is the main entry point for
+### this file: it is called by any GO_DB-based package at load-time.
+### -------------------------------------------------------------------------
+
+
+### Mandatory fields: objName, Class and L2Rchain
+GO_DB_AnnDbBimap_seeds <- list(
+#    list(
+#        objName="ENTREZID2GO",
+#        Class="GoAnnDbBimap",
+#        L2Rchain=list(
+#            list(
+#                tablename="go_gene",
+#                Lcolname="gene_id",
+#                tagname=c(Relationship_type="{relationship_type}"),
+#                Rcolname="_id"
+#            ),
+#            list(
+#                tablename="go_term",
+#                Lcolname="_id",
+#                Rcolname="go_id",
+#                Rattribnames=c(Ontology="{ontology}")
+#            )
+#        )
+#    ),
+#    ## TODO: Try to define the ENTREZID map as the reverse of ENTREZID2GO
+#    list(
+#        objName="ENTREZID",
+#        Class="AnnDbBimap",
+#        L2Rchain=list(
+#            list(
+#                tablename="go_term",
+#                Lcolname="go_id",
+#                Rcolname="_id"
+#            ),
+#            list(
+#                tablename="go_gene",
+#                Lcolname="_id",
+#                tagname=c(Relationship_type="{relationship_type}"),
+#                Rcolname="gene_id"
+#            )
+#        )
+#    ),
+#    list(
+#        objName="ALLENTREZID",
+#        Class="AnnDbBimap",
+#        L2Rchain=list(
+#            list(
+#                tablename="go_term",
+#                Lcolname="go_id",
+#                Rcolname="_id"
+#            ),
+#            list(
+#                tablename="go_all_gene",
+#                Lcolname="_id",
+#                tagname=c(Relationship_type="{relationship_type}"),
+#                Rcolname="gene_id"
+#            )
+#        )
+#    ),
+    list(
+        objName="BPPARENTS",
+        Class="AnnDbBimap",
+        L2Rchain=list(
+            list(
+                tablename="go_term",
+                Lcolname="go_id",
+                Rcolname="_id",
+                filter="{ontology}='BP'"
+            ),
+            list(
+                tablename="go_bp_parents",
+                Lcolname="_id",
+                tagname=c(RelationshipType="{relationship_type}"),
+                Rcolname="_parent_id"
+            ),
+            list(
+                tablename="go_term",
+                Lcolname="_id",
+                Rcolname="go_id"
+            )
+        )
+    ),
+    list(
+        objName="CCPARENTS",
+        Class="AnnDbBimap",
+        L2Rchain=list(
+            list(
+                tablename="go_term",
+                Lcolname="go_id",
+                Rcolname="_id",
+                filter="{ontology}='CC'"
+            ),
+            list(
+                tablename="go_cc_parents",
+                Lcolname="_id",
+                tagname=c(RelationshipType="{relationship_type}"),
+                Rcolname="_parent_id"
+            ),
+            list(
+                tablename="go_term",
+                Lcolname="_id",
+                Rcolname="go_id"
+            )
+        )
+    ),
+    list(
+        objName="MFPARENTS",
+        Class="AnnDbBimap",
+        L2Rchain=list(
+            list(
+                tablename="go_term",
+                Lcolname="go_id",
+                Rcolname="_id",
+                filter="{ontology}='MF'"
+            ),
+            list(
+                tablename="go_mf_parents",
+                Lcolname="_id",
+                tagname=c(RelationshipType="{relationship_type}"),
+                Rcolname="_parent_id"
+            ),
+            list(
+                tablename="go_term",
+                Lcolname="_id",
+                Rcolname="go_id"
+            )
+        )
+    ),
+    list(
+        objName="BPANCESTOR",
+        Class="AnnDbBimap",
+        L2Rchain=list(
+            list(
+                tablename="go_term",
+                Lcolname="go_id",
+                Rcolname="_id",
+                filter="{ontology}='BP'"
+            ),
+            list(
+                tablename="go_bp_offspring",
+                Lcolname="_offspring_id",
+                Rcolname="_id"
+            ),
+            list(
+                tablename="go_term",
+                Lcolname="_id",
+                Rcolname="go_id"
+            )
+        )
+    ),
+    list(
+        objName="CCANCESTOR",
+        Class="AnnDbBimap",
+        L2Rchain=list(
+            list(
+                tablename="go_term",
+                Lcolname="go_id",
+                Rcolname="_id",
+                filter="{ontology}='CC'"
+            ),
+            list(
+                tablename="go_cc_offspring",
+                Lcolname="_offspring_id",
+                Rcolname="_id"
+            ),
+            list(
+                tablename="go_term",
+                Lcolname="_id",
+                Rcolname="go_id"
+            )
+        )
+    ),
+    list(
+        objName="MFANCESTOR",
+        Class="AnnDbBimap",
+        L2Rchain=list(
+            list(
+                tablename="go_term",
+                Lcolname="go_id",
+                Rcolname="_id",
+                filter="{ontology}='MF'"
+            ),
+            list(
+                tablename="go_mf_offspring",
+                Lcolname="_offspring_id",
+                Rcolname="_id"
+            ),
+            list(
+                tablename="go_term",
+                Lcolname="_id",
+                Rcolname="go_id"
+            )
+        )
+    ),
+    list(
+        objName="TERM",
+        Class="GOTermsAnnDbBimap",
+        L2Rchain=list(
+            list(
+                tablename="go_term",
+                Lcolname="go_id",
+                Rcolname="go_id",
+                Rattribnames=c(
+                    Term="{term}",
+                    Ontology="{ontology}",
+                    Definition="{definition}",
+                    Synonym="go_synonym.synonym",
+                    Secondary="go_synonym.secondary"
+                ),
+                Rattrib_join="LEFT JOIN go_synonym ON {_id}=go_synonym._id"
+            )
+        )
+    ),
+    list(
+        objName="OBSOLETE",
+        Class="GOTermsAnnDbBimap",
+        L2Rchain=list(
+            list(
+                tablename="go_obsolete",
+                Lcolname="go_id",
+                Rcolname="go_id",
+                Rattribnames=c(
+                    Term="{term}",
+                    Ontology="{ontology}",
+                    Definition="{definition}",
+                    ## The RSQLite driver crashes on queries like
+                    ##   SELECT NULL, ... FROM ...
+                    ## so a temporary workaround is to use
+                    ##   SELECT '', ... FROM ...
+                    #Synonym="NULL",
+                    #Secondary="NULL"
+                    Synonym="''",
+                    Secondary="''"
+                )
+            )
+        )
+    ),
+    list(
+        objName="SYNONYM",
+        Class="GOTermsAnnDbBimap",
+        L2Rchain=list(
+            list(
+                tablename="go_synonym",
+                Lcolname="synonym",
+                Rcolname="_id",
+                filter="{like_go_id}=1"
+            ),
+            list(
+                tablename="go_term",
+                Lcolname="_id",
+                Rcolname="go_id",
+                Rattribnames=c(
+                    Term="{term}",
+                    Ontology="{ontology}",
+                    Definition="{definition}",
+                    Synonym="go_synonym.synonym",
+                    Secondary="go_synonym.secondary"
+                ),
+                Rattrib_join="LEFT JOIN go_synonym ON {_id}=go_synonym._id"
+            )
+        )
+    )
+)
+
+createAnnObjs.GO_DB <- function(prefix, objTarget, dbconn, datacache)
+{
+    checkDBSCHEMA(dbconn, "GO_DB")
+
+    ## AnnDbBimap objects
+    seed0 <- list(
+        objTarget=objTarget,
+        datacache=datacache
+    )
+    ann_objs <- createAnnDbBimaps(GO_DB_AnnDbBimap_seeds, seed0)
+
+    ## Reverse maps
+    revmap2 <- function(from, to)
+    {
+        map <- revmap(ann_objs[[from]], objName=to)
+        L2Rchain <- map@L2Rchain
+        tmp <- L2Rchain[[1]]@filter
+        L2Rchain[[1]]@filter <- L2Rchain[[length(L2Rchain)]]@filter
+        L2Rchain[[length(L2Rchain)]]@filter <- tmp
+        map@L2Rchain <- L2Rchain
+        map
+    }
+    ann_objs$BPCHILDREN <- revmap2("BPPARENTS", "BPCHILDREN")
+    ann_objs$CCCHILDREN <- revmap2("CCPARENTS", "CCCHILDREN")
+    ann_objs$MFCHILDREN <- revmap2("MFPARENTS", "MFCHILDREN")
+    ann_objs$BPOFFSPRING <- revmap2("BPANCESTOR", "BPOFFSPRING")
+    ann_objs$CCOFFSPRING <- revmap2("CCANCESTOR", "CCOFFSPRING")
+    ann_objs$MFOFFSPRING <- revmap2("MFANCESTOR", "MFOFFSPRING")
+
+    ## 1 special map that is not an AnnDbBimap object (just a named integer vector)
+    ann_objs$MAPCOUNTS <- createMAPCOUNTS(dbconn, prefix)
+
+    prefixAnnObjNames(ann_objs, prefix)
+}
+
