@@ -1,0 +1,13 @@
+bibentry(
+  bibtype="Article",
+  author = c(person(given="Yaohui", family="Zeng"),
+             person(given="Patrick", family="Breheny")),
+  title   = "The biglasso Package: A Memory- and Computation-Efficient Solver for Lasso Model Fitting with Big Data in R",
+  journal = "R Journal",
+  eprint  = "1701.05936",
+  year = "2021",
+  number  = "2",
+  pages   = "6--19",
+  volume  = "12",
+  doi = "10.32614/RJ-2021-001",
+  url = "https://doi.org/10.32614/RJ-2021-001")
