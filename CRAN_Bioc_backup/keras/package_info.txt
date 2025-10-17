@@ -1,0 +1,7 @@
+Package: keras
+Version: 2.16.0
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/keras_2.16.0.tar.gz
+Size: 3.39 MB
+Download Date: 2025-10-17
+

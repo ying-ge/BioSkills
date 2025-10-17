@@ -1,0 +1,7 @@
+Package: targets
+Version: 1.11.4
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/targets_1.11.4.tar.gz
+Size: 0.74 MB
+Download Date: 2025-10-17
+

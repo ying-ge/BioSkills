@@ -1,0 +1,7 @@
+Package: torch
+Version: 0.16.1
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/torch_0.16.1.tar.gz
+Size: 1.81 MB
+Download Date: 2025-10-17
+

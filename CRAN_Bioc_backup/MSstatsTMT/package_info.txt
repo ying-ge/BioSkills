@@ -1,0 +1,7 @@
+Package: MSstatsTMT
+Version: 2.10.0
+Source: Bioconductor BioCsoft
+URL: https://bioconductor.org/packages/3.18/bioc/src/contrib/MSstatsTMT_2.10.0.tar.gz
+Size: 1.52 MB
+Download Date: 2025-10-17
+

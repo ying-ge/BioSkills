@@ -1,0 +1,7 @@
+Package: brms
+Version: 2.23.0
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/brms_2.23.0.tar.gz
+Size: 4.95 MB
+Download Date: 2025-10-17
+

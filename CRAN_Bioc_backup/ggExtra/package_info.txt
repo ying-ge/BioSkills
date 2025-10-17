@@ -1,0 +1,7 @@
+Package: ggExtra
+Version: 0.11.0
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/ggExtra_0.11.0.tar.gz
+Size: 0.83 MB
+Download Date: 2025-10-17
+

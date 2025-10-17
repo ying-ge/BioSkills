@@ -1,0 +1,7 @@
+Package: ggformula
+Version: 1.0.0
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/ggformula_1.0.0.tar.gz
+Size: 6.92 MB
+Download Date: 2025-10-17
+

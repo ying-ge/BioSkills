@@ -1,0 +1,7 @@
+Package: bookdown
+Version: 0.45
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/bookdown_0.45.tar.gz
+Size: 0.82 MB
+Download Date: 2025-10-17
+

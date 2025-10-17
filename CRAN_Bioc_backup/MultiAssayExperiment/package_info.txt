@@ -1,0 +1,7 @@
+Package: MultiAssayExperiment
+Version: 1.28.0
+Source: Bioconductor BioCsoft
+URL: https://bioconductor.org/packages/3.18/bioc/src/contrib/MultiAssayExperiment_1.28.0.tar.gz
+Size: 1.13 MB
+Download Date: 2025-10-17
+

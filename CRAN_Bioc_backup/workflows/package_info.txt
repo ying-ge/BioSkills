@@ -1,0 +1,7 @@
+Package: workflows
+Version: 1.3.0
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/workflows_1.3.0.tar.gz
+Size: 0.11 MB
+Download Date: 2025-10-17
+

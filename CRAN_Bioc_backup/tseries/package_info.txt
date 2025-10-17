@@ -1,0 +1,7 @@
+Package: tseries
+Version: 0.10-58
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/tseries_0.10-58.tar.gz
+Size: 0.16 MB
+Download Date: 2025-10-17
+

@@ -1,0 +1,7 @@
+Package: circRNAprofiler
+Version: 1.16.0
+Source: Bioconductor BioCsoft
+URL: https://bioconductor.org/packages/3.18/bioc/src/contrib/circRNAprofiler_1.16.0.tar.gz
+Size: 3.57 MB
+Download Date: 2025-10-17
+

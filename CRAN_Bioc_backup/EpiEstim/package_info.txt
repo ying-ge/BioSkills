@@ -1,0 +1,7 @@
+Package: EpiEstim
+Version: 2.2-5
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/EpiEstim_2.2-5.tar.gz
+Size: 0.57 MB
+Download Date: 2025-10-17
+

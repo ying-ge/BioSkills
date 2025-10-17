@@ -1,0 +1,7 @@
+Package: flexdashboard
+Version: 0.6.2
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/flexdashboard_0.6.2.tar.gz
+Size: 0.29 MB
+Download Date: 2025-10-17
+

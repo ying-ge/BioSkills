@@ -1,0 +1,7 @@
+Package: agricolae
+Version: 1.3-7
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/agricolae_1.3-7.tar.gz
+Size: 0.55 MB
+Download Date: 2025-10-17
+

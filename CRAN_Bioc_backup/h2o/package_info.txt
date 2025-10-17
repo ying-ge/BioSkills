@@ -1,0 +1,7 @@
+Package: h2o
+Version: 3.44.0.3
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/h2o_3.44.0.3.tar.gz
+Size: 0.64 MB
+Download Date: 2025-10-17
+

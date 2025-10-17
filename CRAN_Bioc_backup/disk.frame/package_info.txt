@@ -1,0 +1,7 @@
+Package: disk.frame
+Version: 0.8.3
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/disk.frame_0.8.3.tar.gz
+Size: 0.77 MB
+Download Date: 2025-10-17
+

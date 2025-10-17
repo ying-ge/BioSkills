@@ -1,0 +1,7 @@
+Package: multiMiR
+Version: 1.24.0
+Source: Bioconductor BioCsoft
+URL: https://bioconductor.org/packages/3.18/bioc/src/contrib/multiMiR_1.24.0.tar.gz
+Size: 0.32 MB
+Download Date: 2025-10-17
+

@@ -1,0 +1,7 @@
+Package: rayshader
+Version: 0.37.3
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/rayshader_0.37.3.tar.gz
+Size: 2.73 MB
+Download Date: 2025-10-17
+

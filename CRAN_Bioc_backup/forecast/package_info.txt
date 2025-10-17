@@ -1,0 +1,7 @@
+Package: forecast
+Version: 8.24.0
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/forecast_8.24.0.tar.gz
+Size: 0.55 MB
+Download Date: 2025-10-17
+

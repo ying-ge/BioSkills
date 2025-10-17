@@ -1,0 +1,7 @@
+Package: packrat
+Version: 0.9.3
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/packrat_0.9.3.tar.gz
+Size: 0.36 MB
+Download Date: 2025-10-17
+

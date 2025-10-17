@@ -1,0 +1,7 @@
+Package: sna
+Version: 2.8
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/sna_2.8.tar.gz
+Size: 0.29 MB
+Download Date: 2025-10-17
+

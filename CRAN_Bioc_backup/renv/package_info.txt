@@ -1,0 +1,7 @@
+Package: renv
+Version: 1.1.5
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/renv_1.1.5.tar.gz
+Size: 1.20 MB
+Download Date: 2025-10-17
+

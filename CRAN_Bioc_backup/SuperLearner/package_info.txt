@@ -1,0 +1,7 @@
+Package: SuperLearner
+Version: 2.0-29
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/SuperLearner_2.0-29.tar.gz
+Size: 0.50 MB
+Download Date: 2025-10-17
+

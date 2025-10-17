@@ -1,0 +1,7 @@
+Package: raster
+Version: 3.6-32
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/raster_3.6-32.tar.gz
+Size: 0.55 MB
+Download Date: 2025-10-17
+

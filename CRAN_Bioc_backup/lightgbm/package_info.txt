@@ -1,0 +1,7 @@
+Package: lightgbm
+Version: 4.6.0
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/lightgbm_4.6.0.tar.gz
+Size: 1.64 MB
+Download Date: 2025-10-17
+

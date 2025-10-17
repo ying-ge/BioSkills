@@ -1,0 +1,7 @@
+Package: faraway
+Version: 1.0.9
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/faraway_1.0.9.tar.gz
+Size: 0.48 MB
+Download Date: 2025-10-17
+

@@ -1,0 +1,7 @@
+Package: timetk
+Version: 2.9.1
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/timetk_2.9.1.tar.gz
+Size: 3.77 MB
+Download Date: 2025-10-17
+

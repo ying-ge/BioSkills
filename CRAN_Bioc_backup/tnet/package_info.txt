@@ -1,0 +1,7 @@
+Package: tnet
+Version: 3.0.16
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/tnet_3.0.16.tar.gz
+Size: 0.59 MB
+Download Date: 2025-10-17
+

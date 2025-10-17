@@ -1,0 +1,7 @@
+Package: zoo
+Version: 1.8-14
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/zoo_1.8-14.tar.gz
+Size: 0.74 MB
+Download Date: 2025-10-17
+

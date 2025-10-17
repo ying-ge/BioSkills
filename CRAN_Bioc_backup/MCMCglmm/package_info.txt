@@ -1,0 +1,7 @@
+Package: MCMCglmm
+Version: 2.36
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/MCMCglmm_2.36.tar.gz
+Size: 0.16 MB
+Download Date: 2025-10-17
+

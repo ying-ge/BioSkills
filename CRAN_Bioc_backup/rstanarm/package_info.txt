@@ -1,0 +1,7 @@
+Package: rstanarm
+Version: 2.32.2
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/rstanarm_2.32.2.tar.gz
+Size: 3.81 MB
+Download Date: 2025-10-17
+

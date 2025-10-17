@@ -1,0 +1,7 @@
+Package: cellHTS2
+Version: 2.66.0
+Source: Bioconductor BioCsoft
+URL: https://bioconductor.org/packages/3.18/bioc/src/contrib/cellHTS2_2.66.0.tar.gz
+Size: 2.83 MB
+Download Date: 2025-10-17
+

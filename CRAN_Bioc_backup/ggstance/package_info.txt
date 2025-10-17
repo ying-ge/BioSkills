@@ -1,0 +1,7 @@
+Package: ggstance
+Version: 0.3.7
+Source: CRAN
+URL: https://cloud.r-project.org/src/contrib/ggstance_0.3.7.tar.gz
+Size: 0.12 MB
+Download Date: 2025-10-17
+
