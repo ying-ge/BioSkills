@@ -1,0 +1,39 @@
+Package: tRNA
+Title: Analyzing tRNA sequences and structures
+Version: 1.20.1
+Date: 2024-01-17
+Authors@R: person("Felix GM", 
+                  "Ernst",
+                  email = "felix.gm.ernst@outlook.com",
+                  role = c("aut", "cre"),
+                  comment = c(ORCID = "0000-0001-5064-0928"))
+Description: 
+    The tRNA package allows tRNA sequences and structures to be accessed and
+    used for subsetting. In addition, it provides visualization tools
+    to compare feature parameters of multiple tRNA sets and correlate them to
+    additional data. The tRNA package uses GRanges objects as inputs requiring
+    only few additional column data sets.
+License: GPL-3 + file LICENSE
+Encoding: UTF-8
+LazyData: true
+biocViews: Software, Visualization
+Depends: R (>= 3.5), GenomicRanges, Structstrings
+Imports: stringr, S4Vectors, methods, BiocGenerics, IRanges, XVector,
+        Biostrings, Modstrings, ggplot2, scales
+Suggests: knitr, rmarkdown, testthat, BiocStyle, tRNAscanImport
+Collate: 'tRNA.R' 'AllGenerics.R' 'tRNA-checks.R' 'tRNA-dotbracket.R'
+        'tRNA-features.R' 'tRNA-plot.R' 'tRNA-sequences.R'
+        'tRNA-structures.R' 'tRNA-subset.R' 'tRNA-utils.R' 'utils.R'
+VignetteBuilder: knitr
+RoxygenNote: 7.2.3
+BugReports: https://github.com/FelixErnst/tRNA/issues
+git_url: https://git.bioconductor.org/packages/tRNA
+git_branch: RELEASE_3_18
+git_last_commit: 72864e7
+git_last_commit_date: 2024-01-17
+Repository: Bioconductor 3.18
+Date/Publication: 2024-01-18
+NeedsCompilation: no
+Packaged: 2024-01-19 00:42:10 UTC; biocbuild
+Author: Felix GM Ernst [aut, cre] (<https://orcid.org/0000-0001-5064-0928>)
+Maintainer: Felix GM Ernst <felix.gm.ernst@outlook.com>

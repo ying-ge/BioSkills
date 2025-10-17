@@ -1,0 +1,231 @@
+---
+title: "Analyzing tRNA sequences and structures"
+author: "Felix G.M. Ernst"
+date: "`r Sys.Date()`"
+package: tRNA
+abstract: >
+  Example of importing tRNAdb output as GRanges
+output:
+  BiocStyle::html_document:
+    toc: true
+    toc_float: true
+    df_print: paged
+vignette: >
+  %\VignetteIndexEntry{tRNA}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+bibliography: references.bib
+---
+
+```{r style, echo = FALSE, results = 'asis'}
+BiocStyle::markdown(css.files = c('custom.css'))
+```
+
+# Introduction
+
+The `tRNA` package provides access to tRNA feature information for subsetting
+and visualization. Visualization functions are implemented to compare feature
+parameters of multiple tRNA sets and to correlate them to additional data.
+
+As input the package expects a `GRanges` object with certain metadata columns.
+The following columns are required: `tRNA_length`, `tRNA_type`,
+`tRNA_anticodon`, `tRNA_seq`, `tRNA_str`, `tRNA_CCA.end`. The `tRNA_str` column
+must contain a valid dot bracket annotation. For more details please have a look
+at the vignette of the `Structstrings` package.
+
+# Loading tRNA information
+
+To work with the `tRNA` package, tRNA information can be retrieved or loaded 
+into a R session in a number of ways:
+
+  1. A `GRanges` object can be constructed manually containing the required 
+  colums mentioned above.
+  2. a tRNAscan result file can be loaded using the function
+  `import.tRNAscanAsGRanges()` from the `tRNAscanImport` package
+  3. selected tRNA information can be retrieved using the function
+  `import.tRNAdb()` from the `tRNAdbImport` package
+
+For the examples in this vignette a number of predefined `GRanges` objects are 
+loaded.
+
+```{r, echo=FALSE}
+suppressPackageStartupMessages({
+  library(tRNA)
+  library(Structstrings)
+})
+data("gr", package = "tRNA")
+```
+
+```{r, eval=FALSE}
+library(tRNA)
+library(Structstrings)
+data("gr", package = "tRNA")
+```
+
+# tRNA sequences and structures
+
+To retrieve the sequences for individual tRNA structure elements the functions
+`gettRNAstructureGRanges` or `gettRNAstructureSeqs` can be used. Several
+optional arguments can be used to modify the result (See 
+`?gettRNAstructureSeqs`).
+
+```{r}
+# just get the coordinates of the anticodonloop
+gettRNAstructureGRanges(gr, structure = "anticodonLoop")
+gettRNAstructureSeqs(gr, joinFeatures = TRUE, structure = "anticodonLoop")
+```
+
+In addition, the sequences can be returned already joined to get a fully blank
+padded set of sequences. The boundaries of the individual structures is returned
+as metadata of the `RNAStringSet` object.
+
+```{r}
+seqs <- gettRNAstructureSeqs(gr[1L:10L], joinCompletely = TRUE)
+seqs
+# getting the tRNA structure boundaries
+metadata(seqs)[["tRNA_structures"]]
+```
+
+Be aware, that `gettRNAstructureGRanges` and `gettRNAstructureSeqs` might not be
+working as expected, if the tRNA sequences in questions are armless or deviate
+drastically from the canonical tRNA model. The functions in the `tRNA` packages
+were thouroughly tested using human mitochondrial tRNA and other tRNAs missing
+certain features. However, for fringe cases results may differ. If you encounter
+such a case, please report it with an example.
+
+# Subsetting tRNA sequences
+
+Structure information of the tRNA can be queried for subsetting using several
+functions. For the following examples the functions `hasAccpeptorStem` and 
+`hasDloop` are used.
+
+```{r echo=TRUE, results="hide"}
+gr[hasAcceptorStem(gr, unpaired = TRUE)]
+# mismatches and bulged are subsets of unpaired
+gr[hasAcceptorStem(gr, mismatches = TRUE)]
+gr[hasAcceptorStem(gr, bulged = TRUE)]
+# combination of different structure parameters
+gr[hasAcceptorStem(gr, mismatches = TRUE) & 
+     hasDloop(gr, length = 8L)]
+```
+
+Please have a look at the man page `?hasAccpeptorStem` for all available 
+subsetting functions.
+
+# Visualization
+
+To get an overview of tRNA features and compare different datasets, the function
+`gettRNAFeaturePlots` is used. It accepts a named `GRangesList` as input.
+Internally it will calculate a list of features values based on the functions
+mentioned above and the data contained in the mcols of the `GRanges` objects.
+
+```{r}
+# load tRNA data for E. coli and H. sapiens
+data("gr_eco", package = "tRNA")
+data("gr_human", package = "tRNA")
+
+# get summary plots
+grl <- GRangesList(Sce = gr,
+                   Hsa = gr_human,
+                   Eco = gr_eco)
+plots <- gettRNAFeaturePlots(grl)
+```
+```{r plot1, fig.cap = "tRNA length."}
+plots$length
+```
+```{r plot2, fig.cap = "tRNAscan-SE scores."}
+plots$tRNAscan_score
+```
+```{r plot3, fig.cap = "tRNA GC content."}
+plots$gc
+```
+```{r plot4, fig.cap = "tRNAs with introns."}
+plots$tRNAscan_intron
+```
+```{r plot5, fig.cap = "Length of the variable loop."}
+plots$variableLoop_length
+```
+
+To access the results without generating plots, use the function 
+`gettRNASummary`.
+
+To check whether features correlate with additional scores, optional arguments
+can be added to `gettRNAFeaturePlots` or used from the `score` column of the
+`GRanges` objects. For the first case a list of scores with the same dimensions
+as the `GRangesList` object has to be provided as the argument `scores`. For the
+latter case, just set the argument `plotScore = TRUE`.
+
+```{r, eval=FALSE}
+# score column will be used
+plots <- gettRNAFeaturePlots(grl, plotScores = TRUE)
+```
+```{r}
+plots <- gettRNAFeaturePlots(grl,
+                             scores = list(runif(length(grl[[1L]]),0L,100L),
+                                           runif(length(grl[[2L]]),0L,100L),
+                                           runif(length(grl[[3L]]),0L,100L)))
+```
+```{r plot6, fig.cap = "tRNA length and score correlation."}
+plots$length
+```
+```{r plot7, fig.cap = "variable loop length and score correlation."}
+plots$variableLoop_length
+```
+
+Since all plots returned by the functions mentioned above are `ggplot2` objects,
+they can be modified manually and changed to suit your needs.
+
+```{r plot8, fig.cap = "Customized plot switching out the point and violin plot into a boxplot."}
+plots$length$layers <- plots$length$layers[c(-1L,-2L)]
+plots$length + ggplot2::geom_boxplot()
+```
+
+In addition, the data of the plots can be accessed directly.
+
+```{r}
+head(plots$length$data)
+```
+
+# Options
+
+The colours of the plots can be customized directly on creation with the 
+following options.
+
+```{r}
+options("tRNA_colour_palette")
+options("tRNA_colour_yes")
+options("tRNA_colour_no")
+```
+
+# Dot bracket annotation
+
+To retrieve detailed information on the base pairing the function
+`gettRNABasePairing()` is used. Internally this will construct a
+`DotBracketStringSet` from the `tRNA_str` column, if this column does not
+already contain a `DotBracketStringSet`. It is then passed on to the
+`Structstrings::getBasePairing` function.
+
+A valid DotBracket annotation is expected to contain only pairs of `<>{}[]()`
+and the `.` character (Please note the orientation. For `<>` the orientation is
+variable, since the tRNAscan files use the `><` annotation by default. However
+upon creation of a `DotBracketStringSet` this annotation will be converted).
+
+```{r}
+head(gettRNABasePairing(gr)[[1L]])
+head(getBasePairing(gr[1L]$tRNA_str)[[1L]])
+```
+
+The loop ids for the structure elements can be retrieved with the
+`gettRNALoopIDs()` function, which relies on the `Structstrings::getLoopIndices`
+function. (For more details, please have a look at the `?getLoopIndices`)
+
+```{r}
+gettRNALoopIDs(gr)[[1L]]
+getLoopIndices(gr[1L]$tRNA_str)
+```
+
+# Session info
+
+```{r}
+sessionInfo()
+```
