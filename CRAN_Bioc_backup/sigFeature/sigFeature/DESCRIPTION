@@ -1,0 +1,39 @@
+Package: sigFeature
+Type: Package
+Title: sigFeature: Significant feature selection using SVM-RFE &
+        t-statistic
+Version: 1.20.0
+Date: 2021-11-21
+Authors@R: c(person("Pijush Das", "Developer", role = c("aut", "cre"),
+              email = "topijush@gmail.com"),
+              person("Dr. Susanta Roychudhury", "User", role = "ctb"),
+              person("Dr. Sucheta Tripathy", "User", role = "ctb",
+              email = "tsucheta@iicb.res.in"))
+Depends: R (>= 3.5.0)
+Suggests: RUnit, BiocGenerics, knitr, rmarkdown
+Description: This package provides a novel feature selection algorithm for binary 
+             classification using support vector machine recursive feature elimination 
+             SVM-RFE and t-statistic. In this feature selection process, the selected 
+             features are differentially significant between the two classes and also 
+             they are good classifier with higher degree of classification accuracy.
+License: GPL (>= 2)
+Encoding: UTF-8
+LazyData: TRUE
+biocViews: FeatureExtraction, GeneExpression, Microarray,
+        Transcription, mRNAMicroarray, GenePrediction, Normalization,
+        Classification, SupportVectorMachine
+Imports: biocViews, nlme, e1071, openxlsx, pheatmap, RColorBrewer,
+        Matrix, SparseM, graphics, stats, utils, SummarizedExperiment,
+        BiocParallel, methods
+VignetteBuilder: knitr
+git_url: https://git.bioconductor.org/packages/sigFeature
+git_branch: RELEASE_3_18
+git_last_commit: 2510522
+git_last_commit_date: 2023-10-24
+Date/Publication: 2023-10-24
+NeedsCompilation: no
+Packaged: 2023-10-24 23:03:47 UTC; biocbuild
+Author: Pijush Das Developer [aut, cre],
+  Dr. Susanta Roychudhury User [ctb],
+  Dr. Sucheta Tripathy User [ctb]
+Maintainer: Pijush Das Developer <topijush@gmail.com>
