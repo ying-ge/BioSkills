@@ -1,0 +1,42 @@
+Package: NetPathMiner
+Version: 1.38.0
+Date: 2014 onwards
+Title: NetPathMiner for Biological Network Construction, Path Mining
+        and Visualization
+Authors@R: c(
+    person("Ahmed", "Mohamed", , "mohamed@kuicr.kyoto-u.ac.jp", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0001-6507-5300")),
+    person("Tim", "Hancock", , "timothy.hancock@kuicr.kyoto-u.ac.jp", role = c("aut")),
+    person("Tim", "Hancock", , "timothy.hancock@kuicr.kyoto-u.ac.jp", role = c("aut"))
+    )
+Description: NetPathMiner is a general framework for network path
+    mining using genome-scale networks. It constructs networks from
+    KGML, SBML and BioPAX files, providing three network
+    representations, metabolic, reaction and gene representations.
+    NetPathMiner finds active paths and applies machine learning
+    methods to summarize found paths for easy interpretation. It
+    also provides static and interactive visualizations of networks
+    and paths to aid manual investigation.
+Depends: R (>= 3.0.2), igraph (>= 1.0)
+Suggests: rBiopaxParser (>= 2.1), RCurl, graph, knitr, rmarkdown,
+        BiocStyle
+VignetteBuilder: knitr
+License: GPL (>= 2)
+URL: https://github.com/ahmohamed/NetPathMiner
+NeedsCompilation: yes
+SystemRequirements: libxml2, libSBML (>= 5.5)
+Biarch: TRUE
+biocViews: GraphAndNetwork, Pathways, Network, Clustering,
+        Classification
+RoxygenNote: 6.1.1
+Encoding: UTF-8
+git_url: https://git.bioconductor.org/packages/NetPathMiner
+git_branch: RELEASE_3_18
+git_last_commit: 3116490
+git_last_commit_date: 2023-10-24
+Date/Publication: 2023-10-24
+Packaged: 2023-10-24 22:08:11 UTC; biocbuild
+Author: Ahmed Mohamed [aut, cre] (<https://orcid.org/0000-0001-6507-5300>),
+  Tim Hancock [aut],
+  Tim Hancock [aut]
+Maintainer: Ahmed Mohamed <mohamed@kuicr.kyoto-u.ac.jp>
