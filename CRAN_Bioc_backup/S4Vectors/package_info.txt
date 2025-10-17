@@ -3,5 +3,5 @@ Version: 0.40.2
 Source: Bioconductor BioCsoft
 URL: https://bioconductor.org/packages/3.18/bioc/src/contrib/S4Vectors_0.40.2.tar.gz
 Size: 0.80 MB
-Download Date: 2025-10-14
+Download Date: 2025-10-17
 
