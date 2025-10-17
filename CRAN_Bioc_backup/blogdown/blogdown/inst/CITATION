@@ -1,0 +1,23 @@
+year = sub('.*(2[[:digit:]]{3})-.*', '\\1', meta$Date, perl = TRUE)
+vers = paste('R package version', meta$Version)
+if (length(year) == 0) year = format(Sys.Date(), '%Y')
+
+bibentry(
+  'Manual',
+  title = paste(meta$Package, meta$Title, sep =": "),
+  author = Filter(function(p) 'aut' %in% p$role, as.person(meta$Author)),
+  year = year,
+  note = vers,
+  url = strsplit(meta$URL, ',')[[1]][1]
+)
+
+bibentry(
+  'Book',
+  title = 'blogdown: Creating Websites with {R} Markdown',
+  author = as.person('Yihui Xie [aut], Alison Presmanes Hill [aut], Amber Thomas [aut]'),
+  publisher = 'Chapman and Hall/CRC',
+  address = 'Boca Raton, Florida',
+  year = '2017',
+  isbn = '978-0815363729',
+  url = 'https://bookdown.org/yihui/blogdown/'
+)
