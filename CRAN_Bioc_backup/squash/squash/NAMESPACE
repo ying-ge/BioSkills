@@ -1,0 +1,36 @@
+# Export all names
+exportPattern(".")
+
+importFrom("grDevices", 
+    "dev.off", 
+    "gray", 
+    "rainbow", 
+    "xy.coords",
+    "xyz.coords"
+)
+             
+importFrom("graphics", 
+    "axis", 
+    "box", 
+    "clip", 
+    "grconvertX",
+    "grconvertY", 
+    "layout", 
+    "par", 
+    "plot", 
+    "polygon",
+    "rasterImage", 
+    "rect", 
+    "strheight", 
+    "strwidth", 
+    "text"
+)
+
+importFrom("stats", 
+    "as.dendrogram", 
+    "order.dendrogram"
+)
+
+importFrom("methods", 
+    "is"
+)
