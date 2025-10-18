@@ -1,10 +1,11 @@
 {
   "name": "cellphonedb",
   "category": "immunology",
-  "download_time": "2025-10-17 14:36:13",
+  "download_time": "2025-10-18 01:51:31",
   "files": [
     "cellphonedb-5.0.1-py3-none-any.whl"
   ],
   "size_mb": 0.08,
-  "status": "success"
+  "status": "success",
+  "estimated_size": null
 }

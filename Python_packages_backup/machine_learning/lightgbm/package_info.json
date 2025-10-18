@@ -1,0 +1,11 @@
+{
+  "name": "lightgbm",
+  "category": "machine_learning",
+  "download_time": "2025-10-18 01:51:42",
+  "files": [
+    "lightgbm-4.6.0-py3-none-manylinux_2_28_x86_64.whl"
+  ],
+  "size_mb": 3.4,
+  "status": "success",
+  "estimated_size": null
+}

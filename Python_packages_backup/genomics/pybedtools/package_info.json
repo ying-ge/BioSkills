@@ -1,0 +1,11 @@
+{
+  "name": "pybedtools",
+  "category": "genomics",
+  "download_time": "2025-10-18 01:51:25",
+  "files": [
+    "pybedtools-0.12.0.tar.gz"
+  ],
+  "size_mb": 12.02,
+  "status": "success",
+  "estimated_size": null
+}

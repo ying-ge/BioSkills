@@ -1,0 +1,11 @@
+{
+  "name": "xlrd",
+  "category": "data_processing",
+  "download_time": "2025-10-18 01:51:11",
+  "files": [
+    "xlrd-2.0.2-py2.py3-none-any.whl"
+  ],
+  "size_mb": 0.09,
+  "status": "success",
+  "estimated_size": null
+}

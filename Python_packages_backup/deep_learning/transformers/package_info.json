@@ -1,0 +1,11 @@
+{
+  "name": "transformers",
+  "category": "deep_learning",
+  "download_time": "2025-10-18 01:51:17",
+  "files": [
+    "transformers-4.57.1-py3-none-any.whl"
+  ],
+  "size_mb": 11.44,
+  "status": "success",
+  "estimated_size": null
+}

@@ -1,0 +1,11 @@
+{
+  "name": "dask",
+  "category": "data_processing",
+  "download_time": "2025-10-18 01:51:04",
+  "files": [
+    "dask-2025.10.0-py3-none-any.whl"
+  ],
+  "size_mb": 1.41,
+  "status": "success",
+  "estimated_size": null
+}

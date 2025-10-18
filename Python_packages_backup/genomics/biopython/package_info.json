@@ -1,0 +1,11 @@
+{
+  "name": "biopython",
+  "category": "genomics",
+  "download_time": "2025-10-18 01:51:20",
+  "files": [
+    "biopython-1.85-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
+  ],
+  "size_mb": 3.12,
+  "status": "success",
+  "estimated_size": null
+}
