@@ -1,4 +1,5 @@
 califano-lab/ARACNe-AP
+snap-stanford/biomni
 Teichlab/cellphonedb
 peterawe/CMScaller
 cBioPortal/cgdsr
