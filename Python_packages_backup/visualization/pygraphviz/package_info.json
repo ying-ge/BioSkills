@@ -1,0 +1,11 @@
+{
+  "name": "pygraphviz",
+  "category": "visualization",
+  "download_time": "2025-10-18 01:52:04",
+  "files": [
+    "pygraphviz-1.14.tar.gz"
+  ],
+  "size_mb": 0.1,
+  "status": "success",
+  "estimated_size": null
+}
