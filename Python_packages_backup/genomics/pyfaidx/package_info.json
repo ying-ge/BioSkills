@@ -1,0 +1,11 @@
+{
+  "name": "pyfaidx",
+  "category": "genomics",
+  "download_time": "2025-10-18 01:51:30",
+  "files": [
+    "pyfaidx-0.9.0.3-py3-none-any.whl"
+  ],
+  "size_mb": 0.03,
+  "status": "success",
+  "estimated_size": null
+}
