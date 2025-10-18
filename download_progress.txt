@@ -1,1 +1,1 @@
-pygraphviz|success|0.1|visualization|
+matplotlib|success|8.29|core|
