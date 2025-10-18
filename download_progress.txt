@@ -1,1 +1,1 @@
-catboost|success|94.57|machine_learning
+pandas|success|11.79|core|
