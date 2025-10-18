@@ -1,0 +1,172 @@
+name: Extract WHL Files Only (Keep Archives)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  extract_whl:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+
+      - name: Set up Git user
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+
+      - name: Extract WHL Files One by One
+        run: |
+          # 设置最大文件大小 (100MB)
+          MAX_SIZE=$((100 * 1024 * 1024))
+
+          # 查找所有whl文件
+          find . -type f -name "*.whl" | sort | while read whl_file; do
+            echo "=== Processing: $whl_file ==="
+
+            # 获取文件名（不含扩展名）
+            filename=$(basename "$whl_file")
+            filename_clean=$(echo "$filename" | sed 's/\.whl$//')
+
+            # 检查文件是否是zip格式
+            echo "Checking archive format..."
+            if file "$whl_file" | grep -q "Zip archive data"; then
+              temp_dir="temp_extract_$(date +%s)"
+              mkdir -p "$temp_dir"
+
+              # 解压whl到临时目录
+              if unzip -qq "$whl_file" -d "$temp_dir"; then
+                echo "Valid WHL archive detected and extracted"
+
+                large_files_count=0
+                small_files_count=0
+
+                echo "Checking file sizes..."
+                find "$temp_dir" -type f | while read file; do
+                  file_size=$(stat -c%s "$file")
+                  if [ $file_size -gt $MAX_SIZE ]; then
+                    echo "SKIPPING large file: $(basename "$file") ($(du -h "$file" | cut -f1))"
+                    rm -f "$file"
+                    large_files_count=$((large_files_count + 1))
+                  else
+                    echo "KEEPING small file: $(basename "$file") ($(du -h "$file" | cut -f1))"
+                    small_files_count=$((small_files_count + 1))
+                  fi
+                done
+
+                # 移动小文件到目标位置
+                if [ -d "$temp_dir" ] && [ "$(ls -A "$temp_dir" 2>/dev/null)" ]; then
+                  echo "Moving small files to repository..."
+                  find "$temp_dir" -type f | while read file; do
+                    relative_path="${file#$temp_dir/}"
+                    target_path="$(dirname "$whl_file")/$relative_path"
+
+                    # 创建目标目录
+                    mkdir -p "$(dirname "$target_path")"
+
+                    # 移动文件
+                    mv "$file" "$target_path"
+                    echo "Moved: $relative_path"
+                  done
+                else
+                  echo "No files to move (all were too large or archive was empty)"
+                fi
+
+                rm -rf "$temp_dir"
+                success=true
+              else
+                echo "WHL extraction failed"
+                rm -rf "$temp_dir"
+                success=false
+              fi
+            else
+              echo "Not a zip archive, skipping"
+              success=false
+            fi
+
+            # 添加变更到Git
+            git add .
+
+            # 检查是否有变更
+            if ! git diff --cached --quiet; then
+              echo "Committing changes from $filename_clean..."
+
+              # 构建commit message
+              if [ "$success" = true ]; then
+                commit_msg="Extracted: $filename_clean (whl"
+                if [ $large_files_count -gt 0 ]; then
+                  commit_msg="$commit_msg, skipped $large_files_count large files)"
+                else
+                  commit_msg="$commit_msg)"
+                fi
+              else
+                commit_msg="Skipped: $filename_clean (invalid format)"
+              fi
+
+              echo "Commit message: $commit_msg"
+              git commit -m "$commit_msg"
+
+              # 推送变更
+              echo "Pushing to repository..."
+              if git push origin main; then
+                echo "Successfully pushed $filename_clean"
+              else
+                echo "Push failed, trying to resolve..."
+                git pull origin main --rebase
+                git push origin main || {
+                  echo "Force pushing..."
+                  git push origin main --force
+                }
+              fi
+            else
+              echo "No new files to commit from $filename_clean"
+            fi
+
+            # 保留压缩包，不删除
+            echo "=== Completed: $filename_clean (archive kept) ==="
+            sleep 2
+          done
+
+      - name: Final Status
+        run: |
+          echo "=== Extraction Summary ==="
+          echo "WHL files remaining: $(find . -name "*.whl" | wc -l)"
+
+          echo ""
+          echo "=== Repository Status ==="
+          git status
+
+          echo ""
+          echo "=== Check for any large files ==="
+          MAX_SIZE=$((100 * 1024 * 1024))
+          large_files=$(find . -type f -size +${MAX_SIZE}c ! -path "./.git/*" ! -name "*.whl")
+          if [ -n "$large_files" ]; then
+            echo "WARNING: Found large files:"
+            echo "$large_files" | while read file; do
+              echo "$file ($(du -h "$file" | cut -f1))"
+            done
+          else
+            echo "No large files found - all clear!"
+          fi
+
+      - name: Create Processing Log (Optional)
+        run: |
+          echo "# WHL Processing Log" > extraction_log.md
+          echo "Generated on: $(date)" >> extraction_log.md
+          echo "" >> extraction_log.md
+
+          echo "## Archives Processed" >> extraction_log.md
+          echo "- WHL files: $(find . -name "*.whl" | wc -l)" >> extraction_log.md
+          echo "" >> extraction_log.md
+
+          echo "## Extracted Files" >> extraction_log.md
+          # 这里可以添加更详细的日志逻辑
+          echo "Files extracted and committed successfully." >> extraction_log.md
+
+          git add extraction_log.md
+          git commit -m "Update extraction log" || true
+          git push origin main || true
