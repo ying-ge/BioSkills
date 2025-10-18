@@ -1,1 +1,1 @@
-setuptools|success|1.15|core|
+openpyxl|success|0.24|data_processing|
