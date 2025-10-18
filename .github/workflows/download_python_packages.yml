@@ -1,4 +1,4 @@
-name: Download Python Packages (逐个推送版 - 修复版)
+name: Download Python Packages (跳过大文件版)
  
 on:
   workflow_dispatch:
@@ -72,7 +72,7 @@ jobs:
           "${{ github.event.inputs.package_file || '.github/docs/lib_python.txt' }}" \
           classified_packages.yml
           
-    - name: Download packages with incremental commits
+    - name: Download packages with size filter
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         GITHUB_RUN_STARTED_AT: ${{ github.run_started_at }}
@@ -81,8 +81,9 @@ jobs:
         GITHUB_RUN_ID: ${{ github.run_id }}
         GITHUB_REPOSITORY: ${{ github.repository }}
         PACKAGE_FILE: ${{ github.event.inputs.package_file || '.github/docs/lib_python.txt' }}
+        MAX_FILE_SIZE_MB: 100
       run: |
-        # 创建逐个下载的Python脚本（修复版）
+        # 创建逐个下载的Python脚本（大小过滤版）
         cat > incremental_download.py << 'EOF'
         import os
         import sys
@@ -90,31 +91,73 @@ jobs:
         import json
         import time
         import subprocess
+        import shutil
         from pathlib import Path
         from tqdm import tqdm
         
-        def write_progress(package_name, status, size_mb=0, category=""):
+        def write_progress(package_name, status, size_mb=0, category="", reason=""):
             """写入进度信息"""
-            progress_info = f"{package_name}|{status}|{size_mb}|{category}"
+            progress_info = f"{package_name}|{status}|{size_mb}|{category}|{reason}"
             with open("download_progress.txt", "w") as f:
                 f.write(progress_info)
-            print(f"📦 进度更新: {package_name} - {status} ({size_mb}MB)")
+            if reason:
+                print(f"📦 进度更新: {package_name} - {status} ({size_mb}MB) - {reason}")
+            else:
+                print(f"📦 进度更新: {package_name} - {status} ({size_mb}MB)")
         
-        def get_package_size(package_dir):
-            """获取包目录大小"""
+        def get_package_info_before_download(package_name):
+            """在下载前获取包信息，预估文件大小"""
             try:
-                result = subprocess.run(['du', '-sm', package_dir], 
-                                      capture_output=True, text=True)
+                # 使用pip show获取包信息
+                result = subprocess.run(['pip', 'show', package_name], 
+                                      capture_output=True, text=True, timeout=30)
                 if result.returncode == 0:
-                    return float(result.stdout.split()[0])
+                    lines = result.stdout.split('\n')
+                    for line in lines:
+                        if line.startswith('Size:'):
+                            size_str = line.split(':', 1)[1].strip()
+                            # 尝试解析大小
+                            if 'KB' in size_str:
+                                size_kb = float(size_str.replace('KB', '').strip())
+                                return size_kb / 1024  # 转换为MB
+                            elif 'MB' in size_str:
+                                return float(size_str.replace('MB', '').strip())
             except:
                 pass
-            return 0
+            return None
         
-        def download_single_package(package_info, backup_dir):
+        def check_file_sizes(package_dir, max_size_mb=100):
+            """检查包目录中的文件大小"""
+            large_files = []
+            total_size = 0
+            
+            for root, dirs, files in os.walk(package_dir):
+                for file in files:
+                    file_path = os.path.join(root, file)
+                    if os.path.isfile(file_path):
+                        file_size = os.path.getsize(file_path)
+                        file_size_mb = file_size / (1024 * 1024)
+                        total_size += file_size_mb
+                        
+                        if file_size_mb > max_size_mb:
+                            large_files.append({
+                                'name': file,
+                                'size_mb': round(file_size_mb, 2)
+                            })
+            
+            return large_files, round(total_size, 2)
+        
+        def download_single_package(package_info, backup_dir, max_size_mb=100):
             """下载单个包"""
             package_name = package_info['name']
             category = package_info.get('category', 'uncategorized')
+            
+            # 预检查包大小（如果可能）
+            estimated_size = get_package_info_before_download(package_name)
+            if estimated_size and estimated_size > max_size_mb:
+                write_progress(package_name, 'skipped_estimated_large', estimated_size, category, 
+                             f"预估大小: {estimated_size:.1f}MB")
+                return False, 0, None
             
             # 创建包目录
             category_dir = os.path.join(backup_dir, category)
@@ -124,7 +167,6 @@ jobs:
             
             # 清理已存在的目录
             if os.path.exists(package_dir):
-                import shutil
                 shutil.rmtree(package_dir)
             os.makedirs(package_dir)
             
@@ -134,57 +176,65 @@ jobs:
                     'pip', 'download', '--no-deps', '--dest', package_dir, package_name
                 ]
                 
+                print(f"🔄 正在下载 {package_name}...")
                 result = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
                 
                 if result.returncode == 0:
                     # 检查下载的文件
                     files = os.listdir(package_dir)
                     if files:
-                        # 计算大小
-                        total_size = 0
-                        for file in files:
-                            file_path = os.path.join(package_dir, file)
-                            if os.path.isfile(file_path):
-                                total_size += os.path.getsize(file_path)
+                        # 检查文件大小
+                        large_files, total_size = check_file_sizes(package_dir, max_size_mb)
                         
-                        size_mb = total_size / (1024 * 1024)
-                        
-                        # 创建包信息文件
-                        info = {
-                            'name': package_name,
-                            'category': category,
-                            'download_time': time.strftime('%Y-%m-%d %H:%M:%S'),
-                            'files': files,
-                            'size_mb': round(size_mb, 2),
-                            'status': 'success'
-                        }
-                        
-                        with open(os.path.join(package_dir, 'package_info.json'), 'w') as f:
-                            json.dump(info, f, indent=2)
-                        
-                        write_progress(package_name, 'success', round(size_mb, 2), category)
-                        return True, size_mb, package_dir
+                        if large_files:
+                            # 有大文件，跳过此包
+                            large_files_info = ", ".join([f"{f['name']}({f['size_mb']}MB)" for f in large_files])
+                            write_progress(package_name, 'skipped_large_files', total_size, category, 
+                                         f"大文件: {large_files_info}")
+                            
+                            # 清理目录
+                            shutil.rmtree(package_dir)
+                            return False, 0, None
+                        else:
+                            # 创建包信息文件
+                            info = {
+                                'name': package_name,
+                                'category': category,
+                                'download_time': time.strftime('%Y-%m-%d %H:%M:%S'),
+                                'files': files,
+                                'size_mb': total_size,
+                                'status': 'success',
+                                'estimated_size': estimated_size
+                            }
+                            
+                            with open(os.path.join(package_dir, 'package_info.json'), 'w') as f:
+                                json.dump(info, f, indent=2)
+                            
+                            write_progress(package_name, 'success', total_size, category)
+                            return True, total_size, package_dir
                     else:
-                        write_progress(package_name, 'failed_no_files', 0, category)
+                        write_progress(package_name, 'failed_no_files', 0, category, "下载后无文件")
                         return False, 0, None
                 else:
-                    write_progress(package_name, f'failed_{result.returncode}', 0, category)
+                    error_msg = result.stderr.strip() if result.stderr else f"退出码: {result.returncode}"
+                    write_progress(package_name, 'failed_download', 0, category, error_msg[:50])
                     return False, 0, None
                     
             except subprocess.TimeoutExpired:
-                write_progress(package_name, 'timeout', 0, category)
+                write_progress(package_name, 'timeout', 0, category, "下载超时(300s)")
                 return False, 0, None
             except Exception as e:
-                write_progress(package_name, f'error_{str(e)[:20]}', 0, category)
+                write_progress(package_name, 'error', 0, category, str(e)[:50])
                 return False, 0, None
         
         def main():
-            if len(sys.argv) != 3:
-                print("用法: python incremental_download.py <classified_packages.yml> <backup_dir>")
+            if len(sys.argv) < 3:
+                print("用法: python incremental_download.py <classified_packages.yml> <backup_dir> [max_size_mb]")
                 sys.exit(1)
             
             packages_file = sys.argv[1]
             backup_dir = sys.argv[2]
+            max_size_mb = float(sys.argv[3]) if len(sys.argv) > 3 else 100.0
             
             # 读取包分类信息
             with open(packages_file, 'r', encoding='utf-8') as f:
@@ -199,19 +249,36 @@ jobs:
                         'category': category
                     })
             
-            print(f"开始下载 {len(all_packages)} 个Python包...")
+            print(f"开始下载 {len(all_packages)} 个Python包 (文件大小限制: {max_size_mb}MB)...")
             
             success_count = 0
             failed_count = 0
+            skipped_count = 0
             total_size = 0
             
+            # 预先检查并跳过已知的大包
+            known_large_packages = ['torch', 'tensorflow', 'jax', 'paddlepaddle', 'mxnet']
+            filtered_packages = []
+            
+            for pkg_info in all_packages:
+                if pkg_info['name'].lower() in known_large_packages:
+                    write_progress(pkg_info['name'], 'skipped_known_large', 0, pkg_info['category'], 
+                                 "已知大包(>100MB)")
+                    skipped_count += 1
+                else:
+                    filtered_packages.append(pkg_info)
+            
+            print(f"跳过 {len(all_packages) - len(filtered_packages)} 个已知大包，剩余 {len(filtered_packages)} 个包")
+            
             # 逐个下载包
-            for i, package_info in enumerate(tqdm(all_packages, desc="下载进度")):
-                success, size_mb, package_dir = download_single_package(package_info, backup_dir)
+            for i, package_info in enumerate(tqdm(filtered_packages, desc="下载进度")):
+                success, size_mb, package_dir = download_single_package(package_info, backup_dir, max_size_mb)
                 
                 if success:
                     success_count += 1
                     total_size += size_mb
+                elif size_mb > 0:  # 跳过的大文件
+                    skipped_count += 1
                 else:
                     failed_count += 1
                 
@@ -223,7 +290,9 @@ jobs:
                 'total_packages': len(all_packages),
                 'success_count': success_count,
                 'failed_count': failed_count,
+                'skipped_count': skipped_count,
                 'total_size_mb': round(total_size, 2),
+                'max_file_size_mb': max_size_mb,
                 'completion_time': time.strftime('%Y-%m-%d %H:%M:%S')
             }
             
@@ -232,8 +301,10 @@ jobs:
             
             print(f"\n=== 下载完成 ===")
             print(f"✅ 成功: {success_count}")
+            print(f"⚠️ 跳过(>100MB): {skipped_count}")
             print(f"❌ 失败: {failed_count}")
             print(f"💾 总大小: {total_size:.2f} MB")
+            print(f"📦 处理总数: {len(all_packages)}")
             
         if __name__ == '__main__':
             main()
@@ -251,7 +322,7 @@ jobs:
         
         # 在后台运行下载脚本
         echo "🚀 开始逐个下载Python包..."
-        python incremental_download.py classified_packages.yml Python_packages_backup &
+        python incremental_download.py classified_packages.yml Python_packages_backup $MAX_FILE_SIZE_MB &
         download_pid=$!
         
         # 监控进度并逐一提交
@@ -268,8 +339,12 @@ jobs:
               status=$(echo "$current_progress" | cut -d'|' -f2)
               size=$(echo "$current_progress" | cut -d'|' -f3)
               category=$(echo "$current_progress" | cut -d'|' -f4)
+              reason=$(echo "$current_progress" | cut -d'|' -f5)
               
               echo "📦 包处理完成: $package_name ($status, ${size}MB)"
+              if [ -n "$reason" ]; then
+                echo "   原因: $reason"
+              fi
               
               # 如果下载成功，立即提交并推送
               if [ "$status" = "success" ]; then
@@ -315,6 +390,8 @@ jobs:
                 else
                   echo "⚠️ 包目录不存在: $package_path"
                 fi
+              elif [[ "$status" == *"skipped"* ]]; then
+                echo "⚠️ 跳过大文件包: $package_name"
               fi
               
               last_progress="$current_progress"
@@ -371,6 +448,7 @@ jobs:
                   summary = json.load(f)
               
               print(f"| ✅ 成功 | {summary['success_count']} | 已下载并推送 |")
+              print(f"| ⚠️ 跳过(>100MB) | {summary['skipped_count']} | 文件大小超限 |")
               print(f"| ❌ 失败 | {summary['failed_count']} | 下载失败 |")
               print(f"| 📦 总数 | {summary['total_packages']} | 计划下载 |")
               print(f"| 💾 总大小 | {summary['total_size_mb']}MB | 实际推送数据 |")
@@ -386,10 +464,11 @@ jobs:
         
         echo "" >> $GITHUB_STEP_SUMMARY
         echo "### 🔧 技术细节" >> $GITHUB_STEP_SUMMARY
-        echo "- 逐个下载推送，避免大文件累积" >> $GITHUB_STEP_SUMMARY
+        echo "- 自动跳过超过100MB的文件" >> $GITHUB_STEP_SUMMARY
+        echo "- 预检查已知大包(torch, tensorflow等)" >> $GITHUB_STEP_SUMMARY
+        echo "- 逐个下载推送，避免文件累积" >> $GITHUB_STEP_SUMMARY
         echo "- 自动重试推送失败的情况" >> $GITHUB_STEP_SUMMARY
         echo "- 实时监控下载进度" >> $GITHUB_STEP_SUMMARY
-        echo "- 支持包分类和元数据管理" >> $GITHUB_STEP_SUMMARY
         
         # 显示实际备份情况
         if [ -d "Python_packages_backup" ]; then
@@ -399,6 +478,32 @@ jobs:
           echo "- 包目录数: $(find Python_packages_backup -mindepth 2 -maxdepth 2 -type d | wc -l)" >> $GITHUB_STEP_SUMMARY
           echo "- 文件总数: $(find Python_packages_backup -type f | wc -l)" >> $GITHUB_STEP_SUMMARY
           echo "- 磁盘使用: $(du -sh Python_packages_backup 2>/dev/null | cut -f1 || echo '未知')" >> $GITHUB_STEP_SUMMARY
+        fi
+        
+        # 显示跳过的大文件包列表
+        if [ -f "download_progress.txt" ]; then
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### ⚠️ 跳过的大文件包 (>100MB)" >> $GITHUB_STEP_SUMMARY
+          echo "| 包名 | 原因 |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|------|" >> $GITHUB_STEP_SUMMARY
+          
+          python3 << 'EOF'
+          import re
+          
+          try:
+              with open('download_progress.txt', 'r') as f:
+                  content = f.read().strip()
+                  if content:
+                      parts = content.split('|')
+                      if len(parts) >= 5:
+                          package_name = parts[0]
+                          status = parts[1]
+                          reason = parts[4]
+                          if 'skipped' in status or 'known_large' in status:
+                              print(f"| {package_name} | {reason} |")
+          except:
+              pass
+          EOF >> $GITHUB_STEP_SUMMARY
         fi
         
     - name: Create release (manual only)
