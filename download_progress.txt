@@ -1,1 +1,1 @@
-pytorch-lightning|success|0.79|deep_learning|
+biopython|success|3.12|genomics|
