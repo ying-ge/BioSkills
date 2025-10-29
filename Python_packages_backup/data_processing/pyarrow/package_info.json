@@ -1,11 +1,11 @@
 {
   "name": "pyarrow",
   "category": "data_processing",
-  "download_time": "2025-10-18 03:14:16",
+  "download_time": "2025-10-29 02:51:20",
   "files": [
-    "pyarrow-21.0.0-cp312-cp312-manylinux_2_28_x86_64.whl"
+    "pyarrow-22.0.0-cp312-cp312-manylinux_2_28_x86_64.whl"
   ],
-  "size_mb": 40.85,
+  "size_mb": 45.52,
   "status": "success",
   "estimated_size": null
 }
