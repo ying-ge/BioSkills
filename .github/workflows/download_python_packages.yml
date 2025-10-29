@@ -408,7 +408,9 @@ jobs:
         echo "" >> $GITHUB_STEP_SUMMARY
         
         if [ -f "download_summary.json" ]; then
-          python3 << 'EOF'
+          # Redirect the python heredoc output into $GITHUB_STEP_SUMMARY by placing the redirection
+          # before the heredoc, which avoids the EOF delimiter / redirection ordering issue.
+          python3 >> $GITHUB_STEP_SUMMARY << 'EOF'
           import json
           
           try:
@@ -423,7 +425,7 @@ jobs:
               print(f"| ⏰ 完成时间 | {summary['completion_time']} | 备份完成时间 |")
           except Exception as e:
               print(f"❌ 无法读取统计信息: {e}")
-          EOF >> $GITHUB_STEP_SUMMARY
+          EOF
         else
           echo "| 状态 | 数量 | 备注 |" >> $GITHUB_STEP_SUMMARY
           echo "|------|------|------|" >> $GITHUB_STEP_SUMMARY
@@ -453,7 +455,8 @@ jobs:
           echo "| 包名 | 原因 |" >> $GITHUB_STEP_SUMMARY
           echo "|------|------|" >> $GITHUB_STEP_SUMMARY
           
-          python3 << 'EOF'
+          # Same fix here: redirect python heredoc output into $GITHUB_STEP_SUMMARY
+          python3 >> $GITHUB_STEP_SUMMARY << 'EOF'
           try:
               with open('download_progress.txt', 'r') as f:
                   content = f.read().strip()
@@ -467,7 +470,7 @@ jobs:
                               print(f"| {package_name} | {reason} |")
           except:
               pass
-          EOF >> $GITHUB_STEP_SUMMARY
+          EOF
         fi
         
     - name: Create release (manual only)
