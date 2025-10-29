@@ -1,1 +1,1 @@
-optuna|success|0.38|machine_learning|
+celltypist|success|6.99|singlecell|
