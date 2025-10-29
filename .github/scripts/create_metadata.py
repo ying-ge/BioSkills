@@ -106,8 +106,7 @@ echo "📋 按类别安装示例:"
 
     # 优化：使用列表推导式代替循环中的字符串拼接
     category_examples = [
-        f'\n  # {metadata["categories"][category]} ({count} 包)\n'
-        f'  # pip install $BACKUP_DIR/{category}/*.whl\n'
+        f'\n  # {metadata["categories"][category]} ({count} 包)\n  # pip install $BACKUP_DIR/{category}/*.whl\n'
         for category, count in metadata['package_stats']['categories'].items()
         if count > 0
     ]

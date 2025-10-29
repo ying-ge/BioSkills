@@ -134,7 +134,7 @@ def main():
     skipped_count = 0
     
     # 控制并发数量，避免过多并发导致的问题
-    max_workers = min(10, os.cpu_count() * 2) if os.cpu_count() else 10
+    max_workers = min(10, (os.cpu_count() or 1) * 2)
     
     print(f"📊 Total packages to process: {total_packages}")
     print(f"⚡ Using {max_workers} concurrent workers for downloads")
