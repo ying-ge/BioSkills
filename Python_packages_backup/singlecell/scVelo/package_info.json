@@ -1,0 +1,11 @@
+{
+  "name": "scVelo",
+  "category": "singlecell",
+  "download_time": "2025-10-29 02:52:25",
+  "files": [
+    "scvelo-0.3.3-py3-none-any.whl"
+  ],
+  "size_mb": 0.19,
+  "status": "success",
+  "estimated_size": null
+}

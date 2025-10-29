@@ -1,0 +1,11 @@
+{
+  "name": "SnapATAC2",
+  "category": "singlecell",
+  "download_time": "2025-10-29 02:52:18",
+  "files": [
+    "snapatac2-2.8.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
+  ],
+  "size_mb": 16.65,
+  "status": "success",
+  "estimated_size": null
+}

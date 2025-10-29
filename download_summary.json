@@ -1,9 +1,9 @@
 {
-  "total_packages": 47,
-  "success_count": 39,
-  "failed_count": 6,
+  "total_packages": 62,
+  "success_count": 52,
+  "failed_count": 8,
   "skipped_count": 2,
-  "total_size_mb": 302.99,
+  "total_size_mb": 333.55,
   "max_file_size_mb": 100.0,
-  "completion_time": "2025-10-18 03:15:08"
+  "completion_time": "2025-10-29 02:52:43"
 }

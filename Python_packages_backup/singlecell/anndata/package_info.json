@@ -1,9 +1,9 @@
 {
   "name": "anndata",
   "category": "singlecell",
-  "download_time": "2025-10-18 03:14:53",
+  "download_time": "2025-10-29 02:52:02",
   "files": [
-    "anndata-0.12.3-py3-none-any.whl"
+    "anndata-0.12.4-py3-none-any.whl"
   ],
   "size_mb": 0.16,
   "status": "success",

@@ -1,0 +1,11 @@
+{
+  "name": "rapids-singlecell",
+  "category": "singlecell",
+  "download_time": "2025-10-29 02:52:20",
+  "files": [
+    "rapids_singlecell-0.13.3-py3-none-any.whl"
+  ],
+  "size_mb": 0.16,
+  "status": "success",
+  "estimated_size": null
+}
