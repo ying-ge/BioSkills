@@ -1,1 +1,1 @@
-scikit-learn|success|9.04|machine_learning|
+lightgbm|success|3.4|machine_learning|
