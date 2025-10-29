@@ -1,1 +1,1 @@
-openpyxl|success|0.24|data_processing|
+biopython|success|3.09|genomics|
