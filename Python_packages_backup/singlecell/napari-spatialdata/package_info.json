@@ -1,0 +1,11 @@
+{
+  "name": "napari-spatialdata",
+  "category": "singlecell",
+  "download_time": "2025-10-29 02:52:31",
+  "files": [
+    "napari_spatialdata-0.5.7-py3-none-any.whl"
+  ],
+  "size_mb": 0.1,
+  "status": "success",
+  "estimated_size": null
+}

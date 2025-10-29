@@ -1,1 +1,1 @@
-pertpy|success|0.21|singlecell|
+napari-spatialdata|success|0.1|singlecell|
