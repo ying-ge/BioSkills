@@ -6,6 +6,21 @@ scvelo
 celltypist
 scrublet
 scdifferential
+CellBender
+Harmony
+spatialdata
+mudata
+SnapATAC2
+rapids-singlecell
+pertpy
+decoupler
+scirpy
+scVelo
+MultiVelo
+velocyto
+hdWGCNA
+napari-spatialdata
+cellxgene
 
 # 机器学习包
 scikit-learn
