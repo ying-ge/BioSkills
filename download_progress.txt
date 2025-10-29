@@ -1,1 +1,1 @@
-cellxgene|success|2.74|singlecell|
+networkx|success|1.94|visualization|
