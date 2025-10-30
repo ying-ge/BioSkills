@@ -1,1 +1,1 @@
-napari-spatialdata|success|0.1|singlecell|
+bokeh|success|6.87|visualization|
