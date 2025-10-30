@@ -1,1 +1,1 @@
-openpyxl|success|0.24|data_processing|
+fastai|success|0.22|deep_learning|
