@@ -1,1 +1,1 @@
-decoupler|success|0.11|singlecell|
+napari-spatialdata|success|0.1|singlecell|
