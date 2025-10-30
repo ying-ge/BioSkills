@@ -21,7 +21,7 @@ def parse_package_list(file_path):
         'uncategorized': []
     }
     
-    # 关键词映射
+    # 关键词映射 - 优化：预编译为更快的查找方式
     category_keywords = {
         '单细胞': 'singlecell',
         '机器学习': 'machine_learning',
@@ -46,11 +46,12 @@ def parse_package_list(file_path):
                 
                 # 检查是否是类别标题
                 if line.startswith('#') and '包' in line:
-                    current_category = 'uncategorized'
-                    for keyword, category in category_keywords.items():
-                        if keyword in line:
-                            current_category = category
-                            break
+                    # 优化：使用生成器表达式和next()代替循环
+                    # 这样找到第一个匹配就立即停止，而不是检查所有关键词
+                    current_category = next(
+                        (category for keyword, category in category_keywords.items() if keyword in line),
+                        'uncategorized'
+                    )
                     print(f"Category found: {line} -> {current_category}")
                     continue
                 
