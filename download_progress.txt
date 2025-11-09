@@ -1,1 +1,1 @@
-bokeh|success|6.87|visualization|
+pandas|success|11.79|core|
