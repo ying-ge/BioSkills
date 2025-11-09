@@ -1,1 +1,1 @@
-anndata|success|0.16|singlecell|
+scrublet|success|0.01|singlecell|
