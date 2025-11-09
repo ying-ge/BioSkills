@@ -1,1 +1,1 @@
-wheel|success|0.07|core|
+openpyxl|success|0.24|data_processing|
