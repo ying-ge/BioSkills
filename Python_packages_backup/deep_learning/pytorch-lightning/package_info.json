@@ -1,9 +1,9 @@
 {
   "name": "pytorch-lightning",
   "category": "deep_learning",
-  "download_time": "2025-10-30 13:12:27",
+  "download_time": "2025-11-09 02:05:10",
   "files": [
-    "pytorch_lightning-2.5.5-py3-none-any.whl"
+    "pytorch_lightning-2.5.6-py3-none-any.whl"
   ],
   "size_mb": 0.79,
   "status": "success",
