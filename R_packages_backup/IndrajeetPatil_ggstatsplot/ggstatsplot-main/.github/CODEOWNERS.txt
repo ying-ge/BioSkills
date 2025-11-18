@@ -1,2 +1,0 @@
-# CODEOWNERS for ggstatsplot
-.github/CODEOWNERS @IndrajeetPatil
