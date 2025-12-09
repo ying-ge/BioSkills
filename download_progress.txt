@@ -1,1 +1,1 @@
-catboost|success|94.57|machine_learning|
+scvi-tools|success|0.6|singlecell|
