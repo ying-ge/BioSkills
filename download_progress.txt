@@ -1,1 +1,1 @@
-polars|success|0.76|data_processing|
+pytorch-lightning|success|0.81|deep_learning|
