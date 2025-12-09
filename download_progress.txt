@@ -1,1 +1,1 @@
-scirpy|success|4.64|singlecell|
+napari-spatialdata|success|0.1|singlecell|
