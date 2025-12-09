@@ -1,1 +1,1 @@
-pytorch-lightning|success|0.81|deep_learning|
+huggingface_hub|success|0.5|deep_learning|
