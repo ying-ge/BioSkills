@@ -1,1 +1,1 @@
-napari-spatialdata|success|0.1|singlecell|
+plotly|success|9.44|visualization|
