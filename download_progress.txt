@@ -1,1 +1,1 @@
-dask|success|1.41|data_processing|
+fastai|success|0.22|deep_learning|
