@@ -1,11 +1,11 @@
 {
   "name": "scipy",
   "category": "core",
-  "download_time": "2026-01-09 00:38:22",
+  "download_time": "2026-02-09 00:47:13",
   "files": [
-    "scipy-1.16.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl"
+    "scipy-1.17.0-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl"
   ],
-  "size_mb": 34.02,
+  "size_mb": 33.39,
   "status": "success",
   "estimated_size": null
 }
