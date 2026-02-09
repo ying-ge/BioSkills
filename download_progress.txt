@@ -1,1 +1,1 @@
-scipy|success|33.39|core|
+openpyxl|success|0.24|data_processing|
