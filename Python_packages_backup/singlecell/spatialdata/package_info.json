@@ -1,9 +1,9 @@
 {
   "name": "spatialdata",
   "category": "singlecell",
-  "download_time": "2026-01-09 00:39:24",
+  "download_time": "2026-02-09 00:48:13",
   "files": [
-    "spatialdata-0.6.1-py3-none-any.whl"
+    "spatialdata-0.7.1.post1-py3-none-any.whl"
   ],
   "size_mb": 0.18,
   "status": "success",

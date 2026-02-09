@@ -1,9 +1,9 @@
 {
   "name": "polars",
   "category": "data_processing",
-  "download_time": "2026-01-09 00:38:30",
+  "download_time": "2026-02-09 00:47:21",
   "files": [
-    "polars-1.36.1-py3-none-any.whl"
+    "polars-1.38.1-py3-none-any.whl"
   ],
   "size_mb": 0.77,
   "status": "success",

@@ -1,11 +1,11 @@
 {
   "name": "scanpy",
   "category": "singlecell",
-  "download_time": "2026-01-09 00:39:11",
+  "download_time": "2026-02-09 00:48:01",
   "files": [
-    "scanpy-1.11.5-py3-none-any.whl"
+    "scanpy-1.12-py3-none-any.whl"
   ],
-  "size_mb": 2.0,
+  "size_mb": 2.05,
   "status": "success",
   "estimated_size": null
 }

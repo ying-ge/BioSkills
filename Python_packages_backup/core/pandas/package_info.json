@@ -1,11 +1,11 @@
 {
   "name": "pandas",
   "category": "core",
-  "download_time": "2026-01-09 00:38:20",
+  "download_time": "2026-02-09 00:47:12",
   "files": [
-    "pandas-2.3.3-cp312-cp312-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl"
+    "pandas-3.0.0-cp312-cp312-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl"
   ],
-  "size_mb": 11.79,
+  "size_mb": 10.36,
   "status": "success",
   "estimated_size": null
 }
