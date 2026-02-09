@@ -1,1 +1,1 @@
-scirpy|success|4.64|singlecell|
+cellxgene|success|2.74|singlecell|
