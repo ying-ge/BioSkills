@@ -1,1 +1,1 @@
-Harmony|success|0.24|singlecell|
+SnapATAC2|success|16.65|singlecell|
