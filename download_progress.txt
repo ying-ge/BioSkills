@@ -1,1 +1,1 @@
-scipy|success|33.6|core|
+polars|success|0.77|data_processing|
