@@ -1,9 +1,9 @@
 {
   "name": "setuptools",
   "category": "core",
-  "download_time": "2026-03-09 00:46:15",
+  "download_time": "2026-04-09 00:44:07",
   "files": [
-    "setuptools-82.0.0-py3-none-any.whl"
+    "setuptools-82.0.1-py3-none-any.whl"
   ],
   "size_mb": 0.96,
   "status": "success",
