@@ -1,1 +1,1 @@
-matplotlib|success|8.31|core|
+pyarrow|success|45.38|data_processing|
