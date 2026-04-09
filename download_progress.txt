@@ -1,1 +1,1 @@
-mudata|success|0.04|singlecell|
+decoupler|success|0.12|singlecell|
