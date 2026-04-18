@@ -66,7 +66,7 @@
   "releases_url": "https://api.github.com/repos/cole-trapnell-lab/monocle-release/releases{/id}",
   "deployments_url": "https://api.github.com/repos/cole-trapnell-lab/monocle-release/deployments",
   "created_at": "2014-07-04T21:14:19Z",
-  "updated_at": "2026-02-04T13:49:26Z",
+  "updated_at": "2026-03-28T05:25:47Z",
   "pushed_at": "2022-07-15T15:38:38Z",
   "git_url": "git://github.com/cole-trapnell-lab/monocle-release.git",
   "ssh_url": "git@github.com:cole-trapnell-lab/monocle-release.git",
@@ -83,11 +83,11 @@
   "has_wiki": true,
   "has_pages": true,
   "has_discussions": false,
-  "forks_count": 126,
+  "forks_count": 128,
   "mirror_url": null,
   "archived": false,
   "disabled": false,
-  "open_issues_count": 327,
+  "open_issues_count": 328,
   "license": null,
   "allow_forking": true,
   "is_template": false,
@@ -98,8 +98,8 @@
 
   ],
   "visibility": "public",
-  "forks": 126,
-  "open_issues": 327,
+  "forks": 128,
+  "open_issues": 328,
   "watchers": 293,
   "default_branch": "master",
   "permissions": {
@@ -134,6 +134,6 @@
     "user_view_type": "public",
     "site_admin": false
   },
-  "network_count": 126,
+  "network_count": 128,
   "subscribers_count": 36
 }
