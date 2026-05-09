@@ -1,11 +1,11 @@
 {
   "name": "CellBender",
   "category": "singlecell",
-  "download_time": "2026-04-09 00:44:59",
+  "download_time": "2026-05-09 01:02:55",
   "files": [
-    "cellbender-0.3.0-py3-none-any.whl"
+    "cellbender-0.3.2-py3-none-any.whl"
   ],
-  "size_mb": 0.16,
+  "size_mb": 0.17,
   "status": "success",
   "estimated_size": null
 }

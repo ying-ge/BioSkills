@@ -1,1 +1,1 @@
-scvelo|success|0.18|singlecell|
+CellBender|success|0.17|singlecell|
