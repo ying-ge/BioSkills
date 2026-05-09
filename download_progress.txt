@@ -1,1 +1,1 @@
-SnapATAC2|success|28.04|singlecell|
+scVelo|success|0.18|singlecell|
