@@ -1,9 +1,9 @@
 {
   "name": "pyensembl",
   "category": "genomics",
-  "download_time": "2026-04-09 00:44:33",
+  "download_time": "2026-05-09 01:02:28",
   "files": [
-    "pyensembl-2.6.2-py3-none-any.whl"
+    "pyensembl-2.6.7-py3-none-any.whl"
   ],
   "size_mb": 0.05,
   "status": "success",

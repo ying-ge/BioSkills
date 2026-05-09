@@ -1,9 +1,9 @@
 {
   "name": "wheel",
   "category": "core",
-  "download_time": "2026-04-09 00:44:08",
+  "download_time": "2026-05-09 01:02:04",
   "files": [
-    "wheel-0.46.3-py3-none-any.whl"
+    "wheel-0.47.0-py3-none-any.whl"
   ],
   "size_mb": 0.03,
   "status": "success",

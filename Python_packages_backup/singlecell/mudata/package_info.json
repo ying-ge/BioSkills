@@ -1,9 +1,9 @@
 {
   "name": "mudata",
   "category": "singlecell",
-  "download_time": "2026-04-09 00:45:04",
+  "download_time": "2026-05-09 01:03:00",
   "files": [
-    "mudata-0.3.3-py3-none-any.whl"
+    "mudata-0.3.8-py3-none-any.whl"
   ],
   "size_mb": 0.04,
   "status": "success",

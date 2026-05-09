@@ -1,11 +1,11 @@
 {
   "name": "pysam",
   "category": "genomics",
-  "download_time": "2026-04-09 00:44:24",
+  "download_time": "2026-05-09 01:02:21",
   "files": [
-    "pysam-0.23.3-cp312-cp312-manylinux_2_28_x86_64.whl"
+    "pysam-0.24.0-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl"
   ],
-  "size_mb": 22.91,
+  "size_mb": 22.15,
   "status": "success",
   "estimated_size": null
 }
