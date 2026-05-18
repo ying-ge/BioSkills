@@ -66,16 +66,16 @@
   "releases_url": "https://api.github.com/repos/lmcinnes/umap/releases{/id}",
   "deployments_url": "https://api.github.com/repos/lmcinnes/umap/deployments",
   "created_at": "2017-07-02T01:11:17Z",
-  "updated_at": "2026-04-18T00:36:05Z",
-  "pushed_at": "2026-04-18T00:35:57Z",
+  "updated_at": "2026-05-17T10:18:32Z",
+  "pushed_at": "2026-05-02T00:59:16Z",
   "git_url": "git://github.com/lmcinnes/umap.git",
   "ssh_url": "git@github.com:lmcinnes/umap.git",
   "clone_url": "https://github.com/lmcinnes/umap.git",
   "svn_url": "https://github.com/lmcinnes/umap",
   "homepage": "https://umap-learn.readthedocs.io",
-  "size": 94677,
-  "stargazers_count": 8149,
-  "watchers_count": 8149,
+  "size": 94679,
+  "stargazers_count": 8178,
+  "watchers_count": 8178,
   "language": "Python",
   "has_issues": true,
   "has_projects": true,
@@ -110,7 +110,7 @@
   "visibility": "public",
   "forks": 862,
   "open_issues": 520,
-  "watchers": 8149,
+  "watchers": 8178,
   "default_branch": "master",
   "permissions": {
     "admin": false,
@@ -121,5 +121,5 @@
   },
   "temp_clone_token": "",
   "network_count": 862,
-  "subscribers_count": 122
+  "subscribers_count": 123
 }
