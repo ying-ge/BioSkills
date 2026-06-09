@@ -1,1 +1,1 @@
-bokeh|success|6.1|visualization|
+matplotlib|success|8.38|core|
