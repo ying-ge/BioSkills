@@ -1,1 +1,1 @@
-scanpy|success|2.05|singlecell|
+scrublet|success|0.01|singlecell|
