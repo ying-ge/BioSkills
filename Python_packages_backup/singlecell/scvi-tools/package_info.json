@@ -1,11 +1,11 @@
 {
   "name": "scvi-tools",
   "category": "singlecell",
-  "download_time": "2026-05-09 01:02:49",
+  "download_time": "2026-06-09 01:09:31",
   "files": [
-    "scvi_tools-1.4.2-py3-none-any.whl"
+    "scvi_tools-1.4.3-py3-none-any.whl"
   ],
-  "size_mb": 0.63,
+  "size_mb": 0.67,
   "status": "success",
   "estimated_size": null
 }

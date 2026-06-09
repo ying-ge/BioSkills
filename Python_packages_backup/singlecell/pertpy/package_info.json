@@ -1,9 +1,9 @@
 {
   "name": "pertpy",
   "category": "singlecell",
-  "download_time": "2026-05-09 01:03:06",
+  "download_time": "2026-06-09 01:09:49",
   "files": [
-    "pertpy-1.0.6-py3-none-any.whl"
+    "pertpy-1.1.0-py3-none-any.whl"
   ],
   "size_mb": 0.22,
   "status": "success",

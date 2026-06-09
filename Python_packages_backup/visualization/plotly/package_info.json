@@ -1,9 +1,9 @@
 {
   "name": "plotly",
   "category": "visualization",
-  "download_time": "2026-05-09 01:03:21",
+  "download_time": "2026-06-09 01:10:04",
   "files": [
-    "plotly-6.7.0-py3-none-any.whl"
+    "plotly-6.8.0-py3-none-any.whl"
   ],
   "size_mb": 9.44,
   "status": "success",
