@@ -1,1 +1,1 @@
-rapids-singlecell|success|1.95|singlecell|
+MultiVelo|success|0.5|singlecell|
