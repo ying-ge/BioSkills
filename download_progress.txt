@@ -1,1 +1,1 @@
-MultiVelo|success|0.5|singlecell|
+napari-spatialdata|success|0.1|singlecell|
