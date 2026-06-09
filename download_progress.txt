@@ -1,1 +1,1 @@
-scrublet|success|0.01|singlecell|
+spatialdata|success|0.19|singlecell|
