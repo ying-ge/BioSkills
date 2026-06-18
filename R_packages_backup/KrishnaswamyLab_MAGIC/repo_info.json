@@ -66,7 +66,7 @@
   "releases_url": "https://api.github.com/repos/KrishnaswamyLab/MAGIC/releases{/id}",
   "deployments_url": "https://api.github.com/repos/KrishnaswamyLab/MAGIC/deployments",
   "created_at": "2016-08-01T21:35:39Z",
-  "updated_at": "2026-04-24T14:43:57Z",
+  "updated_at": "2026-06-17T14:42:56Z",
   "pushed_at": "2024-10-03T21:50:55Z",
   "git_url": "git://github.com/KrishnaswamyLab/MAGIC.git",
   "ssh_url": "git@github.com:KrishnaswamyLab/MAGIC.git",
@@ -74,8 +74,8 @@
   "svn_url": "https://github.com/KrishnaswamyLab/MAGIC",
   "homepage": "",
   "size": 226856,
-  "stargazers_count": 381,
-  "watchers_count": 381,
+  "stargazers_count": 384,
+  "watchers_count": 384,
   "language": "Jupyter Notebook",
   "has_issues": true,
   "has_projects": true,
@@ -83,7 +83,7 @@
   "has_wiki": true,
   "has_pages": false,
   "has_discussions": false,
-  "forks_count": 107,
+  "forks_count": 108,
   "mirror_url": null,
   "archived": false,
   "disabled": false,
@@ -104,9 +104,9 @@
 
   ],
   "visibility": "public",
-  "forks": 107,
+  "forks": 108,
   "open_issues": 34,
-  "watchers": 381,
+  "watchers": 384,
   "default_branch": "master",
   "permissions": {
     "admin": false,
@@ -140,6 +140,6 @@
     "user_view_type": "public",
     "site_admin": false
   },
-  "network_count": 107,
-  "subscribers_count": 21
+  "network_count": 108,
+  "subscribers_count": 22
 }
