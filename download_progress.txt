@@ -1,1 +1,1 @@
-matplotlib|success|9.57|core|
+openpyxl|success|0.24|data_processing|
