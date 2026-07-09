@@ -1,1 +1,1 @@
-SnapATAC2|success|28.04|singlecell|
+scirpy|success|4.66|singlecell|
