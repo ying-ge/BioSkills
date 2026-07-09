@@ -1,1 +1,1 @@
-celltypist|success|6.99|singlecell|
+Harmony|success|0.24|singlecell|
