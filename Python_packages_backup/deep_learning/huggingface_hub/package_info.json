@@ -1,11 +1,11 @@
 {
   "name": "huggingface_hub",
   "category": "deep_learning",
-  "download_time": "2026-06-09 01:09:01",
+  "download_time": "2026-07-09 00:54:45",
   "files": [
-    "huggingface_hub-1.18.0-py3-none-any.whl"
+    "huggingface_hub-1.22.0-py3-none-any.whl"
   ],
-  "size_mb": 0.65,
+  "size_mb": 0.73,
   "status": "success",
   "estimated_size": null
 }

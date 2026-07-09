@@ -1,11 +1,11 @@
 {
   "name": "keras",
   "category": "deep_learning",
-  "download_time": "2026-06-09 01:08:55",
+  "download_time": "2026-07-09 00:54:40",
   "files": [
-    "keras-3.14.1-py3-none-any.whl"
+    "keras-3.15.0-py3-none-any.whl"
   ],
-  "size_mb": 1.55,
+  "size_mb": 1.62,
   "status": "success",
   "estimated_size": null
 }

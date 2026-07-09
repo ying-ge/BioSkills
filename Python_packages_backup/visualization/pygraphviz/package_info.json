@@ -1,11 +1,11 @@
 {
   "name": "pygraphviz",
   "category": "visualization",
-  "download_time": "2026-06-09 01:10:10",
+  "download_time": "2026-07-09 00:55:52",
   "files": [
-    "pygraphviz-1.14.tar.gz"
+    "pygraphviz-2.0-cp312-cp312-manylinux_2_28_x86_64.whl"
   ],
-  "size_mb": 0.1,
+  "size_mb": 5.11,
   "status": "success",
   "estimated_size": null
 }
