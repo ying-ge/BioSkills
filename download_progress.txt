@@ -1,1 +1,1 @@
-networkx|success|1.97|visualization|
+matplotlib|success|9.57|core|
