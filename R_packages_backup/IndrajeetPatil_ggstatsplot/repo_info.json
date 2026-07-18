@@ -66,7 +66,7 @@
   "releases_url": "https://api.github.com/repos/IndrajeetPatil/ggstatsplot/releases{/id}",
   "deployments_url": "https://api.github.com/repos/IndrajeetPatil/ggstatsplot/deployments",
   "created_at": "2018-01-08T19:16:42Z",
-  "updated_at": "2026-06-14T09:57:10Z",
+  "updated_at": "2026-07-16T11:43:17Z",
   "pushed_at": "2026-05-03T09:46:52Z",
   "git_url": "git://github.com/IndrajeetPatil/ggstatsplot.git",
   "ssh_url": "git@github.com:IndrajeetPatil/ggstatsplot.git",
@@ -74,8 +74,8 @@
   "svn_url": "https://github.com/IndrajeetPatil/ggstatsplot",
   "homepage": "https://www.indrapatil.com/ggstatsplot/",
   "size": 2597360,
-  "stargazers_count": 2190,
-  "watchers_count": 2190,
+  "stargazers_count": 2189,
+  "watchers_count": 2189,
   "language": "R",
   "has_issues": true,
   "has_projects": false,
@@ -83,7 +83,7 @@
   "has_wiki": false,
   "has_pages": true,
   "has_discussions": false,
-  "forks_count": 203,
+  "forks_count": 202,
   "mirror_url": null,
   "archived": false,
   "disabled": false,
@@ -113,9 +113,9 @@
     "statistical-analysis"
   ],
   "visibility": "public",
-  "forks": 203,
+  "forks": 202,
   "open_issues": 0,
-  "watchers": 2190,
+  "watchers": 2189,
   "default_branch": "main",
   "permissions": {
     "admin": false,
@@ -125,6 +125,6 @@
     "pull": false
   },
   "temp_clone_token": "",
-  "network_count": 203,
+  "network_count": 202,
   "subscribers_count": 40
 }
