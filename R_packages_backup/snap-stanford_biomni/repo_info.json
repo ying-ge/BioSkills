@@ -66,16 +66,16 @@
   "releases_url": "https://api.github.com/repos/snap-stanford/Biomni/releases{/id}",
   "deployments_url": "https://api.github.com/repos/snap-stanford/Biomni/deployments",
   "created_at": "2025-03-19T21:06:53Z",
-  "updated_at": "2026-06-18T03:54:17Z",
-  "pushed_at": "2026-06-15T18:43:05Z",
+  "updated_at": "2026-07-18T03:37:44Z",
+  "pushed_at": "2026-07-13T19:14:42Z",
   "git_url": "git://github.com/snap-stanford/Biomni.git",
   "ssh_url": "git@github.com:snap-stanford/Biomni.git",
   "clone_url": "https://github.com/snap-stanford/Biomni.git",
   "svn_url": "https://github.com/snap-stanford/Biomni",
   "homepage": "https://biomni.stanford.edu",
   "size": 5441,
-  "stargazers_count": 3221,
-  "watchers_count": 3221,
+  "stargazers_count": 3502,
+  "watchers_count": 3502,
   "language": "Python",
   "has_issues": true,
   "has_projects": true,
@@ -83,11 +83,11 @@
   "has_wiki": true,
   "has_pages": false,
   "has_discussions": false,
-  "forks_count": 596,
+  "forks_count": 629,
   "mirror_url": null,
   "archived": false,
   "disabled": false,
-  "open_issues_count": 70,
+  "open_issues_count": 72,
   "license": {
     "key": "apache-2.0",
     "name": "Apache License 2.0",
@@ -106,9 +106,9 @@
     "biomedicine"
   ],
   "visibility": "public",
-  "forks": 596,
-  "open_issues": 70,
-  "watchers": 3221,
+  "forks": 629,
+  "open_issues": 72,
+  "watchers": 3502,
   "default_branch": "main",
   "permissions": {
     "admin": false,
@@ -142,6 +142,6 @@
     "user_view_type": "public",
     "site_admin": false
   },
-  "network_count": 596,
-  "subscribers_count": 36
+  "network_count": 629,
+  "subscribers_count": 38
 }
