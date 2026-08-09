@@ -1,1 +1,1 @@
-matplotlib|success|9.57|core|
+xlrd|success|0.09|data_processing|
