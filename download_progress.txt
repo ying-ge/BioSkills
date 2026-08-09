@@ -1,1 +1,1 @@
-xlrd|success|0.09|data_processing|
+huggingface_hub|success|0.75|deep_learning|
