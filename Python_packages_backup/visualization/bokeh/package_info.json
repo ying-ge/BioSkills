@@ -1,9 +1,9 @@
 {
   "name": "bokeh",
   "category": "visualization",
-  "download_time": "2026-07-09 00:55:49",
+  "download_time": "2026-08-09 02:13:20",
   "files": [
-    "bokeh-3.9.1-py3-none-any.whl"
+    "bokeh-3.9.2-py3-none-any.whl"
   ],
   "size_mb": 6.11,
   "status": "success",
