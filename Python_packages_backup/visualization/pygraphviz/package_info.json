@@ -1,9 +1,9 @@
 {
   "name": "pygraphviz",
   "category": "visualization",
-  "download_time": "2026-07-09 00:55:52",
+  "download_time": "2026-08-09 02:13:23",
   "files": [
-    "pygraphviz-2.0-cp312-cp312-manylinux_2_28_x86_64.whl"
+    "pygraphviz-2.0.1-cp312-cp312-manylinux_2_28_x86_64.whl"
   ],
   "size_mb": 5.11,
   "status": "success",

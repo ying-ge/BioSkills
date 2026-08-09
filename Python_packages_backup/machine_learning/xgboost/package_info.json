@@ -1,11 +1,11 @@
 {
   "name": "xgboost",
   "category": "machine_learning",
-  "download_time": "2026-07-09 00:55:07",
+  "download_time": "2026-08-09 02:12:29",
   "files": [
-    "xgboost-3.3.0-py3-none-manylinux_2_28_x86_64.whl"
+    "xgboost-3.4.0-py3-none-manylinux_2_28_x86_64.whl"
   ],
-  "size_mb": 94.14,
+  "size_mb": 54.95,
   "status": "success",
   "estimated_size": null
 }

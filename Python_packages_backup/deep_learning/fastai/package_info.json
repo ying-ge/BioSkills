@@ -1,9 +1,9 @@
 {
   "name": "fastai",
   "category": "deep_learning",
-  "download_time": "2026-07-09 00:54:43",
+  "download_time": "2026-08-09 02:12:03",
   "files": [
-    "fastai-2.8.7-py3-none-any.whl"
+    "fastai-2.8.8-py3-none-any.whl"
   ],
   "size_mb": 0.23,
   "status": "success",

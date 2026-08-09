@@ -1,0 +1,11 @@
+{
+  "name": "vdjtools",
+  "category": "immunology",
+  "download_time": "2026-08-09 02:12:24",
+  "files": [
+    "vdjtools-3.1.2-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl"
+  ],
+  "size_mb": 1.52,
+  "status": "success",
+  "estimated_size": null
+}
