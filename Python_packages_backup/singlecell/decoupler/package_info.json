@@ -1,11 +1,11 @@
 {
   "name": "decoupler",
   "category": "singlecell",
-  "download_time": "2026-07-09 00:55:35",
+  "download_time": "2026-08-09 02:13:03",
   "files": [
-    "decoupler-2.1.6-py3-none-any.whl"
+    "decoupler-2.2.0-py3-none-any.whl"
   ],
-  "size_mb": 0.12,
+  "size_mb": 0.14,
   "status": "success",
   "estimated_size": null
 }
