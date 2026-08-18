@@ -79,11 +79,11 @@
   "language": "R",
   "has_issues": true,
   "has_projects": true,
-  "has_downloads": true,
+  "has_downloads": false,
   "has_wiki": true,
   "has_pages": false,
   "has_discussions": false,
-  "forks_count": 47,
+  "forks_count": 46,
   "mirror_url": null,
   "archived": false,
   "disabled": false,
@@ -98,7 +98,7 @@
 
   ],
   "visibility": "public",
-  "forks": 47,
+  "forks": 46,
   "open_issues": 29,
   "watchers": 144,
   "default_branch": "master",
@@ -110,6 +110,6 @@
     "pull": false
   },
   "temp_clone_token": "",
-  "network_count": 47,
+  "network_count": 46,
   "subscribers_count": 9
 }
