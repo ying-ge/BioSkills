@@ -79,11 +79,11 @@
   "language": "Jupyter Notebook",
   "has_issues": true,
   "has_projects": true,
-  "has_downloads": true,
+  "has_downloads": false,
   "has_wiki": false,
   "has_pages": false,
   "has_discussions": false,
-  "forks_count": 15,
+  "forks_count": 13,
   "mirror_url": null,
   "archived": false,
   "disabled": false,
@@ -98,7 +98,7 @@
 
   ],
   "visibility": "public",
-  "forks": 15,
+  "forks": 13,
   "open_issues": 4,
   "watchers": 17,
   "default_branch": "master",
@@ -134,6 +134,6 @@
     "user_view_type": "public",
     "site_admin": false
   },
-  "network_count": 15,
+  "network_count": 13,
   "subscribers_count": 5
 }
