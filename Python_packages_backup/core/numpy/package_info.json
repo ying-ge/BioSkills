@@ -1,11 +1,11 @@
 {
   "name": "numpy",
   "category": "core",
-  "download_time": "2026-08-09 02:11:45",
+  "download_time": "2026-09-09 04:15:24",
   "files": [
-    "numpy-2.5.1-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl"
+    "numpy-2.5.3-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl"
   ],
-  "size_mb": 15.9,
+  "size_mb": 15.94,
   "status": "success",
   "estimated_size": null
 }

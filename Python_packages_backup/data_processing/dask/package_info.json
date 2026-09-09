@@ -1,11 +1,11 @@
 {
   "name": "dask",
   "category": "data_processing",
-  "download_time": "2026-08-09 02:11:54",
+  "download_time": "2026-09-09 04:15:33",
   "files": [
-    "dask-2026.7.1-py3-none-any.whl"
+    "dask-2026.8.0-py3-none-any.whl"
   ],
-  "size_mb": 1.43,
+  "size_mb": 1.42,
   "status": "success",
   "estimated_size": null
 }

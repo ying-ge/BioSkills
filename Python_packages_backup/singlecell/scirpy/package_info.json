@@ -1,9 +1,9 @@
 {
   "name": "scirpy",
   "category": "singlecell",
-  "download_time": "2026-08-09 02:13:05",
+  "download_time": "2026-09-09 04:16:41",
   "files": [
-    "scirpy-0.25.0-py3-none-any.whl"
+    "scirpy-0.25.1-py3-none-any.whl"
   ],
   "size_mb": 4.66,
   "status": "success",
