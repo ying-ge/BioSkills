@@ -1,1 +1,1 @@
-lightgbm|success|3.31|machine_learning|
+scvi-tools|success|0.68|singlecell|
