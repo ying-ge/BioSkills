@@ -1,1 +1,1 @@
-napari-spatialdata|success|0.1|singlecell|
+networkx|success|1.97|visualization|
