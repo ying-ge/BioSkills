@@ -1,1 +1,1 @@
-pandas|success|10.49|core|
+polars|success|0.83|data_processing|
