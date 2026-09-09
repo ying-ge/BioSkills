@@ -1,1 +1,1 @@
-scvi-tools|success|0.68|singlecell|
+CellBender|success|0.13|singlecell|
