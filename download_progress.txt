@@ -1,1 +1,1 @@
-CellBender|success|0.13|singlecell|
+SnapATAC2|success|26.86|singlecell|
