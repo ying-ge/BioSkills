@@ -1,11 +1,11 @@
 {
   "name": "matplotlib",
   "category": "core",
-  "download_time": "2026-09-09 04:15:30",
+  "download_time": "2026-10-09 05:42:12",
   "files": [
-    "matplotlib-3.11.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl"
+    "matplotlib-3.11.2-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl"
   ],
-  "size_mb": 9.57,
+  "size_mb": 9.4,
   "status": "success",
   "estimated_size": null
 }
