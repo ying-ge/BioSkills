@@ -1,11 +1,11 @@
 {
   "name": "scikit-learn",
   "category": "machine_learning",
-  "download_time": "2026-09-09 04:16:04",
+  "download_time": "2026-10-09 05:42:45",
   "files": [
-    "scikit_learn-1.9.0-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl"
+    "scikit_learn-1.9.1-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl"
   ],
-  "size_mb": 8.71,
+  "size_mb": 8.74,
   "status": "success",
   "estimated_size": null
 }
