@@ -1,11 +1,11 @@
 {
   "name": "immunarch",
   "category": "immunology",
-  "download_time": "2026-09-09 04:16:00",
+  "download_time": "2026-10-09 05:42:41",
   "files": [
-    "immunarch-0.0.1.dev0-py3-none-any.whl"
+    "immunarch-0.2.0a1-py3-none-any.whl"
   ],
-  "size_mb": 0.0,
+  "size_mb": 0.02,
   "status": "success",
   "estimated_size": null
 }

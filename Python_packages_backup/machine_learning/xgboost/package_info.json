@@ -1,7 +1,7 @@
 {
   "name": "xgboost",
   "category": "machine_learning",
-  "download_time": "2026-09-09 04:16:06",
+  "download_time": "2026-10-09 05:42:46",
   "files": [
     "xgboost-3.4.1-py3-none-manylinux_2_28_x86_64.whl"
   ],
