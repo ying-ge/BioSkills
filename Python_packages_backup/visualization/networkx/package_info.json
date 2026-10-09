@@ -1,11 +1,11 @@
 {
   "name": "networkx",
   "category": "visualization",
-  "download_time": "2026-09-09 04:16:56",
+  "download_time": "2026-10-09 05:43:31",
   "files": [
-    "networkx-3.6.1-py3-none-any.whl"
+    "networkx-3.7-py3-none-any.whl"
   ],
-  "size_mb": 1.97,
+  "size_mb": 2.04,
   "status": "success",
   "estimated_size": null
 }
