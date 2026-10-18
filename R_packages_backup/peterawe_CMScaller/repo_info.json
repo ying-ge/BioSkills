@@ -83,7 +83,7 @@
   "has_wiki": true,
   "has_pages": false,
   "has_discussions": false,
-  "forks_count": 20,
+  "forks_count": 19,
   "mirror_url": null,
   "archived": false,
   "disabled": false,
@@ -104,7 +104,7 @@
 
   ],
   "visibility": "public",
-  "forks": 20,
+  "forks": 19,
   "open_issues": 6,
   "watchers": 36,
   "default_branch": "master",
@@ -116,6 +116,6 @@
     "pull": false
   },
   "temp_clone_token": "",
-  "network_count": 20,
+  "network_count": 19,
   "subscribers_count": 5
 }
