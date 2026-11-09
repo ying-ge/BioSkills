@@ -1,1 +1,1 @@
-biopython|success|3.1|genomics|
+pyfaidx|success|0.03|genomics|
