@@ -1,1 +1,1 @@
-networkx|success|2.04|visualization|
+setuptools|success|0.84|core|
