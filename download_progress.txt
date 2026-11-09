@@ -1,1 +1,1 @@
-setuptools|success|0.84|core|
+keras|success|2.29|deep_learning|
